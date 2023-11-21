@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Globalization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace RecordBook.Pages
@@ -14,6 +14,7 @@ namespace RecordBook.Pages
 
         public void OnGet()
         {
+            ViewData["TimeStamp"] = DateTime.Now.ToString("d", new CultureInfo("ru-RUS"));
         }
     }
 }
