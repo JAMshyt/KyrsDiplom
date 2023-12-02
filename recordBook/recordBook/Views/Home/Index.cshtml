@@ -1,0 +1,18 @@
+﻿@model UserViewModel
+@{
+	ViewData["Title"] = "Вход";
+}
+
+<div class="text-center">
+	<h1 class="display-4">Авторизация</h1>
+	<form method="post" asp-action="Index"  asp-asp-controller="Home">
+		<input type="text"  asp-for="Login" placeholder="Логин" style="width:400px"><br>
+		<span asp-validation-for="Login" style="color:red;"></span><br>
+		<input type="text" asp-for="Password" placeholder="Пароль" style="width:400px"><br>
+		<span asp-validation-for="Password" style="color:red;"></span><br>
+		<input type="submit" value="Войти" class="buton1">
+	</form>
+	<form>
+		<input type="submit" value="Зарегистрироваться" class="buton2">
+	</form>
+</div>

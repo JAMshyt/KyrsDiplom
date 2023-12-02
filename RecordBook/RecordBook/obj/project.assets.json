@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\RecordBook\\RecordBook\\RecordBook.csproj",
-      "projectName": "RecordBook",
-      "projectPath": "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\RecordBook\\RecordBook\\RecordBook.csproj",
+      "projectUniqueName": "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\recordBook\\recordBook\\recordBook.csproj",
+      "projectName": "recordBook",
+      "projectPath": "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\recordBook\\recordBook\\recordBook.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\RecordBook\\RecordBook\\obj\\",
+      "outputPath": "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\recordBook\\recordBook\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
