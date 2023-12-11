@@ -46,3 +46,30 @@ button.accept-policy {
   white-space: nowrap;
   line-height: 60px;
 }
+
+.container {
+    float:right;
+    margin-right:50px;
+}
+
+.navBoard {
+    font-size: 20px;
+    margin-top: 110px;
+    margin-left: 20px;
+    float: left;
+    border: 20px solid #13547156;
+    border-radius: 50px;
+
+}
+
+
+
+
+
+/*button {
+    border: 10px solid #13547156;
+    margin: 0px 0px 0px 0px;
+    padding: 10px;
+    background-color: #fff;
+    text-align: center;
+}*/

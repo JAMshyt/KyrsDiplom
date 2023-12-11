@@ -1,0 +1,14 @@
+﻿using recordBook.Models;
+
+namespace recordBook.RInterface
+{
+	public interface IDepartment_worker_Academic_performance
+	{
+		Task AddDepartment_worker_Academic_performance(Department_worker_Academic_performance department_worker_academic_performance);
+		Task DeleteDepartment_worker_Academic_performance(Department_worker_Academic_performance department_worker_academic_performance);
+		Task UpdateDepartment_worker_Academic_performance(Department_worker_Academic_performance department_worker_academic_performance);
+		Task<Department_worker_Academic_performance?> GetDepartment_worker_Academic_performance(Department_worker_Academic_performance department_worker_academic_performance);
+		Task<Department_worker_Academic_performance?> GetDepartment_worker_Academic_performancebyID(int Id);
+		IQueryable<Department_worker_Academic_performance> GetAllDepartment_worker_Academic_performance();
+	}
+}

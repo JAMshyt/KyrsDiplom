@@ -1,0 +1,71 @@
+﻿@using recordBook.Models
+@using recordBook.Models.ViewModels
+
+@model GroupsStudents
+@*@Model.Groups *@
+@{
+	ViewData["Title"] = "Студенты групы " + Model.selectedGroup.Name_group;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>Выберите группу</p>
+
+<form asp-controller="Home" asp-action="ShowData">
+	<select name="selectedGroup" @*id="select"*@ required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
+		@foreach (var groups in Model.Groups)
+		{
+			if (groups.ID_Group == Model.selectedGroup.ID_Group)
+			{
+				<option value="@groups.ID_Group" selected>@groups.Name_group</option>
+			}
+			else
+			{
+				<option value="@groups.ID_Group" >@groups.Name_group</option>
+			}
+		}
+	</select>
+</form>
+
+<table class="table" id="myTable">
+
+	<thead>
+		<tr>
+			<th id="tableLabel">
+				<h6 style="margin-bottom : 0px; text-align:center;">Фамилия</h6>
+			</th>
+			<th id="tableLabel">
+				<h6 style="margin-bottom : 0px; text-align:center;">Имя</h6>
+			</th>
+			<th id="tableLabel">
+				<h6 style="margin-bottom : 0px; text-align:center;">Отчество</h6>
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
+		{
+		//var data = item.Date.ToString("dd MMMM yyyy");
+			<tr style="cursor: pointer">
+				<td style="text-align:center;font-weight: bold">
+					<p id="label_s">@Html.DisplayFor(modelItem => item.Surname)</p>
+				</td>
+				<td style="text-align:center;font-weight: bold ">
+					<p id="label_s">@Html.DisplayFor(modelItem => item.Name)</p>
+				</td>
+				<td style="text-align:center;font-weight: bold ">
+					<p id="label_s">@Html.DisplayFor(modelItem => item.Patronymic)</p>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
+
+@*<script>
+	document.addEventListener("DOMContentLoaded",function () {
+			document.querySelector('select').addEventListener
+			('change', function () {
+				var selectetGroup = this.options[this.selectedIndex].text;
+				alert(selectetGroup)
+			})})
+</script>*@

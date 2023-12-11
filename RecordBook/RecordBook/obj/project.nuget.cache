@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "qUB6JTCLJRRIHERwkN0eZMy3VNZs73QEQUQMg8qBMJFmg9necZcHhv+Jc9CZpQEMwOKVxLD6JrnQ1eJtGVBjUQ==",
+  "dgSpecHash": "v/N2boDhGBxkU6hw10QFaNIVuMaABV8zuOSQNoisNyYrqRYHWf7tIDP7M0nzhRMdy5ZwV3+LwnJPnuHjhoijLQ==",
   "success": true,
-  "projectFilePath": "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\recordBook\\recordBook\\recordBook.csproj",
+  "projectFilePath": "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\RecordBook\\recordBook\\recordBook.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\User\\.nuget\\packages\\azure.core\\1.24.0\\azure.core.1.24.0.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\azure.identity\\1.6.0\\azure.identity.1.6.0.nupkg.sha512",

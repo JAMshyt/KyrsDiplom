@@ -1,13 +1,28 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using recordBook;
 using recordBook.Models;
 
+namespace recordBook { 
+public class Program
+{
+		public static void Main(string[] args)
+		{
+			CreateHostBuilder(args).Build().Run();
+		}
+		public static IHostBuilder CreateHostBuilder(string[] args) =>
+			Host.CreateDefaultBuilder(args)
+			.ConfigureWebHostDefaults(webBuilder =>
+			{
+				webBuilder.UseStartup<Startup>();
+			});
+}/*
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-string connection = builder.Configuration.GetConnectionString("DefaultConnection");
+/*string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // добавляем контекст ApplicationContext в качестве сервиса в приложение
 builder.Services.AddDbContext<Context>(options => options.UseSqlServer(connection));
@@ -34,4 +49,6 @@ app.MapControllerRoute(
 	name: "default",
 	pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.Run();
+app.Run();*/
+}
+
