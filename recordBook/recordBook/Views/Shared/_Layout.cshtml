@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>@ViewData["Title"] - recordBook</title>
+	<title>@ViewData["Title"]</title>
 	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/recordBook.styles.css" asp-append-version="true" />
@@ -23,7 +23,7 @@
 							<a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Главная</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Отчислиться</a>
+							<a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="ShowData">Отчислиться</a>
 						</li>
 					</ul>
 				</div>
@@ -44,12 +44,12 @@
 				background-color: white;
 			}
 
-				input:nth-child(2) {
+				input:nth-child(1) {
 					border-top-left-radius: 25px;
 					border-top-right-radius: 25px;
 				}
 
-				input:nth-child(8) {
+				input:nth-child(7) {
 					border-bottom-left-radius: 25px;
 					border-bottom-right-radius: 25px;
 				}
@@ -57,7 +57,7 @@
 		</style>
 		<form>
 			<input type="submit" asp-action="Index" asp-controller="Home" value="Экзамены"><br>
-			<input type="submit" asp-action="ShowData" asp-controller="Home" value="Рейтинг-контроль"><br>
+			<input type="submit" asp-action="AddStudent" asp-controller="Home" value="Добавления студента"><br>
 			<input type="submit" asp-action="ShowData" asp-controller="Home" value="Посещаемость"><br>
 			<input type="submit" asp-action="ShowData" asp-controller="Home" value="Просмотр групп"><br>
 		</form>

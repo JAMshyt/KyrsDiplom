@@ -2,14 +2,17 @@
 
 namespace recordBook.Models
 {
-	public class Student
-	{
-		[Key]
-		public int ID_Student { get; set; }
-		public string Surname { get; set; }
-		public string Name { get; set; }
-		public string Patronymic { get; set; }
-		public int ID_Group { get; set; }
+    public class Student
+    {
+        [Key]
+        public int ID_Student { get; set; }
+        [Required(ErrorMessage = "Заполните фамилию")]
+        public string Surname { get; set; }
+        [Required(ErrorMessage = "Заполните имя")]
+        public string Name { get; set; }
+        public string Patronymic { get; set; }
+        //[Required(ErrorMessage = "Выберите группу")]
+        public int ID_Group { get; set; }
 
-	}
+    }
 }

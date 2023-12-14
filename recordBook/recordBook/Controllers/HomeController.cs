@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Net;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -103,13 +104,21 @@ namespace recordBook.Controllers
 		//Get таблиц
 
 		//Страницы
-		public async Task<IActionResult> ShowData(int selectedGroup)
+		public async Task<IActionResult> ShowData(int selectedGroup, int selectedStudent)
 		{
+			if (selectedStudent > 0)//ТОЛЬКО УДАЛЕНИЕ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			{
+				var StudentToRemove = _student.GetStudentbyID(selectedStudent).Result;
+				Group GroupOfDeletedStudent = _group.GetGroupbyID(StudentToRemove.ID_Group).Result;
+				await _student.DeleteStudent(StudentToRemove);
+				var model = new GroupsStudents { Groups = GetGroups(), Students = GetStudents(), selectedGroup = GroupOfDeletedStudent };
+				return View(model);
+			}
+
 			if (selectedGroup > 0)
 			{
-				var groupById = _group.GetGroupbyID(selectedGroup);
-				var gr = groupById.Result;
-				var model = new GroupsStudents { Groups = GetGroups(), Students = GetStudents(), selectedGroup = gr };
+				var groupById = _group.GetGroupbyID(selectedGroup).Result;
+				var model = new GroupsStudents { Groups = GetGroups(), Students = GetStudents(), selectedGroup = groupById };
 				return View(model);
 			}
 			else
@@ -117,29 +126,35 @@ namespace recordBook.Controllers
 				var model = new GroupsStudents { Groups = GetGroups(), Students = GetStudents(), selectedGroup = GetGroups().FirstOrDefault() };
 				return View(model);
 			}
+
 		}
 
-		//await db.Students.ToListAsync()
+		public async Task<IActionResult> AddStudent()
+		{
+			var model2 = new DeleteStudentneedGroup {Groups = GetGroups()};
+			return View(model2);
+		}
 
-
-		//[HttpPost]
-		//public async Task<IActionResult> Create(Student student)
-		//{
-		//	db.Students.Add(student);
-		//	await db.SaveChangesAsync();
-		//	return RedirectToAction("Index");
-		//}
-
+		[HttpPost]
+		public async Task<IActionResult> AddStudent(string surname, string name, string patronymic, int selectedGroup, DeleteStudentneedGroup del)
+		{
+			if (ModelState.IsValid)
+			{
+				var addStudent = new Student() { Surname = surname, Name = name, Patronymic = patronymic, ID_Group = selectedGroup };
+				await _student.AddStudent(addStudent);
+				return Content("Студент добавлен");
+			}
+			else
+			{
+				var model2 = new DeleteStudentneedGroup { Groups = GetGroups()};
+				return View(model2);
+			}
+		}
 
 		public IActionResult Index()
 		{
 			return View();
 		}
-
-		//public IActionResult ShowData()
-		//{
-		//	return View();
-		//}
 
 
 		[HttpPost]

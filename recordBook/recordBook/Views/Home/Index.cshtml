@@ -6,7 +6,7 @@
 
 <div class="text-center">
 	<h1 class="display-4">Авторизация</h1>
-	<form method="post" asp-action="Index" asp-asp-controller="Home">
+	<form  asp-action="Index" asp-controller="Home">
 		<input type="text" asp-for="Login" placeholder="Логин" style="width:400px;"><br>
 		<span asp-validation-for="Login" style="color:red;"></span><br>
 		<input type="text" asp-for="Password" placeholder="Пароль" style="width:400px;"><br>

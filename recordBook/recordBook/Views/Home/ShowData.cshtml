@@ -12,7 +12,7 @@
 <p>Выберите группу</p>
 
 <form asp-controller="Home" asp-action="ShowData">
-	<select name="selectedGroup" @*id="select"*@ required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
+	<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
 		@foreach (var groups in Model.Groups)
 		{
 			if (groups.ID_Group == Model.selectedGroup.ID_Group)
@@ -21,7 +21,7 @@
 			}
 			else
 			{
-				<option value="@groups.ID_Group" >@groups.Name_group</option>
+				<option value="@groups.ID_Group">@groups.Name_group</option>
 			}
 		}
 	</select>
@@ -40,13 +40,17 @@
 			<th id="tableLabel">
 				<h6 style="margin-bottom : 0px; text-align:center;">Отчество</h6>
 			</th>
+			<th id="tableLabel">
+				<h6 style="margin-bottom : 0px; text-align:center;">Действие</h6>
+			</th>
 		</tr>
 	</thead>
+	<form asp-controller="Home" asp-action="ShowData">
 	<tbody>
-		@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
-		{
-		//var data = item.Date.ToString("dd MMMM yyyy");
-			<tr style="cursor: pointer">
+			@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
+			{
+			//var data = item.Date.ToString("dd MMMM yyyy");
+			<tr>
 				<td style="text-align:center;font-weight: bold">
 					<p id="label_s">@Html.DisplayFor(modelItem => item.Surname)</p>
 				</td>
@@ -56,9 +60,14 @@
 				<td style="text-align:center;font-weight: bold ">
 					<p id="label_s">@Html.DisplayFor(modelItem => item.Patronymic)</p>
 				</td>
+				<td style="text-align:center;font-weight: bold;">
+					<button name="selectedStudent" value="@item.ID_Student" onclick="this.form.submit()" style="border:1px; font-weight:normal">Удалить</button>
+
+				</td>
 			</tr>
-		}
+			}
 	</tbody>
+	</form>
 </table>
 
 @*<script>
