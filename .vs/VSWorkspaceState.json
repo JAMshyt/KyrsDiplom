@@ -4,9 +4,7 @@
     "\\recordBook",
     "\\recordBook\\recordBook",
     "\\recordBook\\recordBook\\Controllers",
-    "\\recordBook\\recordBook\\Migrations",
     "\\recordBook\\recordBook\\Models"
   ],
-  "SelectedNode": "\\recordBook\\recordBook\\Migrations\\20231203124400_first.cs",
   "PreviewInSolutionExplorer": false
 }

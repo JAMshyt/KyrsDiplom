@@ -11,7 +11,7 @@ namespace recordBook.Models
         [Required(ErrorMessage = "Заполните имя")]
         public string Name { get; set; }
         public string Patronymic { get; set; }
-        //[Required(ErrorMessage = "Выберите группу")]
+        [Required(ErrorMessage = "Выберите группу")]
         public int ID_Group { get; set; }
 
     }

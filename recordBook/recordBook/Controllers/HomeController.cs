@@ -136,7 +136,7 @@ namespace recordBook.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> AddStudent(string surname, string name, string patronymic, int selectedGroup, DeleteStudentneedGroup del)
+		public async Task<IActionResult> AddStudent(string surname, string name, string patronymic, int selectedGroup)
 		{
 			if (ModelState.IsValid)
 			{
