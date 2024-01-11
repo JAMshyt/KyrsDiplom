@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "cf0IREwjuYSfElE5dcCNCVmStbPHhNsskwOC5DBZQ9kP0K5fdVQPEPHgpBpuHdYElGCcxV4rGJsvXnb9BiCz3Q==",
+  "dgSpecHash": "xSedpUr6cR43SXftTjd1L0z6G8BQQM2bG4/7uTWy/V+nJBV6CIQp/bAmb1E9uGjp5W7Ti6CItq/ziV/7ODOulg==",
   "success": true,
-  "projectFilePath": "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\recordBook\\recordBook\\recordBook.csproj",
+  "projectFilePath": "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\RecordBook\\recordBook\\recordBook.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\User\\.nuget\\packages\\azure.core\\1.24.0\\azure.core.1.24.0.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\azure.identity\\1.6.0\\azure.identity.1.6.0.nupkg.sha512",
@@ -70,7 +70,11 @@
     "C:\\Users\\User\\.nuget\\packages\\system.text.json\\7.0.0\\system.text.json.7.0.0.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\system.windows.extensions\\5.0.0\\system.windows.extensions.5.0.0.nupkg.sha512"
+    "C:\\Users\\User\\.nuget\\packages\\system.windows.extensions\\5.0.0\\system.windows.extensions.5.0.0.nupkg.sha512",
+    "C:\\Users\\User\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\7.0.15\\microsoft.windowsdesktop.app.ref.7.0.15.nupkg.sha512",
+    "C:\\Users\\User\\.nuget\\packages\\microsoft.netcore.app.ref\\7.0.15\\microsoft.netcore.app.ref.7.0.15.nupkg.sha512",
+    "C:\\Users\\User\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\7.0.15\\microsoft.aspnetcore.app.ref.7.0.15.nupkg.sha512",
+    "C:\\Users\\User\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\7.0.15\\microsoft.netcore.app.host.win-x64.7.0.15.nupkg.sha512"
   ],
   "logs": []
 }

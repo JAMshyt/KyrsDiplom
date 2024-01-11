@@ -2,8 +2,5 @@
 # Данный GITIGNORE-файл был автоматически создан Microsoft(R) Visual Studio.
 ################################################################################
 
-/.vs/КурсачДипломРепоз/FileContentIndex/94577b07-1ce3-4904-81ed-7337b7326062.vsidx
-/.vs/КурсачДипломРепоз/FileContentIndex/2410a48f-8d4b-48c7-8aae-2537e007cf99.vsidx
-/.vs/КурсачДипломРепоз/FileContentIndex/99d22677-ddc0-431f-bb1c-eac3d39a2470.vsidx
-/.vs/КурсачДипломРепоз/FileContentIndex/c0b0387d-3ba5-4cca-96ea-646067d75a8b.vsidx
-/.vs/КурсачДипломРепоз/FileContentIndex/f1c45cda-aa8f-49ae-9ff0-399dea3e3dd8.vsidx
+/.vs
+/recordBook/.vs

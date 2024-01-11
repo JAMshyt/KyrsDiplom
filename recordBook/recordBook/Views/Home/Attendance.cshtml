@@ -1,0 +1,82 @@
+﻿@using recordBook.Models
+@using recordBook.Models.ViewModels
+
+@model AttendanceStudents
+@*@Model.Groups*@
+@{
+	ViewData["Title"] = "Посещаемость групы " + Model.selectedGroup.Name_group;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>Выберите группу</p>
+
+<form asp-controller="Home" asp-action="Attendance">
+	<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
+		@foreach (var groups in Model.Groups)
+		{
+			if (groups.ID_Group == Model.selectedGroup.ID_Group)
+			{
+				<option value="@groups.ID_Group" selected>@groups.Name_group</option>
+			}
+			else
+			{
+				<option value="@groups.ID_Group">@groups.Name_group</option>
+			}
+		}
+	</select>
+
+	<select name="selectedSubject" required onchange="this.form.submit()" style="width:200px; height:40px; text-align:center">
+		@foreach (var subj in Model.Subjects)
+		{
+			if (Model.Group_Subjects.Where(z => z.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(subj.ID_Subject))
+			{
+				if (subj.ID_Subject == Model.selectedSubject.ID_Subject)
+				{
+					<option value="@subj.ID_Subject" selected>@subj.Name_subject</option>
+				}
+				else
+				{
+					<option value="@subj.ID_Subject">@subj.Name_subject</option>
+				}
+			}
+		}
+	</select>
+</form>
+
+
+<table class="table" id="myTable">
+
+	<thead>
+		<tr>
+			<th id="tableLabel">
+				<h6 style="margin-bottom : 0px; text-align:center;">Ученик</h6>
+			</th>
+			@foreach(var dat in Model.Attendances.Where()){
+				var data = dat.Date_presence.ToString("dd.MM");
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center;">@data</h6>
+				</th>
+			}
+		</tr>
+	</thead>
+	<form asp-controller="Home" asp-action="Attendance">
+	<tbody>
+			@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
+			{
+				//var data = item.Date.ToString("dd MMMM yyyy");]]
+			<tr>
+				<td style="text-align:center;font-weight: bold">
+					<p id="label_s">@Html.DisplayFor(modelItem => item.Surname)</p>
+				</td>
+					@foreach (var item2 in Model.Attendances.Where(z => z.ID_Student == item.ID_Student).Where(z => z.ID_Subject == Model.selectedSubject.ID_Subject))
+					{
+					<td style="text-align:center;font-weight: bold">
+						<p id="label_s" style="border:none;">@Html.DisplayFor(modelItem => item2.Precense)</p>
+					</td>
+					}
+			</tr>
+			}
+	</tbody>
+	</form>
+</table>
