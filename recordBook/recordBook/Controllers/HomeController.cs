@@ -129,9 +129,39 @@ namespace recordBook.Controllers
 
 		}
 
+		public async Task<IActionResult> ExamsMarks(int selectedGroup, int selectedSubject)
+		{
+
+			if (selectedGroup > 0 & selectedSubject>0)
+			{
+				var groupById = _group.GetGroupbyID(selectedGroup).Result;
+				var subjectById = _subject.GetSubjectbyID(selectedSubject).Result;
+				var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = groupById, selectedSubject = subjectById };
+				return View(model);
+			}
+			if (selectedGroup > 0 )
+			{
+				var groupById = _group.GetGroupbyID(selectedGroup).Result;
+				var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = groupById, selectedSubject = GetSubjects().FirstOrDefault() };
+				return View(model);
+			}
+			if ( selectedSubject > 0)
+			{
+				var subjectById = _subject.GetSubjectbyID(selectedSubject).Result;
+				var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = GetGroups().FirstOrDefault(), selectedSubject = subjectById };
+				return View(model);
+			}
+			else
+			{
+				var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = GetGroups().FirstOrDefault(), selectedSubject = GetSubjects().FirstOrDefault() };
+				return View(model);
+			}
+
+		}
+
 		public async Task<IActionResult> AddStudent()
 		{
-			var model2 = new DeleteStudentneedGroup {Groups = GetGroups()};
+			var model2 = new AddStudentViewModel {Groups = GetGroups()};
 			return View(model2);
 		}
 
@@ -146,7 +176,7 @@ namespace recordBook.Controllers
 			}
 			else
 			{
-				var model2 = new DeleteStudentneedGroup { Groups = GetGroups()};
+				var model2 = new AddStudentViewModel { Groups = GetGroups()};
 				return View(model2);
 			}
 		}

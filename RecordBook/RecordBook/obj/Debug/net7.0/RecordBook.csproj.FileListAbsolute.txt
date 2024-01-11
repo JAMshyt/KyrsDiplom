@@ -75,3 +75,4 @@ D:\Лабы\ещё один курс\КурсачДипломРепоз\RecordBo
 D:\Лабы\ещё один курс\КурсачДипломРепоз\RecordBook\recordBook\bin\Debug\net7.0\Mono.TextTemplating.dll
 D:\Лабы\ещё один курс\КурсачДипломРепоз\RecordBook\recordBook\bin\Debug\net7.0\System.CodeDom.dll
 D:\Лабы\ещё один курс\КурсачДипломРепоз\RecordBook\recordBook\obj\Debug\net7.0\scopedcss\Views\Shared\_IndexLayout.cshtml.rz.scp.css
+D:\Лабы\ещё один курс\КурсачДипломРепоз\RecordBook\recordBook\obj\Debug\net7.0\recordBook.sourcelink.json

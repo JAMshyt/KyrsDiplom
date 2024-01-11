@@ -2,7 +2,7 @@
 
 namespace recordBook.Models.ViewModels
 {
-    public class DeleteStudentneedGroup
+    public class AddStudentViewModel
     {
 
         [Required(ErrorMessage = "Заполните фамилию")]
