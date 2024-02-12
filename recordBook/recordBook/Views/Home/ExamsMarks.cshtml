@@ -8,8 +8,6 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<p>Выберите группу</p>
-
 <form asp-controller="Home" asp-action="ExamsMarks">
 	<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
 		@foreach (var groups in Model.Groups)

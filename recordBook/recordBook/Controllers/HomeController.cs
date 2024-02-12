@@ -156,7 +156,6 @@ namespace recordBook.Controllers
 				var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = GetGroups().FirstOrDefault(), selectedSubject = GetSubjects().FirstOrDefault() };
 				return View(model);
 			}
-
 		}
 
 		public async Task<IActionResult> AddStudent()
