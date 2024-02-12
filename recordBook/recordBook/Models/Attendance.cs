@@ -9,8 +9,8 @@ namespace recordBook.Models
 		public int ID_Attendance { get; set; }
 		public int ID_Subject { get; set; }
 		public int ID_Student { get; set; }
-		public DateTime Date_precense { get; set; }
+		public DateTime Date_presence { get; set; }
 		public bool Precense { get; set; }
-		public int ID_Department_worker { get; set; }
+		//public int ID_Department_worker { get; set; }
 	}
 }

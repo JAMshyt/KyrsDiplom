@@ -9,6 +9,7 @@ namespace recordBook.RInterface
 		Task UpdateGroup_Subject(Group_Subject group_subject);
 		Task<Group_Subject?> GetGroup_Subject(Group_Subject group_subject);
 		Task<Group_Subject?> GetGroup_SubjectbyID(int Id);
-		IQueryable<Group_Subject> GetAllGroup_Subject();
+        IQueryable<Group_Subject> GetGroup_SubjectbyGroupID(int GroupId);
+        IQueryable<Group_Subject> GetAllGroup_Subject();
 	}
 }

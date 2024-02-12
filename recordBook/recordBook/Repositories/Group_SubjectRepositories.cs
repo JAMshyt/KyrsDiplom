@@ -29,7 +29,12 @@ namespace recordBook.Repositories
 			return _context.Group_Subject.AsQueryable();
 		}
 
-		public Task<Group_Subject?> GetGroup_Subject(Group_Subject group_subject)
+        public IQueryable<Group_Subject> GetGroup_SubjectbyGroupID(int GroupId)
+        {
+            return GetAllGroup_Subject().Where(x => x.ID_Group == GroupId).AsQueryable();
+        }
+
+        public Task<Group_Subject?> GetGroup_Subject(Group_Subject group_subject)
 		{
 			return GetAllGroup_Subject().Where(x => x.ID_Group_Subject == group_subject.ID_Group_Subject).FirstOrDefaultAsync();
 		}
@@ -39,7 +44,7 @@ namespace recordBook.Repositories
 			return GetAllGroup_Subject().Where(x => x.ID_Group_Subject == Id).FirstOrDefaultAsync();
 		}
 
-		public async Task UpdateGroup_Subject(Group_Subject group_subject)
+        public async Task UpdateGroup_Subject(Group_Subject group_subject)
 		{
 			_context.Group_Subject.Update(group_subject);
 			await _context.SaveChangesAsync();

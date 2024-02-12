@@ -1,12 +1,16 @@
-﻿@using recordBook.Models
-@using recordBook.Models.ViewModels
+﻿@* @using recordBook.Models
+@using recordBook.Models.ViewModels *@
 
-@model AddStudentViewModel
+@model recordBook.Models.ViewModels.AddStudentViewModel;
 @{
 	ViewBag.Title = "Добавление студента";
 }
 
-<form asp-action="AddStudent" asp-controller="home">
+<form asp-action="AddStudent" asp-controller="Home">
+	@if (Model.studentAdded)
+	{
+		<span style="color:green;">Студент @Model.Surname @Model.Name @Model.Patronymic добавлен </span>
+	}
 	<div class="form-group">
 		<label asp-for="Surname" class="control-label">Фамилия</label>
 		<span asp-validation-for="Surname" style="color:Red;"></span>
@@ -22,8 +26,8 @@
 		<input type="text" asp-for="Patronymic" class="form-control" />
 	</div>
 	<div class="form-group">
-		<label asp-for="ID_Group" class="control-label">Группа</label>
-		<select name="selectedGroup" style="width:120px; height:40px; text-align:center; margin-top:10px;">
+		<label class="control-label">Группа</label>
+		<select asp-for="ID_Group" style="width:120px; height:40px; text-align:center; margin-top:10px;">
 			@foreach (var groups in Model.Groups)
 			{
 				<option value="@groups.ID_Group">@groups.Name_group</option>
@@ -31,6 +35,6 @@
 		</select>
 	</div>
 	<div class="form-group">
-		<input type="submit" value="Отправить" class="btn btn-default" />
+		<input type="submit" value="Добавить" class="btn btn-success" style="width:100px; margin-top:10px;" />
 	</div>
 </form>

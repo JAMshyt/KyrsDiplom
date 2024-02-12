@@ -1,0 +1,25 @@
+﻿.form-group2 {
+    position: relative;
+    display: inline-block;
+    width: 30%;
+    /*top:50px;*/
+}
+
+
+.form-group3 {
+    position: relative;
+    display: inline-block;
+    width: 30%;
+    margin-left:10%;
+}
+
+.grSelectBtn {
+    text-align:center;
+    width: 100px;
+    border: solid;
+    border-color: gray;
+    border-width: 1px;
+    height: 45px;
+    border-radius:100px;
+}
+

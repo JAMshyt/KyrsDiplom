@@ -1,0 +1,87 @@
+﻿@* @using recordBook.Models
+@using recordBook.Models.ViewModels *@
+
+@model recordBook.Models.ViewModels.AddSubjectViewModel;
+@{
+	ViewBag.Title = "Добавление предмета";
+}
+
+<form asp-action="AddSubject" asp-controller="home">
+	<div class="form-group">
+		<label asp-for="NameSubject" class="control-label">Название</label>
+		<span asp-validation-for="NameSubject" style="color:Red;"></span>
+		<input type="text" asp-for="NameSubject" class="form-control" style="width:30%" />
+	</div>
+	<p style="margin-top:50px; margin-bottom:20px;">Выберите группы, которые изучают предмет</p>
+	<div class="form-group1">
+		<div class="form-group2">
+			@* <select name="selectedGroup" style="width:120px; height:40px; text-align:center;">
+			@foreach (var groups in Model.Groups)
+			{
+			<option value="@groups.ID_Group">@groups.Name_group</option>
+			}
+			</select> *@
+
+			<table class="table" id="myTable">
+				<thead>
+					<tr>
+						<td id="tableLabel">
+							<h6 style="margin-bottom : 0px;">Доступные группы</h6>
+						</td>
+						<td id="tableLabel">
+						</td>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var groups in Model.Groups)
+					{
+						<tr style="text-align:center">
+							<td value="@groups.ID_Group">@groups.Name_group</td>
+							<td>
+
+								<a class="btn btn-outline-success" name="selectedStudent" id="deleteStudent" onclick="selectGroup(@groups.ID_Group)" style="border:1px; font-weight:normal">Выбрать</a>
+							
+							</td>
+						</tr>
+					}
+				</tbody>
+
+			</table>
+
+		</div>
+		<div class="form-group3">
+			<table class="table" id="myTable">
+				<thead>
+					<tr>
+						<td id="tableLabel">
+							<h6 style="margin-bottom : 0px;">Выбранные группы</h6>
+						</td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+					</tr>
+				</tbody>
+
+			</table>
+		</div>
+	</div>
+	<input type="submit" value="Добавить" class="btn btn-success" style="width:100px;" />
+
+</form>
+
+<script type='text/javascript'>
+
+	function selectGroup(Id) {
+		fetch('/Home/DropStudent/' + Id)
+		// .then(function (response) {
+		// 	return response.text();
+		// })
+		// .then(function (html) {
+		// 	myTable.innerHTML = html;
+		// });
+		location.reload();
+		location.reload();
+	}
+
+</script>

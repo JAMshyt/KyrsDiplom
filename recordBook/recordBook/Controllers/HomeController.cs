@@ -104,16 +104,16 @@ namespace recordBook.Controllers
 		//Get таблиц
 
 		//Страницы
-		public async Task<IActionResult> ShowData(int selectedGroup, int selectedStudent)
+		public async Task<IActionResult> ShowData(int selectedGroup)
 		{
-			if (selectedStudent > 0)//ТОЛЬКО УДАЛЕНИЕ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			{
-				var StudentToRemove = _student.GetStudentbyID(selectedStudent).Result;
-				Group GroupOfDeletedStudent = _group.GetGroupbyID(StudentToRemove.ID_Group).Result;
-				await _student.DeleteStudent(StudentToRemove);
-				var model = new GroupsStudents { Groups = GetGroups(), Students = GetStudents(), selectedGroup = GroupOfDeletedStudent };
-				return View(model);
-			}
+			//if (selectedStudent > 0)//ТОЛЬКО УДАЛЕНИЕ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			//{
+			//	var StudentToRemove = _student.GetStudentbyID(selectedStudent).Result;
+			//	Group GroupOfDeletedStudent = _group.GetGroupbyID(StudentToRemove.ID_Group).Result;
+			//	await _student.DeleteStudent(StudentToRemove);
+			//	var model = new GroupsStudents { Groups = GetGroups(), Students = GetStudents(), selectedGroup = GroupOfDeletedStudent };
+			//	return View(model);
+			//}
 
 			if (selectedGroup > 0)
 			{
@@ -135,50 +135,125 @@ namespace recordBook.Controllers
 			if (selectedGroup > 0 & selectedSubject>0)
 			{
 				var groupById = _group.GetGroupbyID(selectedGroup).Result;
-				var subjectById = _subject.GetSubjectbyID(selectedSubject).Result;
-				var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = groupById, selectedSubject = subjectById };
+				var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z=>z.ID_Subject);
+				if(!subjectsOfSelectedGroup.Contains(selectedSubject))
+				{
+					selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
+                }
+                var subjectById = _subject.GetSubjectbyID(selectedSubject).Result;
+                var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = groupById, selectedSubject = subjectById };
 				return View(model);
 			}
-			if (selectedGroup > 0 )
-			{
-				var groupById = _group.GetGroupbyID(selectedGroup).Result;
-				var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = groupById, selectedSubject = GetSubjects().FirstOrDefault() };
-				return View(model);
-			}
-			if ( selectedSubject > 0)
-			{
-				var subjectById = _subject.GetSubjectbyID(selectedSubject).Result;
-				var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = GetGroups().FirstOrDefault(), selectedSubject = subjectById };
-				return View(model);
-			}
+			//else if (selectedGroup > 0 )
+			//{
+			//	var groupById = _group.GetGroupbyID(selectedGroup).Result;
+			//	var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = groupById, selectedSubject = GetSubjects().FirstOrDefault() };
+			//	return View(model);
+			//}
+			//else if ( selectedSubject > 0)
+			//{
+			//	var subjectById = _subject.GetSubjectbyID(selectedSubject).Result;
+			//	var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = GetGroups().FirstOrDefault(), selectedSubject = subjectById };
+			//	return View(model);
+			//}
 			else
 			{
 				var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = GetGroups().FirstOrDefault(), selectedSubject = GetSubjects().FirstOrDefault() };
+				return View(model);
+			}
+
+		}
+
+
+		public async Task<IActionResult> AttendanceOfStudents(int selectedGroup, int selectedSubject)
+		{
+
+			if (selectedGroup > 0 & selectedSubject > 0)
+			{
+				var groupById = _group.GetGroupbyID(selectedGroup).Result;
+				var subjectById = _subject.GetSubjectbyID(selectedSubject).Result;
+				var model = new AttendanceViewModel { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Attendances = GetAttendance(), selectedGroup = groupById, selectedSubject = subjectById };
+				return View(model);
+			}
+			//if (selectedGroup > 0)
+			//{
+			//	var groupById = _group.GetGroupbyID(selectedGroup).Result;
+			//	var model = new AttendanceViewModel { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Attendances = GetAttendance(), selectedGroup = groupById, selectedSubject = GetSubjects().FirstOrDefault() };
+			//	return View(model);
+			//}
+			//if (selectedSubject > 0)
+			//{
+			//	var subjectById = _subject.GetSubjectbyID(selectedSubject).Result;
+			//	var model = new AttendanceViewModel { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Attendances = GetAttendance(), selectedGroup = GetGroups().FirstOrDefault(), selectedSubject = subjectById };
+			//	return View(model);
+			//}
+			else
+			{
+				var model = new AttendanceViewModel { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Attendances = GetAttendance(), selectedGroup = GetGroups().FirstOrDefault(), selectedSubject = GetSubjects().FirstOrDefault() };
 				return View(model);
 			}
 		}
 
 		public async Task<IActionResult> AddStudent()
 		{
-			var model2 = new AddStudentViewModel {Groups = GetGroups()};
+			var model2 = new AddStudentViewModel {Groups = GetGroups(), ID_Group = GetGroups().FirstOrDefault().ID_Group, studentAdded = false };
 			return View(model2);
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> AddStudent(string surname, string name, string patronymic, int selectedGroup)
+		public async Task<IActionResult> AddStudent(AddStudentViewModel addStu)
 		{
 			if (ModelState.IsValid)
 			{
-				var addStudent = new Student() { Surname = surname, Name = name, Patronymic = patronymic, ID_Group = selectedGroup };
+				var addStudent = new Student() { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group };
 				await _student.AddStudent(addStudent);
+                var model2 = new AddStudentViewModel { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, Groups = GetGroups(), studentAdded = true };
+                return View(model2);
+            }
+			else
+			{
+				var model2 = new AddStudentViewModel { Groups = GetGroups(),studentAdded=false};
+				return View(model2);
+			}
+		}
+
+		public async Task<IActionResult> AddSubject()
+		{
+			var model2 = new AddSubjectViewModel { Groups = GetGroups() };
+			return View(model2);
+		}
+
+		[HttpPost]
+		[Route("Home/AddSubject/{Id:int}")]
+		public async Task<IActionResult> AddSubject(AddSubjectViewModel AddSubj)
+		{
+			if (ModelState.IsValid)
+			{
+				//var addSubject = new Subject() { Name_subject = nameSubject };
+				//await _subject.AddSubject(addSubject);
 				return Content("Студент добавлен");
 			}
 			else
 			{
-				var model2 = new AddStudentViewModel { Groups = GetGroups()};
+				var model2 = new AddSubjectViewModel { Groups = GetGroups() };
 				return View(model2);
 			}
 		}
+
+		[HttpGet]
+		[Route("Home/DropStudent/{Id:int}")]
+		public async Task<IActionResult> DropStudent(int Id)
+		{
+			var stu = await _student.GetStudentbyID(Id);
+			if (stu != null)
+			{
+				await _student.DeleteStudent(stu);
+			}
+			return RedirectToAction(nameof(ShowData));
+			//return View("ShowData", model);
+		}
+
+
 
 		public IActionResult Index()
 		{

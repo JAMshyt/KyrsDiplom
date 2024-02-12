@@ -5,10 +5,10 @@
 @*@Model.Groups *@
 @{
 	ViewData["Title"] = "Студенты групы " + Model.selectedGroup.Name_group;
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h1>@ViewData["Title"]</h1>
-
 <p>Выберите группу</p>
 
 <form asp-controller="Home" asp-action="ShowData">
@@ -62,7 +62,7 @@
 					<p id="label_s">@Html.DisplayFor(modelItem => item.Patronymic)</p>
 				</td>
 				<td style="text-align:center;font-weight: bold;">
-					<button name="selectedStudent" value="@item.ID_Student" onclick="this.form.submit()" style="border:1px; font-weight:normal">Удалить</button>
+					<a class="btn btn-outline-danger" name="selectedStudent" id="deleteStudent" onclick="DropStudent(@item.ID_Student)" style="border:1px; font-weight:normal">Удалить</a>
 
 				</td>
 			</tr>
@@ -71,11 +71,21 @@
 	</form>
 </table>
 
-@*<script>
-	document.addEventListener("DOMContentLoaded",function () {
-			document.querySelector('select').addEventListener
-			('change', function () {
-				var selectetGroup = this.options[this.selectedIndex].text;
-				alert(selectetGroup)
-			})})
-</script>*@
+<script type='text/javascript'>
+
+	var myTable = document.getElementById("myTable")
+
+	function DropStudent(Id) {
+		fetch('/Home/DropStudent/' + Id)
+			// .then(function (response) {
+			// 	return response.text();
+			// })
+			// .then(function (html) {
+			// 	myTable.innerHTML = html;
+			// });
+		location.reload();
+		location.reload();
+	}
+
+</script>
+

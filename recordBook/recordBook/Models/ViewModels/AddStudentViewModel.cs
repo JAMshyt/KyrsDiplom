@@ -5,18 +5,24 @@ namespace recordBook.Models.ViewModels
     public class AddStudentViewModel
     {
 
-        [Required(ErrorMessage = "Заполните фамилию")]
+        [Required(ErrorMessage = "Введите фамилию")]
         public string Surname { get; set; }
 
-        [Required(ErrorMessage = "Заполните имя")]
+
+
+        [Required(ErrorMessage = "Введите имя")]
         public string Name { get; set; }
-		public string Patronymic { get; set; }
+
+
+		public string? Patronymic { get; set; }
+
+
         public int ID_Group { get; set; }
 
 
-		public IEnumerable<Group> Groups { get; set; }
+		public IEnumerable<Group>? Groups { get; set; }
 
-		public Group selectedGroup { get; set; }
+        public bool studentAdded { get; set; }
 
     }
 }

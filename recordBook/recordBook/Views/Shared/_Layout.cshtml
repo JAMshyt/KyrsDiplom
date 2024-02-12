@@ -34,7 +34,7 @@
 	<div class="navBoard">
 
 		<style>
-			input {
+			.sideMenu {
 				width: 250px;
 				text-align: center;
 				border: 10px solid #13547156;
@@ -44,23 +44,24 @@
 				background-color: white;
 			}
 
-				input:nth-child(1) {
+				.sideMenu:nth-child(1) {
 					border-top-left-radius: 25px;
 					border-top-right-radius: 25px;
 				}
 
-				input:nth-child(7) {
+				.sideMenu:nth-child(9) {
 					border-bottom-left-radius: 25px;
 					border-bottom-right-radius: 25px;
 				}
-
 		</style>
 		<form>
-			<input type="submit" asp-action="ExamsMarks" asp-controller="Home" value="Экзамены"><br>
-			<input type="submit" asp-action="AddStudent" asp-controller="Home" value="Добавления студента"><br>
-			<input type="submit" asp-action="Attendance" asp-controller="Home" value="Посещаемость"><br>
-			<input type="submit" asp-action="ShowData" asp-controller="Home" value="Просмотр групп"><br>
+			<input type="submit" class="sideMenu" asp-action="ExamsMarks" asp-controller="Home" value="Экзамены"><br>
+			<input type="submit" class="sideMenu" asp-action="AddStudent" asp-controller="Home" value="Добавления студента"><br>
+			<input type="submit" class="sideMenu" asp-action="AttendanceOfStudents" asp-controller="Home" value="Посещаемость"><br>
+			<input type="submit" class="sideMenu" asp-action="AddSubject" asp-controller="Home" value="Добавить предмет"><br>
+			<input type="submit" class="sideMenu" asp-action="ShowData" asp-controller="Home" value="Просмотр групп"><br>
 		</form>
+		<label class="navLabel">Навигация</label>
 	</div>
 
 	<div class="container">

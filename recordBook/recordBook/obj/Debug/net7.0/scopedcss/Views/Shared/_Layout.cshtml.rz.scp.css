@@ -53,17 +53,34 @@ button.accept-policy[b-fkdb7xsfkg] {
 }
 
 .navBoard[b-fkdb7xsfkg] {
+    transition-duration: 1.5s;
+    position: absolute;
     font-size: 20px;
     margin-top: 110px;
-    margin-left: 20px;
-    float: left;
-    border: 20px solid #13547156;
+    margin-left: -250px;
+    border: 0px solid #13547156;
     border-radius: 50px;
-
+    z-index: 1;
+    
 }
 
+.navLabel[b-fkdb7xsfkg] {
+    position: absolute;
+    writing-mode: vertical-lr;
+    margin-left: 250px;
+    margin-top: -230px;
+    z-index: 2;
+    border: 10px solid #13547156;
+    border-bottom-right-radius: 25px;
+    border-top-right-radius: 25px;
+}
 
-
+.navBoard:hover[b-fkdb7xsfkg] {
+    position: absolute;
+    transition-duration: 1.5s;
+    font-size: 20px;
+    margin-left: 0px;
+}
 
 
 /*button {
