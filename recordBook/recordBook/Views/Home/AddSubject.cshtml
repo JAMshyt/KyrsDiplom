@@ -39,8 +39,8 @@
 							<td value="@groups.ID_Group">@groups.Name_group</td>
 							<td>
 
-								<a class="btn btn-outline-success" name="selectedStudent" id="deleteStudent" onclick="selectGroup(@groups.ID_Group)" style="border:1px; font-weight:normal">Выбрать</a>
-							
+								<a class="btn btn-outline-success" onclick="selectGroup(@groups.ID_Group)" style="border:1px; font-weight:normal">Выбрать</a>
+
 							</td>
 						</tr>
 					}
@@ -49,18 +49,35 @@
 			</table>
 
 		</div>
+
 		<div class="form-group3">
-			<table class="table" id="myTable">
+			<table class="table">
 				<thead>
 					<tr>
-						<td id="tableLabel">
+						<td id="tableLabel" style="width:35%;">
 							<h6 style="margin-bottom : 0px;">Выбранные группы</h6>
 						</td>
+						<td></td>
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-					</tr>
+					@if (!Model.emptyList)
+					{
+						@foreach (var groups in Model.selectedGroupsList)
+						{
+							<tr style="text-align:center">
+								<td>@groups.Name_group</td>
+								<td>@groups.Decoding</td>
+							</tr>
+						}
+					}
+					else
+					{
+						<tr style="text-align:center">
+							<td>Группы не выраны</td>
+							<td></td>
+						</tr>
+					}
 				</tbody>
 
 			</table>
@@ -73,15 +90,12 @@
 <script type='text/javascript'>
 
 	function selectGroup(Id) {
-		fetch('/Home/DropStudent/' + Id)
-		// .then(function (response) {
-		// 	return response.text();
-		// })
-		// .then(function (html) {
-		// 	myTable.innerHTML = html;
-		// });
-		location.reload();
-		location.reload();
+		fetch('/Home/SelectGroup/' + Id)
+			.then(response => response.text())
+			.then(html => {
+				$("body").html(html);
+			})
+
 	}
 
 </script>

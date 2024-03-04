@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,7 @@ namespace recordBook.Controllers
 		private readonly IAttendance _attedance;
 		private readonly IDepartment_worker_Academic_performance _department_worker_academic_performance;
 		private readonly IGroup_Subject _group_subject;
+		//public List<Group> groupSelect;//выбранные группы для добавления нового предмета
 
 		public HomeController(ILogger<HomeController> logger, IStudent student,
 			IGroup group, ISubject subject, IKind_of_work kind_wf_work,
@@ -53,7 +55,6 @@ namespace recordBook.Controllers
 		public List<Group> GetGroups()
 		{
 			var group = _group.GetAllGroup().ToList();
-
 			return group;
 		}
 
@@ -99,8 +100,6 @@ namespace recordBook.Controllers
 			return group_subj;
 		}
 
-
-
 		//Get таблиц
 
 		//Страницы
@@ -132,16 +131,16 @@ namespace recordBook.Controllers
 		public async Task<IActionResult> ExamsMarks(int selectedGroup, int selectedSubject)
 		{
 
-			if (selectedGroup > 0 & selectedSubject>0)
+			if (selectedGroup > 0 & selectedSubject > 0)
 			{
 				var groupById = _group.GetGroupbyID(selectedGroup).Result;
-				var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z=>z.ID_Subject);
-				if(!subjectsOfSelectedGroup.Contains(selectedSubject))
+				var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
+				if (!subjectsOfSelectedGroup.Contains(selectedSubject))
 				{
 					selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
-                }
-                var subjectById = _subject.GetSubjectbyID(selectedSubject).Result;
-                var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = groupById, selectedSubject = subjectById };
+				}
+				var subjectById = _subject.GetSubjectbyID(selectedSubject).Result;
+				var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = groupById, selectedSubject = subjectById };
 				return View(model);
 			}
 			//else if (selectedGroup > 0 )
@@ -196,7 +195,7 @@ namespace recordBook.Controllers
 
 		public async Task<IActionResult> AddStudent()
 		{
-			var model2 = new AddStudentViewModel {Groups = GetGroups(), ID_Group = GetGroups().FirstOrDefault().ID_Group, studentAdded = false };
+			var model2 = new AddStudentViewModel { Groups = GetGroups(), ID_Group = GetGroups().FirstOrDefault().ID_Group, studentAdded = false };
 			return View(model2);
 		}
 
@@ -207,35 +206,12 @@ namespace recordBook.Controllers
 			{
 				var addStudent = new Student() { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group };
 				await _student.AddStudent(addStudent);
-                var model2 = new AddStudentViewModel { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, Groups = GetGroups(), studentAdded = true };
-                return View(model2);
-            }
-			else
-			{
-				var model2 = new AddStudentViewModel { Groups = GetGroups(),studentAdded=false};
+				var model2 = new AddStudentViewModel { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, Groups = GetGroups(), studentAdded = true };
 				return View(model2);
 			}
-		}
-
-		public async Task<IActionResult> AddSubject()
-		{
-			var model2 = new AddSubjectViewModel { Groups = GetGroups() };
-			return View(model2);
-		}
-
-		[HttpPost]
-		[Route("Home/AddSubject/{Id:int}")]
-		public async Task<IActionResult> AddSubject(AddSubjectViewModel AddSubj)
-		{
-			if (ModelState.IsValid)
-			{
-				//var addSubject = new Subject() { Name_subject = nameSubject };
-				//await _subject.AddSubject(addSubject);
-				return Content("Студент добавлен");
-			}
 			else
 			{
-				var model2 = new AddSubjectViewModel { Groups = GetGroups() };
+				var model2 = new AddStudentViewModel { Groups = GetGroups(), studentAdded = false };
 				return View(model2);
 			}
 		}
@@ -252,6 +228,46 @@ namespace recordBook.Controllers
 			return RedirectToAction(nameof(ShowData));
 			//return View("ShowData", model);
 		}
+
+
+
+		public async Task<IActionResult> AddSubject()
+		{
+			List<Group> groupSelect= new List<Group>();
+			var model2 = new AddSubjectViewModel { Groups = GetGroups(), selectedGroupsList = groupSelect, emptyList = true };
+			return View(model2);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> AddSubject(AddSubjectViewModel AddSubj)
+		{
+			if (ModelState.IsValid)
+			{
+				//var addSubject = new Subject() { Name_subject = nameSubject };
+				//await _subject.AddSubject(addSubject);
+				return Content("предмет добавлен");
+			}
+			else
+			{
+				var model2 = new AddSubjectViewModel { Groups = GetGroups() };
+				return View(model2);
+			}
+		}
+
+		[HttpGet]
+		[Route("Home/SelectGroup/{Id:int}")]
+		public async Task<IActionResult> SelectGroup(int Id)
+		{
+			List<Group> groupSelect=new List<Group>();
+			var group = await _group.GetGroupbyID(Id);
+			groupSelect.Add(group);
+			var model = new AddSubjectViewModel { Groups = GetGroups(), selectedGroupsList = groupSelect, emptyList = false };
+			//return RedirectToAction(nameof(ShowData));
+			return View("AddSubject", model);
+		}
+
+
+
 
 
 

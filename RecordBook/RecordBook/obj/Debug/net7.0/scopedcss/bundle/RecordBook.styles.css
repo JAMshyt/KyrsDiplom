@@ -10,7 +10,7 @@
 .form-group3[b-m45tzvt20v] {
     position: relative;
     display: inline-block;
-    width: 30%;
+    width: 40%;
     margin-left:10%;
 }
 
@@ -170,7 +170,7 @@ button.accept-policy[b-fkdb7xsfkg] {
 
 .navBoard:hover[b-fkdb7xsfkg] {
     position: absolute;
-    transition-duration: 1.5s;
+    transition-duration: 1s;
     font-size: 20px;
     margin-left: 0px;
 }
