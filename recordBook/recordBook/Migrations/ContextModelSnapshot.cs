@@ -208,7 +208,6 @@ namespace recordBook.Migrations
 
 					b.ToTable("Student");
 
-					//b.ToTable(tb => tb.HasTrigger("afterStudentAdd"));		//ДЛЯ ТРИГГЕРА
 				});
 
 			modelBuilder.Entity("recordBook.Models.Subject", b =>

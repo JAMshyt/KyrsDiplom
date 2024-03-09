@@ -24,7 +24,7 @@ namespace recordBook.Controllers
 		private readonly IAttendance _attedance;
 		private readonly IDepartment_worker_Academic_performance _department_worker_academic_performance;
 		private readonly IGroup_Subject _group_subject;
-		//public List<Group> groupSelect;//выбранные группы для добавления нового предмета
+		public List<Group> groupSelect;//выбранные группы для добавления нового предмета
 
 		public HomeController(ILogger<HomeController> logger, IStudent student,
 			IGroup group, ISubject subject, IKind_of_work kind_wf_work,
@@ -105,15 +105,6 @@ namespace recordBook.Controllers
 		//Страницы
 		public async Task<IActionResult> ShowData(int selectedGroup)
 		{
-			//if (selectedStudent > 0)//ТОЛЬКО УДАЛЕНИЕ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			//{
-			//	var StudentToRemove = _student.GetStudentbyID(selectedStudent).Result;
-			//	Group GroupOfDeletedStudent = _group.GetGroupbyID(StudentToRemove.ID_Group).Result;
-			//	await _student.DeleteStudent(StudentToRemove);
-			//	var model = new GroupsStudents { Groups = GetGroups(), Students = GetStudents(), selectedGroup = GroupOfDeletedStudent };
-			//	return View(model);
-			//}
-
 			if (selectedGroup > 0)
 			{
 				var groupById = _group.GetGroupbyID(selectedGroup).Result;
@@ -125,7 +116,6 @@ namespace recordBook.Controllers
 				var model = new GroupsStudents { Groups = GetGroups(), Students = GetStudents(), selectedGroup = GetGroups().FirstOrDefault() };
 				return View(model);
 			}
-
 		}
 
 		public async Task<IActionResult> ExamsMarks(int selectedGroup, int selectedSubject)
@@ -143,18 +133,6 @@ namespace recordBook.Controllers
 				var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = groupById, selectedSubject = subjectById };
 				return View(model);
 			}
-			//else if (selectedGroup > 0 )
-			//{
-			//	var groupById = _group.GetGroupbyID(selectedGroup).Result;
-			//	var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = groupById, selectedSubject = GetSubjects().FirstOrDefault() };
-			//	return View(model);
-			//}
-			//else if ( selectedSubject > 0)
-			//{
-			//	var subjectById = _subject.GetSubjectbyID(selectedSubject).Result;
-			//	var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = GetGroups().FirstOrDefault(), selectedSubject = subjectById };
-			//	return View(model);
-			//}
 			else
 			{
 				var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = GetGroups().FirstOrDefault(), selectedSubject = GetSubjects().FirstOrDefault() };
@@ -174,18 +152,6 @@ namespace recordBook.Controllers
 				var model = new AttendanceViewModel { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Attendances = GetAttendance(), selectedGroup = groupById, selectedSubject = subjectById };
 				return View(model);
 			}
-			//if (selectedGroup > 0)
-			//{
-			//	var groupById = _group.GetGroupbyID(selectedGroup).Result;
-			//	var model = new AttendanceViewModel { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Attendances = GetAttendance(), selectedGroup = groupById, selectedSubject = GetSubjects().FirstOrDefault() };
-			//	return View(model);
-			//}
-			//if (selectedSubject > 0)
-			//{
-			//	var subjectById = _subject.GetSubjectbyID(selectedSubject).Result;
-			//	var model = new AttendanceViewModel { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Attendances = GetAttendance(), selectedGroup = GetGroups().FirstOrDefault(), selectedSubject = subjectById };
-			//	return View(model);
-			//}
 			else
 			{
 				var model = new AttendanceViewModel { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Attendances = GetAttendance(), selectedGroup = GetGroups().FirstOrDefault(), selectedSubject = GetSubjects().FirstOrDefault() };
@@ -258,7 +224,7 @@ namespace recordBook.Controllers
 		[Route("Home/SelectGroup/{Id:int}")]
 		public async Task<IActionResult> SelectGroup(int Id)
 		{
-			List<Group> groupSelect=new List<Group>();
+
 			var group = await _group.GetGroupbyID(Id);
 			groupSelect.Add(group);
 			var model = new AddSubjectViewModel { Groups = GetGroups(), selectedGroupsList = groupSelect, emptyList = false };
