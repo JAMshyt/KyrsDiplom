@@ -1,5 +1,5 @@
 .form-group2[b-m45tzvt20v] {
-    position: fixed;
+    position: relative;
     display: inline-block;
     width: 30%;
     /*top:50px;*/
@@ -7,10 +7,10 @@
 
 
 .form-group3[b-m45tzvt20v] {
-    position: fixed;
+    position: relative;
     display: inline-block;
     width: 40%;
-    margin-left:35%;
+    margin-left:10%;
 }
 
 .grSelectBtn[b-m45tzvt20v] {
