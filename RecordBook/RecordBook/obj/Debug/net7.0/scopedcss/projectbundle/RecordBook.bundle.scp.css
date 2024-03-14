@@ -1,6 +1,6 @@
 /* _content/recordBook/Views/Home/AddSubject.cshtml.rz.scp.css */
 .form-group2[b-m45tzvt20v] {
-    position: relative;
+    position: fixed;
     display: inline-block;
     width: 30%;
     /*top:50px;*/
@@ -8,10 +8,10 @@
 
 
 .form-group3[b-m45tzvt20v] {
-    position: relative;
+    position: fixed;
     display: inline-block;
     width: 40%;
-    margin-left:10%;
+    margin-left:35%;
 }
 
 .grSelectBtn[b-m45tzvt20v] {
