@@ -77,3 +77,4 @@ D:\Лабы\ещё один курс\КурсачДипломРепоз\RecordBo
 D:\Лабы\ещё один курс\КурсачДипломРепоз\RecordBook\recordBook\obj\Debug\net7.0\scopedcss\Views\Shared\_IndexLayout.cshtml.rz.scp.css
 D:\Лабы\ещё один курс\КурсачДипломРепоз\RecordBook\recordBook\obj\Debug\net7.0\recordBook.sourcelink.json
 D:\Лабы\ещё один курс\КурсачДипломРепоз\RecordBook\recordBook\obj\Debug\net7.0\scopedcss\Views\Home\AddSubject.cshtml.rz.scp.css
+D:\Лабы\ещё один курс\КурсачДипломРепоз\RecordBook\recordBook\obj\Debug\net7.0\scopedcss\Views\Home\AttendanceOfStudents.cshtml.rz.scp.css

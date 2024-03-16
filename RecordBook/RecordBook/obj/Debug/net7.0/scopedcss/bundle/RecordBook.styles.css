@@ -24,6 +24,11 @@
     border-radius:100px;
 }
 
+/* _content/recordBook/Views/Home/AttendanceOfStudents.cshtml.rz.scp.css */
+input[type="checkbox"]:disabled[b-u9xm3bsodb] {
+    width: 20px;
+    height: 20px;
+}
 /* _content/recordBook/Views/Home/Index.cshtml.rz.scp.css */
 body[b-tbp4gel1sq] {
 }

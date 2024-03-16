@@ -51,9 +51,9 @@
 			@foreach (var item in Model.Attendances.Where(z => z.ID_Subject == Model.selectedSubject.ID_Subject))
 			{
 				var data = item.Date_presence.ToString("dd.MM");
-			<th id="tableLabel">
-				<h6 style="margin-bottom : 0px; text-align:center;">@data</h6>
-			</th>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center;">@data</h6>
+				</th>
 			}
 		</tr>
 	</thead>
@@ -69,8 +69,15 @@
 					@foreach (var r in Model.Attendances.Where(z => z.ID_Student == item.ID_Student))
 					{
 					<td style="text-align:center; font-weight: bold;">
-						<p id="label_s">@Html.DisplayFor(modelItem => r.Precense)</p>
-					</td>
+							@if (@r.Precense == true)
+							{
+								<input type="checkbox" checked disabled>
+							}
+							else
+							{
+							<input type="checkbox" disabled>
+							}
+						</td>
 					}
 			</tr>
 			}

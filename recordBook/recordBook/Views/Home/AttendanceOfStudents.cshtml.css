@@ -1,0 +1,4 @@
+﻿input[type="checkbox"]:disabled {
+    width: 20px;
+    height: 20px;
+}

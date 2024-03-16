@@ -22,10 +22,6 @@ build_property._RazorSourceGeneratorDebug =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxBZGRTdHVkZW50LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Лабы/ещё один курс/КурсачДипломРепоз/RecordBook/recordBook/Views/Home/AttendanceOfStudents.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxBdHRlbmRhbmNlT2ZTdHVkZW50cy5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
 [D:/Лабы/ещё один курс/КурсачДипломРепоз/RecordBook/recordBook/Views/Home/ExamsMarks.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxFeGFtc01hcmtzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -53,6 +49,10 @@ build_metadata.AdditionalFiles.CssScope =
 [D:/Лабы/ещё один курс/КурсачДипломРепоз/RecordBook/recordBook/Views/Home/AddSubject.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxBZGRTdWJqZWN0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = b-m45tzvt20v
+
+[D:/Лабы/ещё один курс/КурсачДипломРепоз/RecordBook/recordBook/Views/Home/AttendanceOfStudents.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxBdHRlbmRhbmNlT2ZTdHVkZW50cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = b-u9xm3bsodb
 
 [D:/Лабы/ещё один курс/КурсачДипломРепоз/RecordBook/recordBook/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
