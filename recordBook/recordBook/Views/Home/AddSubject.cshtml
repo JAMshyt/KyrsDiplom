@@ -15,13 +15,6 @@
 	<p style="margin-top:50px; margin-bottom:20px;">Выберите группы, которые изучают предмет</p>
 	<div class="form-group1">
 		<div class="form-group2">
-			@* <select name="selectedGroup" style="width:120px; height:40px; text-align:center;">
-			@foreach (var groups in Model.Groups)
-			{
-			<option value="@groups.ID_Group">@groups.Name_group</option>
-			}
-			</select> *@
-
 			<table class="table" id="myTable">
 				<thead>
 					<tr>
@@ -47,55 +40,42 @@
 				</tbody>
 
 			</table>
+			<input type="submit" value="Добавить" class="btn btn-success" style="width:100px;" />
 
 		</div>
 
 		<div class="form-group3">
-			<table class="table">
+			<table class="table" id="tableOfSelectedGroups">
 				<thead>
 					<tr>
-						<td id="tableLabel" style="width:35%;">
+						<td style="width:35%;">
 							<h6 style="margin-bottom : 0px;">Выбранные группы</h6>
 						</td>
 						<td></td>
 					</tr>
 				</thead>
 				<tbody>
-					@if (!Model.emptyList)
-					{
-						@foreach (var groups in Model.selectedGroupsList)
-						{
-							<tr style="text-align:center">
-								<td>@groups.Name_group</td>
-								<td>@groups.Decoding</td>
-							</tr>
-						}
-					}
-					else
-					{
-						<tr style="text-align:center">
-							<td>Группы не выраны</td>
-							<td></td>
-						</tr>
-					}
+
 				</tbody>
 
 			</table>
 		</div>
 	</div>
-	<input type="submit" value="Добавить" class="btn btn-success" style="width:100px;" />
 
 </form>
 
 <script type='text/javascript'>
 
 	function selectGroup(Id) {
-		fetch('/Home/SelectGroup/' + Id)
-			.then(response => response.text())
-			.then(html => {
-				$("body").html(html);
-			})
-
+		var url = "/Home/SelectGroup/" + Id;
+		$.ajax({
+			url: url,
+			method: 'GET',
+			dataType: 'json',
+			success: function (product) {
+				$('#tableOfSelectedGroups').append("<tr><td>" + product.name_group + "</td><td>" + product.decoding + "</td></tr>");
+			},
+		});
 	}
 
 </script>

@@ -24,7 +24,6 @@ namespace recordBook.Controllers
 		private readonly IAttendance _attedance;
 		private readonly IDepartment_worker_Academic_performance _department_worker_academic_performance;
 		private readonly IGroup_Subject _group_subject;
-		public List<Group> groupSelect;//выбранные группы для добавления нового предмета
 
 		public HomeController(ILogger<HomeController> logger, IStudent student,
 			IGroup group, ISubject subject, IKind_of_work kind_wf_work,
@@ -199,7 +198,7 @@ namespace recordBook.Controllers
 
 		public async Task<IActionResult> AddSubject()
 		{
-			List<Group> groupSelect= new List<Group>();
+			List<Group> groupSelect = new List<Group>();
 			var model2 = new AddSubjectViewModel { Groups = GetGroups(), selectedGroupsList = groupSelect, emptyList = true };
 			return View(model2);
 		}
@@ -220,16 +219,16 @@ namespace recordBook.Controllers
 			}
 		}
 
+
+		List<Group> groupSelect = new List<Group>();
+
 		[HttpGet]
 		[Route("Home/SelectGroup/{Id:int}")]
 		public async Task<IActionResult> SelectGroup(int Id)
 		{
 
 			var group = await _group.GetGroupbyID(Id);
-			groupSelect.Add(group);
-			var model = new AddSubjectViewModel { Groups = GetGroups(), selectedGroupsList = groupSelect, emptyList = false };
-			//return RedirectToAction(nameof(ShowData));
-			return View("AddSubject", model);
+			return Json(group);
 		}
 
 
