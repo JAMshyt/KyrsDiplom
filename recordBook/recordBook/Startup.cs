@@ -33,7 +33,6 @@ namespace recordBook
 			services.AddScoped<IDepartment_worker_Academic_performance, Department_worker_Academic_performanceRepositories>();
 			services.AddScoped<IGroup_Subject, Group_SubjectRepositories>();
 
-
 		}
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{

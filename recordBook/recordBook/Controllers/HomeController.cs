@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Security.Cryptography;
+using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -191,42 +193,51 @@ namespace recordBook.Controllers
 				await _student.DeleteStudent(stu);
 			}
 			return RedirectToAction(nameof(ShowData));
-			//return View("ShowData", model);
 		}
 
 
 
 		public async Task<IActionResult> AddSubject()
 		{
-			List<Group> groupSelect = new List<Group>();
-			var model2 = new AddSubjectViewModel { Groups = GetGroups(), selectedGroupsList = groupSelect, emptyList = true };
+			var model2 = new AddSubjectViewModel { Groups = GetGroups(), subjectAdded = false };
 			return View(model2);
 		}
 
+
 		[HttpPost]
-		public async Task<IActionResult> AddSubject(AddSubjectViewModel AddSubj)
+		[Consumes("application/json")]
+		public async Task<IActionResult> AddSubject([FromBody] AddSubjectViewModel AddSubj)
 		{
 			if (ModelState.IsValid)
 			{
-				//var addSubject = new Subject() { Name_subject = nameSubject };
-				//await _subject.AddSubject(addSubject);
-				return Content("предмет добавлен");
+				var addSubject = new Subject() { Name_subject = AddSubj.NameSubject };
+				await _subject.AddSubject(addSubject);
+				foreach (var r in AddSubj.selectedGroups)
+				{
+					var addGroupSubject = new Group_Subject() { ID_Subject = GetSubjects().LastOrDefault().ID_Subject, ID_Group = r };
+					await _group_subject.AddGroup_Subject(addGroupSubject);
+				}
+				var model = new
+				{
+					NameSubject = addSubject.Name_subject,
+					Groups = GetGroups(),
+					subjectAdded = true,
+					selectedGroups = AddSubj.selectedGroups,
+				};
+				return Json(model);
 			}
 			else
 			{
-				var model2 = new AddSubjectViewModel { Groups = GetGroups() };
-				return View(model2);
+				var model2 = new AddSubjectViewModel { Groups = GetGroups(), subjectAdded = false, selectedGroups = AddSubj.selectedGroups, NameSubject = AddSubj.NameSubject };
+				return Json(model2); ;
 			}
 		}
 
-
-		List<Group> groupSelect = new List<Group>();
 
 		[HttpGet]
 		[Route("Home/SelectGroup/{Id:int}")]
 		public async Task<IActionResult> SelectGroup(int Id)
 		{
-
 			var group = await _group.GetGroupbyID(Id);
 			return Json(group);
 		}
