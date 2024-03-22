@@ -29,14 +29,9 @@ namespace recordBook.Repositories
 			return _context.Subject.AsQueryable();
 		}
 
-		public Task<Subject?> GetSubject(Subject subject)
+		public Subject? GetSubjectbyID(int Id)
 		{
-			return GetAllSubject().Where(x => x.ID_Subject == subject.ID_Subject).FirstOrDefaultAsync();
-		}
-
-		public Task<Subject?> GetSubjectbyID(int Id)
-		{
-			return GetAllSubject().Where(x => x.ID_Subject == Id).FirstOrDefaultAsync();
+			return GetAllSubject().Where(x => x.ID_Subject == Id).FirstOrDefaultAsync().Result;
 		}
 
 		public async Task UpdateSubject(Subject subject)

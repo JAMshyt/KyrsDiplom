@@ -29,14 +29,9 @@ namespace recordBook.Repositories
 			return _context.Department_worker_Academic_performance.AsQueryable();
 		}
 
-		public Task<Department_worker_Academic_performance?> GetDepartment_worker_Academic_performance(Department_worker_Academic_performance department_worker_academic_performance)
+		public Department_worker_Academic_performance? GetDepartment_worker_Academic_performancebyID(int Id)
 		{
-			return GetAllDepartment_worker_Academic_performance().Where(x => x.ID_Department_worker_Academic_performance == department_worker_academic_performance.ID_Department_worker_Academic_performance).FirstOrDefaultAsync();
-		}
-
-		public Task<Department_worker_Academic_performance?> GetDepartment_worker_Academic_performancebyID(int Id)
-		{
-			return GetAllDepartment_worker_Academic_performance().Where(x => x.ID_Department_worker_Academic_performance == Id).FirstOrDefaultAsync();
+			return GetAllDepartment_worker_Academic_performance().Where(x => x.ID_Department_worker_Academic_performance == Id).FirstOrDefaultAsync().Result;
 		}
 
 		public async Task UpdateDepartment_worker_Academic_performance(Department_worker_Academic_performance department_worker_academic_performance)

@@ -30,14 +30,9 @@ namespace recordBook.Repositories
 			return _context.Academic_performance.AsQueryable();
 		}
 
-		public Task<Academic_performance?> GetAcademic_performance(Academic_performance academic_performance)
+		public Academic_performance? GetAcademic_performancebyID(int Id)
 		{
-			return GetAllAcademic_performance().Where(x => x.ID_Academic_performance == academic_performance.ID_Academic_performance).FirstOrDefaultAsync();
-		}
-
-		public Task<Academic_performance?> GetAcademic_performancebyID(int Id)
-		{
-			return GetAllAcademic_performance().Where(x => x.ID_Academic_performance == Id).FirstOrDefaultAsync();
+			return GetAllAcademic_performance().Where(x => x.ID_Academic_performance == Id).FirstOrDefaultAsync().Result;
 		}
 
 		public async Task UpdateAcademic_performance(Academic_performance academic_performance)

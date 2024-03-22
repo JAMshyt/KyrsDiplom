@@ -29,14 +29,10 @@ namespace recordBook.Repositories
 			return _context.Student.AsQueryable();
 		}
 
-		public Task<Student?> GetStudent(Student student)
-		{
-			return GetAllStudent().Where(x => x.ID_Student == student.ID_Student).FirstOrDefaultAsync();
-		}
 
-		public Task<Student?> GetStudentbyID(int Id)
+		public Student? GetStudentbyID(int Id)
 		{
-			return GetAllStudent().Where(x => x.ID_Student == Id).FirstOrDefaultAsync();
+			return GetAllStudent().Where(x => x.ID_Student == Id).FirstOrDefaultAsync().Result;
 		}
 
 		public async Task UpdateStudentl(Student student)

@@ -30,14 +30,9 @@ namespace recordBook.Repositories
 			return _context.Attendance.AsQueryable();
 		}
 
-		public Task<Attendance?> GetAttendance(Attendance Attendance)
+		public Attendance? GetAttendancebyID(int Id)
 		{
-			return GetAllAttendance().Where(x => x.ID_Attendance == Attendance.ID_Attendance).FirstOrDefaultAsync();
-		}
-
-		public Task<Attendance?> GetAttendancebyID(int Id)
-		{
-			return GetAllAttendance().Where(x => x.ID_Attendance == Id).FirstOrDefaultAsync();
+			return GetAllAttendance().Where(x => x.ID_Attendance == Id).FirstOrDefaultAsync().Result;
 		}
 
 		public async Task UpdateAttendance(Attendance Attendance)

@@ -30,14 +30,9 @@ namespace recordBook.Repositories
 			return _context.Department_worker.AsQueryable();
 		}
 
-		public Task<Department_worker?> GetDepartment_worker(Department_worker department_worker)
+		public Department_worker? GetDepartment_workerbyID(int Id)
 		{
-			return GetAllDepartment_worker().Where(x => x.ID_Department_worker == department_worker.ID_Department_worker).FirstOrDefaultAsync();
-		}
-
-		public Task<Department_worker?> GetDepartment_workerbyID(int Id)
-		{
-			return GetAllDepartment_worker().Where(x => x.ID_Department_worker == Id).FirstOrDefaultAsync();
+			return GetAllDepartment_worker().Where(x => x.ID_Department_worker == Id).FirstOrDefaultAsync().Result;
 		}
 
 		public async Task UpdateDepartment_worker(Department_worker department_worker)

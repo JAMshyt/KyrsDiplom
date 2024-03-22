@@ -46,7 +46,7 @@ namespace recordBook.Controllers
 			_group_subject = group_subject;
 		}
 
-		//Get таблиц
+		#region Get таблиц
 		public List<Student> GetStudents()
 		{
 			var students = _student.GetAllStudent().ToList();
@@ -101,14 +101,14 @@ namespace recordBook.Controllers
 			return group_subj;
 		}
 
-		//Get таблиц
+		#endregion
 
-		//Страницы
+		#region страницы
 		public async Task<IActionResult> ShowData(int selectedGroup)
 		{
 			if (selectedGroup > 0)
 			{
-				var groupById = _group.GetGroupbyID(selectedGroup).Result;
+				var groupById = _group.GetGroupbyID(selectedGroup);
 				var model = new GroupsStudents { Groups = GetGroups(), Students = GetStudents(), selectedGroup = groupById };
 				return View(model);
 			}
@@ -124,13 +124,13 @@ namespace recordBook.Controllers
 
 			if (selectedGroup > 0 & selectedSubject > 0)
 			{
-				var groupById = _group.GetGroupbyID(selectedGroup).Result;
+				var groupById = _group.GetGroupbyID(selectedGroup);
 				var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
 				if (!subjectsOfSelectedGroup.Contains(selectedSubject))
 				{
 					selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
 				}
-				var subjectById = _subject.GetSubjectbyID(selectedSubject).Result;
+				var subjectById = _subject.GetSubjectbyID(selectedSubject);
 				var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = groupById, selectedSubject = subjectById };
 				return View(model);
 			}
@@ -148,8 +148,8 @@ namespace recordBook.Controllers
 
 			if (selectedGroup > 0 & selectedSubject > 0)
 			{
-				var groupById = _group.GetGroupbyID(selectedGroup).Result;
-				var subjectById = _subject.GetSubjectbyID(selectedSubject).Result;
+				var groupById = _group.GetGroupbyID(selectedGroup);
+				var subjectById = _subject.GetSubjectbyID(selectedSubject);
 				var model = new AttendanceViewModel { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Attendances = GetAttendance(), selectedGroup = groupById, selectedSubject = subjectById };
 				return View(model);
 			}
@@ -187,7 +187,7 @@ namespace recordBook.Controllers
 		[Route("Home/DropStudent/{Id:int}")]
 		public async Task<IActionResult> DropStudent(int Id)
 		{
-			var stu = await _student.GetStudentbyID(Id);
+			var stu = _student.GetStudentbyID(Id);
 			if (stu != null)
 			{
 				await _student.DeleteStudent(stu);
@@ -238,12 +238,11 @@ namespace recordBook.Controllers
 		[Route("Home/SelectGroup/{Id:int}")]
 		public async Task<IActionResult> SelectGroup(int Id)
 		{
-			var group = await _group.GetGroupbyID(Id);
-			return Json(group);
+			return Json(_group.GetGroupbyID(Id));
 		}
 
 
-
+		#endregion
 
 
 

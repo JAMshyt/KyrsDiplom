@@ -29,19 +29,14 @@ namespace recordBook.Repositories
 			return _context.Group_Subject.AsQueryable();
 		}
 
-        public IQueryable<Group_Subject> GetGroup_SubjectbyGroupID(int GroupId)
+        public IQueryable<Group_Subject?> GetGroup_SubjectbyGroupID(int GroupId)
         {
             return GetAllGroup_Subject().Where(x => x.ID_Group == GroupId).AsQueryable();
         }
 
-        public Task<Group_Subject?> GetGroup_Subject(Group_Subject group_subject)
+		public Group_Subject? GetGroup_SubjectbyID(int Id)
 		{
-			return GetAllGroup_Subject().Where(x => x.ID_Group_Subject == group_subject.ID_Group_Subject).FirstOrDefaultAsync();
-		}
-
-		public Task<Group_Subject?> GetGroup_SubjectbyID(int Id)
-		{
-			return GetAllGroup_Subject().Where(x => x.ID_Group_Subject == Id).FirstOrDefaultAsync();
+			return GetAllGroup_Subject().Where(x => x.ID_Group_Subject == Id).FirstOrDefaultAsync().Result;
 		}
 
         public async Task UpdateGroup_Subject(Group_Subject group_subject)

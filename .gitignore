@@ -3,7 +3,11 @@
 ################################################################################
 
 /recordBook/.vs
+.vs/RecordBook
+RecordBook/RecordBook/bin
+RecordBook/RecordBook/obj
 /.vs
+.vs
 bin
 obj
 

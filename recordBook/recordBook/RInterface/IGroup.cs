@@ -7,8 +7,7 @@ namespace recordBook.RInterface
 		Task AddGroup(Group group);
 		Task DeleteGroup(Group group);
 		Task UpdateGroup(Group group);
-		Task<Group?> GetGroup(Group group);
-		Task<Group?> GetGroupbyID(int Id); 
+		Group? GetGroupbyID(int Id); 
 		IQueryable<Group> GetAllGroup();
 	}
 }

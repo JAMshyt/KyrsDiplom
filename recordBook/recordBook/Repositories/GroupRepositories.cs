@@ -29,14 +29,9 @@ namespace recordBook.Repositories
 			return _context.Group.AsQueryable();
 		}
 
-		public Task<Group?> GetGroup(Group group)
+		public Group? GetGroupbyID(int Id)
 		{
-			return GetAllGroup().Where(x => x.ID_Group == group.ID_Group).FirstOrDefaultAsync();
-		}
-
-		public Task<Group?> GetGroupbyID(int Id)
-		{
-			return GetAllGroup().Where(x => x.ID_Group == Id).FirstOrDefaultAsync();
+			return GetAllGroup().Where(x => x.ID_Group == Id).FirstOrDefaultAsync().Result;
 		}
 
 		public async Task UpdateGroup(Group group)
