@@ -6,3 +6,10 @@
 /.vs
 bin
 obj
+
+*.obj
+*.exe
+[Dd]ebug/
+[Rr]elease/
+**/obj/
+**/bin/
