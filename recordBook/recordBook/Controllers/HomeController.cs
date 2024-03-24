@@ -104,43 +104,44 @@ namespace recordBook.Controllers
 		#endregion
 
 		#region страницы
-		public async Task<IActionResult> ShowData(int selectedGroup)
-		{
-			if (selectedGroup > 0)
-			{
-				var groupById = _group.GetGroupbyID(selectedGroup);
-				var model = new GroupsStudents { Groups = GetGroups(), Students = GetStudents(), selectedGroup = groupById };
-				return View(model);
-			}
-			else
-			{
-				var model = new GroupsStudents { Groups = GetGroups(), Students = GetStudents(), selectedGroup = GetGroups().FirstOrDefault() };
-				return View(model);
-			}
-		}
 
-		public async Task<IActionResult> ExamsMarks(int selectedGroup, int selectedSubject)
-		{
+		//public async Task<IActionResult> ShowData(int selectedGroup)
+		//{
+		//	if (selectedGroup > 0)
+		//	{
+		//		var groupById = _group.GetGroupbyID(selectedGroup);
+		//		var model = new GroupsStudents { Groups = GetGroups(), Students = GetStudents(), selectedGroup = groupById };
+		//		return View(model);
+		//	}
+		//	else
+		//	{
+		//		var model = new GroupsStudents { Groups = GetGroups(), Students = GetStudents(), selectedGroup = GetGroups().FirstOrDefault() };
+		//		return View(model);
+		//	}
+		//}
 
-			if (selectedGroup > 0 & selectedSubject > 0)
-			{
-				var groupById = _group.GetGroupbyID(selectedGroup);
-				var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
-				if (!subjectsOfSelectedGroup.Contains(selectedSubject))
-				{
-					selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
-				}
-				var subjectById = _subject.GetSubjectbyID(selectedSubject);
-				var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = groupById, selectedSubject = subjectById };
-				return View(model);
-			}
-			else
-			{
-				var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = GetGroups().FirstOrDefault(), selectedSubject = GetSubjects().FirstOrDefault() };
-				return View(model);
-			}
+		//public async Task<IActionResult> ExamsMarks(int selectedGroup, int selectedSubject)
+		//{
 
-		}
+		//	if (selectedGroup > 0 & selectedSubject > 0)
+		//	{
+		//		var groupById = _group.GetGroupbyID(selectedGroup);
+		//		var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
+		//		if (!subjectsOfSelectedGroup.Contains(selectedSubject))
+		//		{
+		//			selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
+		//		}
+		//		var subjectById = _subject.GetSubjectbyID(selectedSubject);
+		//		var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = groupById, selectedSubject = subjectById };
+		//		return View(model);
+		//	}
+		//	else
+		//	{
+		//		var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(), selectedGroup = GetGroups().FirstOrDefault(), selectedSubject = GetSubjects().FirstOrDefault() };
+		//		return View(model);
+		//	}
+
+		//}
 
 
 		public async Task<IActionResult> AttendanceOfStudents(int selectedGroup, int selectedSubject)
@@ -160,86 +161,86 @@ namespace recordBook.Controllers
 			}
 		}
 
-		public async Task<IActionResult> AddStudent()
-		{
-			var model2 = new AddStudentViewModel { Groups = GetGroups(), ID_Group = GetGroups().FirstOrDefault().ID_Group, studentAdded = false };
-			return View(model2);
-		}
+		//public async Task<IActionResult> AddStudent()
+		//{
+		//	var model2 = new AddStudentViewModel { Groups = GetGroups(), ID_Group = GetGroups().FirstOrDefault().ID_Group, studentAdded = false };
+		//	return View(model2);
+		//}
 
-		[HttpPost]
-		public async Task<IActionResult> AddStudent(AddStudentViewModel addStu)
-		{
-			if (ModelState.IsValid)
-			{
-				var addStudent = new Student() { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group };
-				await _student.AddStudent(addStudent);
-				var model2 = new AddStudentViewModel { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, Groups = GetGroups(), studentAdded = true };
-				return View(model2);
-			}
-			else
-			{
-				var model2 = new AddStudentViewModel { Groups = GetGroups(), studentAdded = false };
-				return View(model2);
-			}
-		}
+		//[HttpPost]
+		//public async Task<IActionResult> AddStudent(AddStudentViewModel addStu)
+		//{
+		//	if (ModelState.IsValid)
+		//	{
+		//		var addStudent = new Student() { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group };
+		//		await _student.AddStudent(addStudent);
+		//		var model2 = new AddStudentViewModel { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, Groups = GetGroups(), studentAdded = true };
+		//		return View(model2);
+		//	}
+		//	else
+		//	{
+		//		var model2 = new AddStudentViewModel { Groups = GetGroups(), studentAdded = false };
+		//		return View(model2);
+		//	}
+		//}
 
-		[HttpGet]
-		[Route("Home/DropStudent/{Id:int}")]
-		public async Task<IActionResult> DropStudent(int Id)
-		{
-			var stu = _student.GetStudentbyID(Id);
-			if (stu != null)
-			{
-				await _student.DeleteStudent(stu);
-			}
-			return RedirectToAction(nameof(ShowData));
-		}
-
-
-
-		public async Task<IActionResult> AddSubject()
-		{
-			var model2 = new AddSubjectViewModel { Groups = GetGroups(), subjectAdded = false };
-			return View(model2);
-		}
+		//[HttpGet]
+		//[Route("Home/DropStudent/{Id:int}")]
+		//public async Task<IActionResult> DropStudent(int Id)
+		//{
+		//	var stu = _student.GetStudentbyID(Id);
+		//	if (stu != null)
+		//	{
+		//		await _student.DeleteStudent(stu);
+		//	}
+		//	return RedirectToAction(nameof(ShowData));
+		//}
 
 
-		[HttpPost]
-		[Consumes("application/json")]
-		public async Task<IActionResult> AddSubject([FromBody] AddSubjectViewModel AddSubj)
-		{
-			if (ModelState.IsValid)
-			{
-				var addSubject = new Subject() { Name_subject = AddSubj.NameSubject };
-				await _subject.AddSubject(addSubject);
-				foreach (var r in AddSubj.selectedGroups)
-				{
-					var addGroupSubject = new Group_Subject() { ID_Subject = GetSubjects().LastOrDefault().ID_Subject, ID_Group = r };
-					await _group_subject.AddGroup_Subject(addGroupSubject);
-				}
-				var model = new
-				{
-					NameSubject = addSubject.Name_subject,
-					Groups = GetGroups(),
-					subjectAdded = true,
-					selectedGroups = AddSubj.selectedGroups,
-				};
-				return Json(model);
-			}
-			else
-			{
-				var model2 = new AddSubjectViewModel { Groups = GetGroups(), subjectAdded = false, selectedGroups = AddSubj.selectedGroups, NameSubject = AddSubj.NameSubject };
-				return Json(model2); ;
-			}
-		}
+
+		//public async Task<IActionResult> AddSubject()
+		//{
+		//	var model2 = new AddSubjectViewModel { Groups = GetGroups(), subjectAdded = false };
+		//	return View(model2);
+		//}
 
 
-		[HttpGet]
-		[Route("Home/SelectGroup/{Id:int}")]
-		public async Task<IActionResult> SelectGroup(int Id)
-		{
-			return Json(_group.GetGroupbyID(Id));
-		}
+		//[HttpPost]
+		//[Consumes("application/json")]
+		//public async Task<IActionResult> AddSubject([FromBody] AddSubjectViewModel AddSubj)
+		//{
+		//	if (ModelState.IsValid)
+		//	{
+		//		var addSubject = new Subject() { Name_subject = AddSubj.NameSubject };
+		//		await _subject.AddSubject(addSubject);
+		//		foreach (var r in AddSubj.selectedGroups)
+		//		{
+		//			var addGroupSubject = new Group_Subject() { ID_Subject = GetSubjects().LastOrDefault().ID_Subject, ID_Group = r };
+		//			await _group_subject.AddGroup_Subject(addGroupSubject);
+		//		}
+		//		var model = new
+		//		{
+		//			NameSubject = addSubject.Name_subject,
+		//			Groups = GetGroups(),
+		//			subjectAdded = true,
+		//			selectedGroups = AddSubj.selectedGroups,
+		//		};
+		//		return Json(model);
+		//	}
+		//	else
+		//	{
+		//		var model2 = new AddSubjectViewModel { Groups = GetGroups(), subjectAdded = false, selectedGroups = AddSubj.selectedGroups, NameSubject = AddSubj.NameSubject };
+		//		return Json(model2); ;
+		//	}
+		//}
+
+
+		//[HttpGet]
+		//[Route("Home/SelectGroup/{Id:int}")]
+		//public async Task<IActionResult> SelectGroup(int Id)
+		//{
+		//	return Json(_group.GetGroupbyID(Id));
+		//}
 
 
 		#endregion

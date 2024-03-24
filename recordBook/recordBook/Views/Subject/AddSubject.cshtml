@@ -8,7 +8,7 @@
 
 
 
-<form asp-action="AddSubject" asp-controller="Home" id="form">
+<form asp-action="AddSubject" asp-controller="Subject" id="form">
 
 
 	<div id="message"></div>
@@ -72,7 +72,7 @@
 
 
 	function selectGroup(Id) {
-		var url = "/Home/SelectGroup/" + Id;
+		var url = "/Subject/SelectGroup/" + Id;
 		$.ajax({
 			url: url,
 			method: 'GET',
@@ -100,7 +100,7 @@
 
 		$.ajax({
 			type: 'POST',
-			url: '/Home/AddSubject/',
+			url: '/Subject/AddSubject/',
 			contentType: 'application/json',
 			data: JSON.stringify(addSubjectData),
 			dataType: 'json',

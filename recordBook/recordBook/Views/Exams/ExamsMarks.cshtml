@@ -8,7 +8,7 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<form asp-controller="Home" asp-action="ExamsMarks">
+<form asp-controller="Exams" asp-action="ExamsMarks">
 	<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
 		@foreach (var groups in Model.Groups)
 		{
@@ -26,7 +26,8 @@
 	<select name="selectedSubject" required onchange="this.form.submit()" style="width:200px; height:40px; text-align:center">
 		@foreach (var subj in Model.Subjects)
 		{
-			if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(subj.ID_Subject)){
+			if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(subj.ID_Subject))
+			{
 				if (subj.ID_Subject == Model.selectedSubject.ID_Subject)
 				{
 					<option value="@subj.ID_Subject" selected>@subj.Name_subject</option>
@@ -40,7 +41,7 @@
 	</select>
 </form>
 
-<table class="table" id="myTable" style="width:1200px">
+<table class="table" id="myTable" style="width:95%">
 
 	<thead>
 		<tr>
@@ -48,27 +49,42 @@
 				<h6 style="margin-bottom : 0px; text-align:center;">Студент</h6>
 			</th>
 			<th id="tableLabel">
-				<h6 style="margin-bottom : 0px; text-align:center; padding-right:100px;">Оценка</h6>
+				<h6 style="margin-bottom : 0px; text-align:center; display:inline">Оценка</h6>
+				<button  type="button" id="ChangeGrade" class="btn btn-warning">Изменить</button>
+			</th>
+			<th id="tableLabel">
+				<h6 style="margin-bottom : 0px; text-align:center">Тип работы</h6>
 			</th>
 		</tr>
 	</thead>
-	<form asp-controller="Home" asp-action="ExamsMarks">
 	<tbody>
-			@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
-			{
-				//var data = item.Date.ToString("dd MMMM yyyy");
+		@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
+		{
+			//var data = item.Date.ToString("dd MMMM yyyy");
 			<tr>
 				<td style="text-align:center; font-weight: bold">
 					<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
 				</td>
-				@foreach(var r in Model.Academic_Performances.Where(z=>z.ID_Student == item.ID_Student).Where(y=>y.ID_Subject == Model.selectedSubject.ID_Subject))
+				@foreach (var r in Model.Academic_Performances.Where(z => z.ID_Student == item.ID_Student).Where(y => y.ID_Subject == Model.selectedSubject.ID_Subject))
 				{
-					<td style="text-align:center;  padding-right:100px; font-weight: bold ">
-					<p id="label_s">@r.Grade</p>
-				</td>
+					<td style="text-align:center;  padding-right:20%; font-weight: bold ">
+						<p id="label_s">@r.Grade</p>
+					</td>
+
+					<td style="text-align:center;  font-weight: bold ">
+						<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
+					</td>
 				}
 			</tr>
-			}
+		}
 	</tbody>
-	</form>
 </table>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type='text/javascript'>
+
+	$('#ChangeGrade').click(function () {
+		alert("В разработке");
+	});
+
+</script>

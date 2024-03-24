@@ -11,7 +11,7 @@
 <h1>@ViewData["Title"]</h1>
 <p>Выберите группу</p>
 
-<form asp-controller="Home" asp-action="ShowData">
+<form asp-controller="Student" asp-action="ShowStudents">
 	<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
 		@foreach (var groups in Model.Groups)
 		{
@@ -46,7 +46,7 @@
 			</th>
 		</tr>
 	</thead>
-	<form asp-controller="Home" asp-action="ShowData">
+	<form asp-controller="Student" asp-action="ShowStudents">
 	<tbody>
 			@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
 			{
@@ -76,7 +76,7 @@
 	var myTable = document.getElementById("myTable")
 
 	function DropStudent(Id) {
-		fetch('/Home/DropStudent/' + Id)
+		fetch('/Student/DropStudent/' + Id)
 			// .then(function (response) {
 			// 	return response.text();
 			// })

@@ -1,28 +1,3 @@
-/* _content/recordBook/Views/Home/AddSubject.cshtml.rz.scp.css */
-.form-group2[b-m45tzvt20v] {
-    position: fixed;
-    display: inline-block;
-    width: 30%;
-    /*top:50px;*/
-}
-
-
-.form-group3[b-m45tzvt20v] {
-    position: fixed;
-    display: inline-block;
-    width: 40%;
-    margin-left: 35%;
-}
-
-.grSelectBtn[b-m45tzvt20v] {
-    text-align: center;
-    width: 100px;
-    border: solid;
-    border-color: gray;
-    border-width: 1px;
-    height: 45px;
-    border-radius: 100px;
-}
 /* _content/recordBook/Views/Home/AttendanceOfStudents.cshtml.rz.scp.css */
 input[type="checkbox"]:disabled[b-u9xm3bsodb] {
     width: 20px;
@@ -187,3 +162,28 @@ button.accept-policy[b-fkdb7xsfkg] {
     background-color: #fff;
     text-align: center;
 }*/
+/* _content/recordBook/Views/Subject/AddSubject.cshtml.rz.scp.css */
+.form-group2[b-x8k36rtrvq] {
+    position: fixed;
+    display: inline-block;
+    width: 30%;
+    /*top:50px;*/
+}
+
+
+.form-group3[b-x8k36rtrvq] {
+    position: fixed;
+    display: inline-block;
+    width: 40%;
+    margin-left: 35%;
+}
+
+.grSelectBtn[b-x8k36rtrvq] {
+    text-align: center;
+    width: 100px;
+    border: solid;
+    border-color: gray;
+    border-width: 1px;
+    height: 45px;
+    border-radius: 100px;
+}
