@@ -45,14 +45,21 @@ namespace recordBook.Controllers
 		}
 		#endregion
 
-
-		public async Task<IActionResult> AddSubject()
+		/// <summary>
+		/// открывает страницу добавления предмета
+		/// </summary>
+		/// <returns></returns>
+		public ViewResult AddSubject() /*async Task<IActionResult>*/
 		{
 			var model2 = new AddSubjectViewModel { Groups = GetGroups(), subjectAdded = false };
 			return View(model2);
 		}
 
-
+		/// <summary>
+		/// проверяет заполненость нужных полей, добавляет предмет
+		/// </summary>
+		/// <param name="AddSubj">JSON файл с моделью студента</param>
+		/// <returns>JSON файл с странице и информацией о студенте и результатом о его добавлении</returns>
 		[HttpPost]
 		[Consumes("application/json")]
 		public async Task<IActionResult> AddSubject([FromBody] AddSubjectViewModel AddSubj)
@@ -82,10 +89,14 @@ namespace recordBook.Controllers
 			}
 		}
 
-
+		/// <summary>
+		/// ищет нужную группу, чтобы добавить её в таблицу выбранных групп
+		/// </summary>
+		/// <param name="Id">id группы</param>
+		/// <returns>JSON файл с информацией о группе</returns>
 		[HttpGet]
 		[Route("Subject/SelectGroup/{Id:int}")]
-		public async Task<IActionResult> SelectGroup(int Id)
+		public JsonResult SelectGroup(int Id) /*async Task<IActionResult>*/
 		{
 			return Json(_group.GetGroupbyID(Id));
 		}

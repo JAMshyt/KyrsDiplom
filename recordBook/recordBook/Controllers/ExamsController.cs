@@ -82,6 +82,13 @@ namespace recordBook.Controllers
 
 		#endregion
 
+
+		/// <summary>
+		/// Выводит все оценки по всем экзамнам. Сортирует их по группам и предметам
+		/// </summary>
+		/// <param name="selectedGroup">id выбранной группы</param>
+		/// <param name="selectedSubject">id выбранного предмета</param>
+		/// <returns>модель с информацией об оценках всех студентов выбранной группы по выбранному предмету</returns>
 		public async Task<IActionResult> ExamsMarks(int selectedGroup, int selectedSubject)
 		{
 
@@ -113,9 +120,13 @@ namespace recordBook.Controllers
 
 		}
 
+		/// <summary>
+		/// Изменяет оценки
+		/// </summary>
+		/// <returns></returns>
 		[HttpGet]
 		[Route("Exams/ChangeGrades/")]
-		public async Task<IActionResult> ChangeGrades()
+		public /*async Task<IActionResult>*/ JsonResult ChangeGrades()
 		{
 			return Json("работает");
 		}

@@ -144,7 +144,7 @@ namespace recordBook.Controllers
 		//}
 
 
-		public async Task<IActionResult> AttendanceOfStudents(int selectedGroup, int selectedSubject)
+		public ViewResult AttendanceOfStudents(int selectedGroup, int selectedSubject) /*async Task<IActionResult>*/
 		{
 
 			if (selectedGroup > 0 & selectedSubject > 0)

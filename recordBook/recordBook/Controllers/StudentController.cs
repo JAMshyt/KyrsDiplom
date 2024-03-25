@@ -48,6 +48,12 @@ namespace recordBook.Controllers
 		}
 		#endregion
 
+
+		/// <summary>
+		/// выводит всех студентов по группам
+		/// </summary>
+		/// <param name="selectedGroup">id выбранной группы</param>
+		/// <returns>модел с всеми учениками выбранной группы</returns>
 		public async Task<IActionResult> ShowStudents(int selectedGroup)
 		{
 			if (selectedGroup > 0)
@@ -64,7 +70,11 @@ namespace recordBook.Controllers
 		}
 
 
-
+		/// <summary>
+		/// удаляет студента
+		/// </summary>
+		/// <param name="Id">id студента</param>
+		/// <returns>возвращает обратно на сайт но не обновляет содержимое, чтобы студент убрался надо обновить страницу</returns>
 		[HttpGet]
 		[Route("Student/DropStudent/{Id:int}")]
 		public async Task<IActionResult> DropStudent(int Id)
@@ -76,13 +86,23 @@ namespace recordBook.Controllers
 			}
 			return RedirectToAction(nameof(ShowStudents));
 		}
+		
 
-		public async Task<IActionResult> AddStudent()
+		/// <summary>
+		/// страница добавления студента
+		/// </summary>
+		/// <returns></returns>
+		public ViewResult AddStudent() /*async Task<IActionResult>*/
 		{
 			var model2 = new AddStudentViewModel { Groups = GetGroups(), ID_Group = GetGroups().FirstOrDefault().ID_Group, studentAdded = false };
 			return View(model2);
 		}
 
+		/// <summary>
+		/// добавляет студента, проверяет заполненность нужных полей
+		/// </summary>
+		/// <param name="addStu">модель студента</param>
+		/// <returns>возвращает обратно на сайт с оповещением о результате добваления</returns>
 		[HttpPost]
 		public async Task<IActionResult> AddStudent(AddStudentViewModel addStu)
 		{
