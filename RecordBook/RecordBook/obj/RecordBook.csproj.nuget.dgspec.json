@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\RecordBook\\recordBook\\recordBook.csproj": {}
+    "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\recordBook\\recordBook\\recordBook.csproj": {}
   },
   "projects": {
-    "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\RecordBook\\recordBook\\recordBook.csproj": {
+    "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\recordBook\\recordBook\\recordBook.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\RecordBook\\recordBook\\recordBook.csproj",
+        "projectUniqueName": "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\recordBook\\recordBook\\recordBook.csproj",
         "projectName": "recordBook",
-        "projectPath": "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\RecordBook\\recordBook\\recordBook.csproj",
+        "projectPath": "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\recordBook\\recordBook\\recordBook.csproj",
         "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-        "outputPath": "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\RecordBook\\recordBook\\obj\\",
+        "outputPath": "D:\\Лабы\\ещё один курс\\КурсачДипломРепоз\\recordBook\\recordBook\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
