@@ -85,6 +85,15 @@
 
 	$('#ChangeGrade').click(function () {
 		alert("В разработке");
+		var url = "/Exams/ChangeGrades";
+		$.ajax({
+			url: url,
+			method: 'GET',
+			dataType: 'json',
+			success: function (product) {
+				console.log(product);
+			},
+		});
 	});
 
 </script>

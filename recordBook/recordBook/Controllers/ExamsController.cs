@@ -113,5 +113,12 @@ namespace recordBook.Controllers
 
 		}
 
+		[HttpGet]
+		[Route("Exams/ChangeGrades/")]
+		public async Task<IActionResult> ChangeGrades()
+		{
+			return Json("работает");
+		}
+
 	}
 }
