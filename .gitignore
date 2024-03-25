@@ -11,6 +11,7 @@ recordBook\recordBook\obj
 recordBook/recordBook/bin
 recordBook/recordBook/obj
 RecordBook
+RecordBook/
 /.vs
 .vs
 bin
@@ -22,3 +23,19 @@ obj
 [Rr]elease/
 **/obj/
 **/bin/
+/RecordBook/.vs/RecordBook/v17/.suo
+/RecordBook/RecordBook/bin/Debug/net7.0/RecordBook.dll
+/RecordBook/RecordBook/bin/Debug/net7.0/RecordBook.exe
+/RecordBook/RecordBook/bin/Debug/net7.0/RecordBook.pdb
+/RecordBook/RecordBook/bin/Debug/net7.0/RecordBook.staticwebassets.runtime.json
+/RecordBook/RecordBook/obj/Debug/net7.0/ref/RecordBook.dll
+/RecordBook/RecordBook/obj/Debug/net7.0/refint/RecordBook.dll
+/RecordBook/RecordBook/obj/Debug/net7.0/apphost.exe
+/RecordBook/RecordBook/obj/Debug/net7.0/RecordBook.AssemblyInfo.cs
+/RecordBook/RecordBook/obj/Debug/net7.0/RecordBook.AssemblyInfoInputs.cache
+/RecordBook/RecordBook/obj/Debug/net7.0/RecordBook.dll
+/RecordBook/RecordBook/obj/Debug/net7.0/RecordBook.genruntimeconfig.cache
+/RecordBook/RecordBook/obj/Debug/net7.0/RecordBook.pdb
+/RecordBook/RecordBook/obj/Debug/net7.0/staticwebassets.build.json
+/RecordBook/RecordBook/obj/Debug/net7.0/staticwebassets.development.json
+/RecordBook/RecordBook/obj/Debug/net7.0/staticwebassets.pack.json
