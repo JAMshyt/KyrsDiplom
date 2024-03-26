@@ -50,7 +50,7 @@
 			</th>
 			<th id="tableLabel">
 				<h6 style="margin-bottom : 0px; text-align:center; display:inline">Оценка</h6>
-				<button  type="button" id="ChangeGrade" class="btn btn-warning">Изменить</button>
+				<button type="button" id="ChangeGrade" class="btn btn-warning">Изменить</button>
 			</th>
 			<th id="tableLabel">
 				<h6 style="margin-bottom : 0px; text-align:center">Тип работы</h6>
@@ -61,14 +61,21 @@
 		@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
 		{
 			//var data = item.Date.ToString("dd MMMM yyyy");
-			<tr>
+			<tr id="columnGrade">
 				<td style="text-align:center; font-weight: bold">
 					<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
 				</td>
 				@foreach (var r in Model.Academic_Performances.Where(z => z.ID_Student == item.ID_Student).Where(y => y.ID_Subject == Model.selectedSubject.ID_Subject))
 				{
-					<td style="text-align:center;  padding-right:20%; font-weight: bold ">
-						<p id="label_s">@r.Grade</p>
+					<td id="cellGrade" style="text-align:center;  padding-right:20%; font-weight: bold ">
+						<p class="labelsGrade">@r.Grade</p>
+						<select class="selectGrades" style="width:200px; height:30px; text-align:center">
+							<option>Отлично</option>
+							<option>Хорошо</option>
+							<option>Удовлетворительно</option>
+							<option>Не удовлетворительно</option>
+							<option selected>-</option>
+						</select>
 					</td>
 
 					<td style="text-align:center;  font-weight: bold ">
@@ -83,8 +90,12 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type='text/javascript'>
 
+	$(document).ready(function () {
+		$('.selectGrades').hide();
+
+	});
+
 	$('#ChangeGrade').click(function () {
-		alert("В разработке");
 		var url = "/Exams/ChangeGrades";
 		$.ajax({
 			url: url,
@@ -94,6 +105,19 @@
 				console.log(product);
 			},
 		});
+
+		if ($(".labelsGrade").is(':visible')) {
+			$('.labelsGrade').hide();
+			$('.selectGrades').show();
+			$('#ChangeGrade').text('Сохранить');
+		}
+		else {
+			$('.labelsGrade').show();
+			$('.selectGrades').hide();
+			$('#ChangeGrade').text('Изменить');
+			console.log('shit');
+		}
+
 	});
 
 </script>
