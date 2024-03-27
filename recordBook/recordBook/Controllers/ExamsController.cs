@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text.Json.Nodes;
+using Azure.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -101,18 +103,30 @@ namespace recordBook.Controllers
 					selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
 				}
 				var subjectById = _subject.GetSubjectbyID(selectedSubject);
-				var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(),
-					Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(),
-					selectedGroup = groupById, selectedSubject = subjectById,
+				var model = new Exams
+				{
+					Groups = GetGroups(),
+					Students = GetStudents(),
+					Group_Subjects = GetGroup_Subject(),
+					Subjects = GetSubjects(),
+					Academic_Performances = GetAcademic_performance(),
+					selectedGroup = groupById,
+					selectedSubject = subjectById,
 					Kind_of_works = GetKind_of_works(),
 				};
 				return View(model);
 			}
 			else
 			{
-				var model = new Exams { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(),
-					Subjects = GetSubjects(), Academic_Performances = GetAcademic_performance(),
-					selectedGroup = GetGroups().FirstOrDefault(), selectedSubject = GetSubjects().FirstOrDefault(),
+				var model = new Exams
+				{
+					Groups = GetGroups(),
+					Students = GetStudents(),
+					Group_Subjects = GetGroup_Subject(),
+					Subjects = GetSubjects(),
+					Academic_Performances = GetAcademic_performance(),
+					selectedGroup = GetGroups().FirstOrDefault(),
+					selectedSubject = GetSubjects().FirstOrDefault(),
 					Kind_of_works = GetKind_of_works(),
 				};
 				return View(model);
@@ -120,15 +134,30 @@ namespace recordBook.Controllers
 
 		}
 
+
+
+		public class IdAndGrade
+		{
+			public int Id{ get; set; }
+			public string newGrade { get; set; }
+
+		}
+
 		/// <summary>
 		/// Изменяет оценки
 		/// </summary>
 		/// <returns></returns>
-		[HttpGet]
-		[Route("Exams/ChangeGrades/")]
-		public /*async Task<IActionResult>*/ JsonResult ChangeGrades()
+		[HttpPost]
+		[Route("/Exams/ChangeGrades/")]
+		[Consumes("application/json")]
+		public async Task<IActionResult> ChangeGrades([FromBody] IdAndGrade request) 
 		{
-			return Json("работает");
+
+			Academic_performance oldAcademPerf = GetAcademic_performance().FirstOrDefault(z=>z.ID_Academic_performance == request.Id);
+			oldAcademPerf.Grade = request.newGrade;
+			await _academic_performance.UpdateAcademic_performance(oldAcademPerf);
+			var str = request.Id + " "+ request.newGrade;
+			return Json(str);
 		}
 
 	}

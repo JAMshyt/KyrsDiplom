@@ -50,7 +50,7 @@
 			</th>
 			<th id="tableLabel">
 				<h6 style="margin-bottom : 0px; text-align:center; display:inline">Оценка</h6>
-				<button type="button" id="ChangeGrade" class="btn btn-warning">Изменить</button>
+				<button type="button" id="ChangeGradeBtn" class="btn btn-warning">Изменить</button>
 			</th>
 			<th id="tableLabel">
 				<h6 style="margin-bottom : 0px; text-align:center">Тип работы</h6>
@@ -69,12 +69,12 @@
 				{
 					<td id="cellGrade" style="text-align:center;  padding-right:20%; font-weight: bold ">
 						<p class="labelsGrade">@r.Grade</p>
-						<select class="selectGrades" style="width:200px; height:30px; text-align:center">
-							<option>Отлично</option>
-							<option>Хорошо</option>
-							<option>Удовлетворительно</option>
-							<option>Не удовлетворительно</option>
-							<option selected>-</option>
+						<select class="selectGrades" onchange="GradeIsChanged(@r.ID_Academic_performance,event)" style="width:200px; height:30px; text-align:center">
+							<option value="Отлично">Отлично</option>
+							<option value="Хорошо">Хорошо</option>
+							<option value="Удовлетворительно">Удовлетворительно</option>
+							<option value="Не удовлетворительно">Не удовлетворительно</option>
+							<option value="-" selected>-</option>
 						</select>
 					</td>
 
@@ -95,29 +95,28 @@
 
 	});
 
-	$('#ChangeGrade').click(function () {
-		var url = "/Exams/ChangeGrades";
-		$.ajax({
-			url: url,
-			method: 'GET',
-			dataType: 'json',
-			success: function (product) {
-				console.log(product);
-			},
-		});
-
-		if ($(".labelsGrade").is(':visible')) {
-			$('.labelsGrade').hide();
+	$('#ChangeGradeBtn').click(function (id) {
+		if ($('#ChangeGradeBtn').text() == 'Изменить') {
 			$('.selectGrades').show();
-			$('#ChangeGrade').text('Сохранить');
+			$('#ChangeGradeBtn').text('Сохранить');
 		}
 		else {
-			$('.labelsGrade').show();
 			$('.selectGrades').hide();
-			$('#ChangeGrade').text('Изменить');
-			console.log('shit');
+			$('#ChangeGradeBtn').text('Изменить');
+			location.reload()
 		}
 
 	});
+
+	function GradeIsChanged(id,event) {
+		var grade = event.target.value;
+		$.ajax({
+			type: 'POST',
+			url: '/Exams/ChangeGrades/',
+			contentType: 'application/json',
+			data: JSON.stringify({ id: id, newGrade: grade }),
+			dataType: 'json',
+		});
+	};
 
 </script>
