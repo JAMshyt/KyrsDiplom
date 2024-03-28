@@ -3,7 +3,7 @@
 
 @model Exams
 @{
-	ViewData["Title"] = "Студенты групы " + Model.selectedGroup.Name_group;
+	ViewData["Title"] = "Экзамены групы " + Model.selectedGroup.Name_group;
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -55,6 +55,9 @@
 			<th id="tableLabel">
 				<h6 style="margin-bottom : 0px; text-align:center">Тип работы</h6>
 			</th>
+			<th id="tableLabel">
+				<h6 style="margin-bottom : 0px; text-align:center">Дата сдачи</h6>
+			</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -67,7 +70,7 @@
 				</td>
 				@foreach (var r in Model.Academic_Performances.Where(z => z.ID_Student == item.ID_Student).Where(y => y.ID_Subject == Model.selectedSubject.ID_Subject))
 				{
-					<td id="cellGrade" style="text-align:center;  padding-right:20%; font-weight: bold ">
+					<td id="cellGrade" style="text-align:center;  padding-right:10%; font-weight: bold ">
 						<p class="labelsGrade">@r.Grade</p>
 						<select class="selectGrades" onchange="GradeIsChanged(@r.ID_Academic_performance,event)" style="width:200px; height:30px; text-align:center">
 							<option value="Отлично">Отлично</option>
@@ -80,6 +83,9 @@
 
 					<td style="text-align:center;  font-weight: bold ">
 						<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
+					</td>
+					<td style="text-align:center;  font-weight: bold ">
+						<p id="label_s"> @r.Date.ToString("dd MMMM yyyy") </p>
 					</td>
 				}
 			</tr>
