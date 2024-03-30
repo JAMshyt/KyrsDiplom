@@ -1,4 +1,4 @@
-﻿@model recordBook.Models.UserViewModel;
+﻿@model recordBook.Models.AuthorizationViewModel;
 @{
 	Layout = "~/Views/Shared/_IndexLayout.cshtml";
 	ViewData["Title"] = "Вход";
@@ -6,11 +6,16 @@
 
 <div class="text-center">
 	<h1 class="display-4">Авторизация</h1>
-	<form  asp-action="Index" asp-controller="Home">
-		<input type="text" asp-for="Login" placeholder="Логин" style="width:400px;"><br>
+	<form asp-action="Authorization" asp-controller="Home">
 		<span asp-validation-for="Login" style="color:red;"></span><br>
-		<input type="text" asp-for="Password" placeholder="Пароль" style="width:400px;"><br>
+		<input type="text" asp-for="Login" placeholder="Логин" style="width:400px;"><br>
 		<span asp-validation-for="Password" style="color:red;"></span><br>
+		<input type="text" asp-for="Password" placeholder="Пароль" style="width:400px;"><br>
+
+		@if (Model.ErrorText)
+		{
+			<span style="color:red;">Логин или пароль не верны</span><br>
+		}
 		<input type="submit" value="Войти" style="height:30px;">
 		<input type="submit" asp-action="ShowData" asp-controller="Home" value="Зарегистрироваться" style="border:0px; width:195px; height:30px;">
 	</form>

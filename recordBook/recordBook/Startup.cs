@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 using recordBook.Models;
 using recordBook.Repositories;
 using recordBook.RInterface;
@@ -15,6 +16,8 @@ namespace recordBook
 		}
 		public void ConfigureServices(IServiceCollection services)
 		{
+			var builder = WebApplication.CreateBuilder();
+
 			string? connection = Configuration.GetConnectionString("DefaultConnection");
 			services.AddDbContext<Context>(options =>
 			options.UseSqlServer(connection));
@@ -32,6 +35,14 @@ namespace recordBook
 			services.AddScoped<IAttendance, AttendanceRepositories>();
 			services.AddScoped<IDepartment_worker_Academic_performance, Department_worker_Academic_performanceRepositories>();
 			services.AddScoped<IGroup_Subject, Group_SubjectRepositories>();
+
+			services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+	.AddCookie(options => options.LoginPath = "/Authorization");
+			builder.Services.AddAuthorization();
+
+			var app = builder.Build();
+			app.UseAuthentication();
+			app.UseAuthorization();
 
 		}
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -56,7 +67,7 @@ namespace recordBook
 			{
 				endpoints.MapControllerRoute(
 				name: "default",
-				pattern: "{controller=Home}/{action=Index}/{id?}");
+				pattern: "{controller=Home}/{action=Authorization}/{id?}");
 			});
 		}
 	}

@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
@@ -104,6 +108,39 @@ namespace recordBook.Controllers
 		#endregion
 
 		#region страницы
+
+		public ViewResult Authorization()
+		{
+			AuthorizationViewModel user = new AuthorizationViewModel() { ErrorText = false };
+			return View(user);
+		}
+
+
+		[HttpPost]
+		public async Task<ActionResult> Authorization(AuthorizationViewModel user)
+		{
+			if (ModelState.IsValid)
+			{
+				Student? student = GetStudents().FirstOrDefault(q => q.Surname == user.Login && q.Name == user.Password);
+				if (student is null)
+				{
+					user.ErrorText = true;
+					return View(user);
+				}
+				else
+				{
+					user.ErrorText = false;
+					var claims = new List<Claim> { new Claim(ClaimTypes.Surname, student.Surname) };// создаем объект ClaimsIdentity
+
+					ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");// установка аутентификационных куки
+
+					await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+					return RedirectToAction("ShowStudents", "Student");
+				}
+			}
+			else return View(user);
+		}
 
 		//public async Task<IActionResult> ShowData(int selectedGroup)
 		//{
@@ -244,27 +281,6 @@ namespace recordBook.Controllers
 
 
 		#endregion
-
-
-
-		public IActionResult Index()
-		{
-			return View();
-		}
-
-
-		[HttpPost]
-		public IActionResult Index(UserViewModel user)
-		{
-			if (ModelState.IsValid)
-			{
-				return Content(user.Login + " " + user.Password);
-			}
-			else return View(user);
-		}
-
-
-
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 		public IActionResult Error()
