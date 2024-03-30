@@ -16,3 +16,7 @@
 /RecordBook/RecordBook/obj/RecordBook.csproj.nuget.g.props
 /RecordBook/RecordBook/bin/Debug/net7.0/RecordBook.deps.json
 /RecordBook/RecordBook/RecordBook.csproj
+/RecordBook/RecordBook/obj/Debug/net7.0/scopedcss/bundle/RecordBook.styles.css
+/RecordBook/RecordBook/obj/Debug/net7.0/scopedcss/projectbundle/RecordBook.bundle.scp.css
+/RecordBook/RecordBook/obj/Debug/net7.0/RecordBook.csproj.CoreCompileInputs.cache
+/RecordBook/RecordBook/obj/Debug/net7.0/RecordBook.csproj.FileListAbsolute.txt
