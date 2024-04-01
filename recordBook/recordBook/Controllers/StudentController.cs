@@ -60,6 +60,8 @@ namespace recordBook.Controllers
 		/// <returns>модел с всеми учениками выбранной группы</returns>
 		public async Task<IActionResult> ShowStudents(int selectedGroup)
 		{
+			TempData["UserName"] = User.Identity.Name;
+			TempData["UserSurname"] = User.FindFirst(ClaimTypes.Surname)?.Value;
 			if (selectedGroup > 0)
 			{
 				var groupById = _group.GetGroupbyID(selectedGroup);

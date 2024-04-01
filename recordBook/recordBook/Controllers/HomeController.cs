@@ -160,6 +160,9 @@ namespace recordBook.Controllers
 					var userName = HttpContext.User.Identity.Name;
 					var surname = HttpContext.User.FindFirst(ClaimTypes.Surname)?.Value;
 
+					TempData["UserName"] = User.Identity.Name;
+					TempData["UserSurname"] = User.FindFirst(ClaimTypes.Surname)?.Value;
+
 					return RedirectToAction("ShowStudents", "Student");
 				}
 			}
