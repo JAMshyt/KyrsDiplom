@@ -139,18 +139,26 @@ namespace recordBook.Controllers
 				else
 				{
 					user.ErrorText = false;
-					var claims = new List<Claim> { new Claim(ClaimTypes.Name, login.Login), new Claim(ClaimTypes.Surname, login.Email) };// создаем объект ClaimsIdentity
 
-					ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");// установка аутентификационных куки
-
-					await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-
-					Response.Cookies.Append("cookieName", "cookieValue", new CookieOptions
+					var cookieOptions = new CookieOptions
 					{
-						SameSite = SameSiteMode.None,
-						Secure = true
-					});
+						Secure = true,
+						HttpOnly = true,
+						SameSite = SameSiteMode.Strict
+					};
+					
+					Response.Cookies.Append("cookieName", "cookieValue", cookieOptions);
 
+					var claims = new List<Claim> { new Claim(ClaimTypes.Name, login.Login), new Claim(ClaimTypes.Surname, login.Email) };
+					ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
+					await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+					
+					Response.Cookies.Append("cookieName", "cookieValue", cookieOptions);
+
+					var test = User.Identity.Name+ " "+ User.FindFirst(ClaimTypes.Surname)?.Value;
+					var cookieValue = Request.Cookies["cookieName"];
+					var userName = HttpContext.User.Identity.Name;
+					var surname = HttpContext.User.FindFirst(ClaimTypes.Surname)?.Value;
 
 					return RedirectToAction("ShowStudents", "Student");
 				}
