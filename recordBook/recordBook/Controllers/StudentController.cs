@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc;
@@ -22,8 +23,10 @@ namespace recordBook.Controllers
 		private readonly ISubject _subject;
 		private readonly IGroup_Subject _group_subject;
 
+		private readonly ILogins _user;
+
 		public StudentController(ILogger<StudentController> logger, IStudent student,
-			IGroup group, ISubject subject,	IGroup_Subject group_subject
+			IGroup group, ISubject subject,	IGroup_Subject group_subject, ILogins user
 			)
 		{
 			_logger = logger;
@@ -31,6 +34,7 @@ namespace recordBook.Controllers
 			_group = group;
 			_subject = subject;
 			_group_subject = group_subject;
+			_user = user;
 		}
 
 
@@ -59,12 +63,12 @@ namespace recordBook.Controllers
 			if (selectedGroup > 0)
 			{
 				var groupById = _group.GetGroupbyID(selectedGroup);
-				var model = new GroupsStudents { Groups = GetGroups(), Students = GetStudents(), selectedGroup = groupById };
+				var model = new GroupsStudentsViewModel {UserName = User.Identity.Name, Groups = GetGroups(), Students = GetStudents(), selectedGroup = groupById };
 				return View(model);
 			}
 			else
 			{
-				var model = new GroupsStudents { Groups = GetGroups(), Students = GetStudents(), selectedGroup = GetGroups().FirstOrDefault() };
+				var model = new GroupsStudentsViewModel { UserName = User.FindFirst(ClaimTypes.Name)?.Value, Groups = GetGroups(), Students = GetStudents(), selectedGroup = GetGroups().FirstOrDefault() };
 				return View(model);
 			}
 		}

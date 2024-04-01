@@ -1,10 +1,10 @@
 ﻿@using recordBook.Models
 @using recordBook.Models.ViewModels
 
-@model GroupsStudents
-@*@Model.Groups *@
+@model GroupsStudentsViewModel
 @{
 	ViewData["Title"] = "Студенты групы " + Model.selectedGroup.Name_group;
+	ViewData["User"] = Model.UserName;
 	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 

@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using recordBook.Models;
 using recordBook.Models.ViewModels;
 using recordBook.RInterface;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace recordBook.Controllers
 {
@@ -30,12 +31,13 @@ namespace recordBook.Controllers
 		private readonly IAttendance _attedance;
 		private readonly IDepartment_worker_Academic_performance _department_worker_academic_performance;
 		private readonly IGroup_Subject _group_subject;
+		private readonly ILogins _logins;
 
 		public HomeController(ILogger<HomeController> logger, IStudent student,
 			IGroup group, ISubject subject, IKind_of_work kind_wf_work,
 			IDepartment_worker department_worker, IAcademic_performance academic_performance,
 			IAttendance attendance, IDepartment_worker_Academic_performance department_worker_academic_performance,
-			IGroup_Subject group_subject
+			IGroup_Subject group_subject, ILogins logins
 			)
 		{
 			_logger = logger;
@@ -48,6 +50,7 @@ namespace recordBook.Controllers
 			_attedance = attendance;
 			_department_worker_academic_performance = department_worker_academic_performance;
 			_group_subject = group_subject;
+			_logins = logins;
 		}
 
 		#region Get таблиц
@@ -105,6 +108,12 @@ namespace recordBook.Controllers
 			return group_subj;
 		}
 
+		public List<Logins> GetLogins()
+		{
+			var logins = _logins.GetAllLogins().ToList();
+			return logins;
+		}
+
 		#endregion
 
 		#region страницы
@@ -121,8 +130,8 @@ namespace recordBook.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				Student? student = GetStudents().FirstOrDefault(q => q.Surname == user.Login && q.Name == user.Password);
-				if (student is null)
+				Logins? login = GetLogins().FirstOrDefault(q => q.Login == user.Login && q.Password == user.Password);
+				if (login is null)
 				{
 					user.ErrorText = true;
 					return View(user);
@@ -130,11 +139,18 @@ namespace recordBook.Controllers
 				else
 				{
 					user.ErrorText = false;
-					var claims = new List<Claim> { new Claim(ClaimTypes.Surname, student.Surname) };// создаем объект ClaimsIdentity
+					var claims = new List<Claim> { new Claim(ClaimTypes.Name, login.Login), new Claim(ClaimTypes.Surname, login.Email) };// создаем объект ClaimsIdentity
 
 					ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");// установка аутентификационных куки
 
 					await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+					Response.Cookies.Append("cookieName", "cookieValue", new CookieOptions
+					{
+						SameSite = SameSiteMode.None,
+						Secure = true
+					});
+
 
 					return RedirectToAction("ShowStudents", "Student");
 				}

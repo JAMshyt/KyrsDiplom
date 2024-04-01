@@ -103,7 +103,7 @@ namespace recordBook.Controllers
 					selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
 				}
 				var subjectById = _subject.GetSubjectbyID(selectedSubject);
-				var model = new Exams
+				var model = new ExamsViewModel
 				{
 					Groups = GetGroups(),
 					Students = GetStudents(),
@@ -118,7 +118,7 @@ namespace recordBook.Controllers
 			}
 			else
 			{
-				var model = new Exams
+				var model = new ExamsViewModel
 				{
 					Groups = GetGroups(),
 					Students = GetStudents(),

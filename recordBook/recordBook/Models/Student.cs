@@ -22,6 +22,7 @@ namespace recordBook.Models
 
         [Required(ErrorMessage = "Выберите группу")]
         public int ID_Group { get; set; }
+		public int ID_Login { get; set; }
 
-    }
+	}
 }

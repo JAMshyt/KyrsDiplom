@@ -13,6 +13,7 @@ namespace recordBook.Models
 		public DbSet<Attendance> Attendance { get; set; }
 		public DbSet<Department_worker_Academic_performance> Department_worker_Academic_performance { get; set; }
 		public DbSet<Group_Subject> Group_Subject { get; set; }
+		public DbSet<Logins> Logins { get; set; }
 
 
 		public Context(DbContextOptions<Context> options)

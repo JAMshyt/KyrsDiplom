@@ -1,6 +1,6 @@
 ﻿namespace recordBook.Models.ViewModels
 {
-	public class Exams
+	public class ExamsViewModel
 	{
 		public IEnumerable<Group> Groups { get; set; }
 		public IEnumerable<Student> Students { get; set; }
