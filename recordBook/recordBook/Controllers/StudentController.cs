@@ -60,17 +60,16 @@ namespace recordBook.Controllers
 		/// <returns>модел с всеми учениками выбранной группы</returns>
 		public async Task<IActionResult> ShowStudents(int selectedGroup)
 		{
-			TempData["UserName"] = User.Identity.Name;
-			TempData["UserSurname"] = User.FindFirst(ClaimTypes.Surname)?.Value;
+			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value+" "+User.FindFirst(ClaimTypes.Name)?.Value;
 			if (selectedGroup > 0)
 			{
 				var groupById = _group.GetGroupbyID(selectedGroup);
-				var model = new GroupsStudentsViewModel {UserName = User.Identity.Name, Groups = GetGroups(), Students = GetStudents(), selectedGroup = groupById };
+				var model = new GroupsStudentsViewModel {Groups = GetGroups(), Students = GetStudents(), selectedGroup = groupById };
 				return View(model);
 			}
 			else
 			{
-				var model = new GroupsStudentsViewModel { UserName = User.FindFirst(ClaimTypes.Name)?.Value, Groups = GetGroups(), Students = GetStudents(), selectedGroup = GetGroups().FirstOrDefault() };
+				var model = new GroupsStudentsViewModel { Groups = GetGroups(), Students = GetStudents(), selectedGroup = GetGroups().FirstOrDefault() };
 				return View(model);
 			}
 		}
@@ -100,6 +99,7 @@ namespace recordBook.Controllers
 		/// <returns></returns>
 		public ViewResult AddStudent() /*async Task<IActionResult>*/
 		{
+			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 			var model2 = new AddStudentViewModel { Groups = GetGroups(), ID_Group = GetGroups().FirstOrDefault().ID_Group, studentAdded = false };
 			return View(model2);
 		}
@@ -112,6 +112,7 @@ namespace recordBook.Controllers
 		[HttpPost]
 		public async Task<IActionResult> AddStudent(AddStudentViewModel addStu)
 		{
+
 			if (ModelState.IsValid)
 			{
 				var addStudent = new Student() { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group };

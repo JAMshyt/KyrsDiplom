@@ -40,12 +40,8 @@ namespace recordBook
 
 			services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 	.AddCookie(options => options.LoginPath = "/Authorization");
-			builder.Services.AddAuthorization();
 
-			var app = builder.Build();
-			app.UseAuthentication();
-			app.UseAuthorization();
-
+			services.AddAuthorization();
 		}
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
@@ -63,6 +59,9 @@ namespace recordBook
 
 			app.UseRouting();
 
+			app.UseAuthorization();
+
+			app.UseAuthentication();
 			app.UseAuthorization();
 
 			app.UseEndpoints(endpoints =>

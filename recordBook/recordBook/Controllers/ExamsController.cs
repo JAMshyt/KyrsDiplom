@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Net;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text.Json.Nodes;
 using Azure.Core;
@@ -93,7 +94,7 @@ namespace recordBook.Controllers
 		/// <returns>модель с информацией об оценках всех студентов выбранной группы по выбранному предмету</returns>
 		public async Task<IActionResult> ExamsMarks(int selectedGroup, int selectedSubject)
 		{
-
+			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 			if (selectedGroup > 0 & selectedSubject > 0)
 			{
 				var groupById = _group.GetGroupbyID(selectedGroup);

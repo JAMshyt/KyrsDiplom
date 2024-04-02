@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc;
@@ -49,8 +50,9 @@ namespace recordBook.Controllers
 		/// открывает страницу добавления предмета
 		/// </summary>
 		/// <returns></returns>
-		public ViewResult AddSubject() /*async Task<IActionResult>*/
+		public ViewResult AddSubject()
 		{
+			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 			var model2 = new AddSubjectViewModel { Groups = GetGroups(), subjectAdded = false };
 			return View(model2);
 		}
