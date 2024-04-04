@@ -149,9 +149,13 @@ namespace recordBook.Controllers
 						new Claim(ClaimTypes.Name, student.Name),
 						new Claim(ClaimTypes.Surname, student.Surname),
 						new Claim(ClaimTypes.GivenName, student.Patronymic),
+						new Claim(ClaimTypes.Role, "Student"),
+						new Claim(ClaimTypes.GroupSid, Convert.ToString(student.ID_Group)),
+						new Claim(ClaimTypes.SerialNumber, Convert.ToString(student.ID_Student))
 						};
 						ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
 						await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+						return RedirectToAction("ExamsMarks", "Exams");
 					}
 					catch
 					{
@@ -163,12 +167,12 @@ namespace recordBook.Controllers
 						new Claim(ClaimTypes.Name, teacher.Name),
 						new Claim(ClaimTypes.Surname, teacher.Surname),
 						new Claim(ClaimTypes.GivenName, teacher.Patronymic),
+						new Claim(ClaimTypes.Role, "Teacher"),
 						};
 						ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
 						await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+						return RedirectToAction("ExamsMarks", "Exams");
 					}
-
-					return RedirectToAction("ShowStudents", "Student");
 				}
 			}
 			else return View(user);

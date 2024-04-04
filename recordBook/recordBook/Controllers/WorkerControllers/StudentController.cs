@@ -12,7 +12,7 @@ using recordBook.Models;
 using recordBook.Models.ViewModels;
 using recordBook.RInterface;
 
-namespace recordBook.Controllers
+namespace recordBook.Controllers.WorkerControllers
 {
 	public class StudentController : Controller
 	{
@@ -22,11 +22,13 @@ namespace recordBook.Controllers
 		private readonly IGroup _group;
 		private readonly ISubject _subject;
 		private readonly IGroup_Subject _group_subject;
+		private readonly ILogins _logins;
 
 		private readonly ILogins _user;
 
 		public StudentController(ILogger<StudentController> logger, IStudent student,
-			IGroup group, ISubject subject,	IGroup_Subject group_subject, ILogins user
+			IGroup group, ISubject subject, IGroup_Subject group_subject, ILogins user,
+			ILogins logins
 			)
 		{
 			_logger = logger;
@@ -35,6 +37,7 @@ namespace recordBook.Controllers
 			_subject = subject;
 			_group_subject = group_subject;
 			_user = user;
+			_logins = logins;
 		}
 
 
@@ -50,6 +53,12 @@ namespace recordBook.Controllers
 			var group = _group.GetAllGroup().ToList();
 			return group;
 		}
+
+		public List<Logins> GetLogins()
+		{
+			var logins = _logins.GetAllLogins().ToList();
+			return logins;
+		}
 		#endregion
 
 
@@ -60,11 +69,11 @@ namespace recordBook.Controllers
 		/// <returns>модел с всеми учениками выбранной группы</returns>
 		public async Task<IActionResult> ShowStudents(int selectedGroup)
 		{
-			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value+" "+User.FindFirst(ClaimTypes.Name)?.Value;
+			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 			if (selectedGroup > 0)
 			{
 				var groupById = _group.GetGroupbyID(selectedGroup);
-				var model = new GroupsStudentsViewModel {Groups = GetGroups(), Students = GetStudents(), selectedGroup = groupById };
+				var model = new GroupsStudentsViewModel { Groups = GetGroups(), Students = GetStudents(), selectedGroup = groupById };
 				return View(model);
 			}
 			else
@@ -91,7 +100,7 @@ namespace recordBook.Controllers
 			}
 			return RedirectToAction(nameof(ShowStudents));
 		}
-		
+
 
 		/// <summary>
 		/// страница добавления студента
@@ -115,7 +124,11 @@ namespace recordBook.Controllers
 
 			if (ModelState.IsValid)
 			{
-				var addStudent = new Student() { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group };
+				var login = new Logins() { Login = addStu.Login, Password = addStu.Password, Email = addStu.Email };
+				await _logins.AddLogin(login);
+
+				var idNewLogin = GetLogins().FirstOrDefault(q => q.Login == addStu.Login);
+				var addStudent = new Student() { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, ID_Login = idNewLogin.ID_Login};
 				await _student.AddStudent(addStudent);
 				var model2 = new AddStudentViewModel { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, Groups = GetGroups(), studentAdded = true };
 				return View(model2);

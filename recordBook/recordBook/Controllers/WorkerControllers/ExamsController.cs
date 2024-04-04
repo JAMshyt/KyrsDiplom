@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text.Json.Nodes;
 using Azure.Core;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ using recordBook.Models;
 using recordBook.Models.ViewModels;
 using recordBook.RInterface;
 
-namespace recordBook.Controllers
+namespace recordBook.Controllers.WorkerControllers
 {
 	public class ExamsController : Controller
 	{
@@ -95,51 +96,61 @@ namespace recordBook.Controllers
 		public async Task<IActionResult> ExamsMarks(int selectedGroup, int selectedSubject)
 		{
 			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
-			if (selectedGroup > 0 & selectedSubject > 0)
+
+			var model = new ExamsViewModel
 			{
-				var groupById = _group.GetGroupbyID(selectedGroup);
-				var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
-				if (!subjectsOfSelectedGroup.Contains(selectedSubject))
+				Groups = GetGroups(),
+				Students = GetStudents(),
+				Group_Subjects = GetGroup_Subject(),
+				Subjects = GetSubjects(),
+				Academic_Performances = GetAcademic_performance(),
+				selectedGroup = GetGroups().FirstOrDefault(),
+				selectedSubject = GetSubjects().FirstOrDefault(),
+				Kind_of_works = GetKind_of_works(),
+			};
+
+			if (User.FindFirst(ClaimTypes.Role)?.Value == "Teacher")
+			{
+
+
+				if (selectedGroup > 0 & selectedSubject > 0)
 				{
-					selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
+					var groupById = _group.GetGroupbyID(selectedGroup);
+					var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
+					if (!subjectsOfSelectedGroup.Contains(selectedSubject))
+					{
+						selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
+					}
+					var subjectById = _subject.GetSubjectbyID(selectedSubject);
+					model.selectedGroup = groupById;
+					model.selectedSubject = subjectById;
 				}
-				var subjectById = _subject.GetSubjectbyID(selectedSubject);
-				var model = new ExamsViewModel
-				{
-					Groups = GetGroups(),
-					Students = GetStudents(),
-					Group_Subjects = GetGroup_Subject(),
-					Subjects = GetSubjects(),
-					Academic_Performances = GetAcademic_performance(),
-					selectedGroup = groupById,
-					selectedSubject = subjectById,
-					Kind_of_works = GetKind_of_works(),
-				};
-				return View(model);
 			}
 			else
 			{
-				var model = new ExamsViewModel
+
+				model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+				model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+				model.Academic_Performances = GetAcademic_performance().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+				model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+				model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+
+
+				if (selectedSubject > 0)
 				{
-					Groups = GetGroups(),
-					Students = GetStudents(),
-					Group_Subjects = GetGroup_Subject(),
-					Subjects = GetSubjects(),
-					Academic_Performances = GetAcademic_performance(),
-					selectedGroup = GetGroups().FirstOrDefault(),
-					selectedSubject = GetSubjects().FirstOrDefault(),
-					Kind_of_works = GetKind_of_works(),
-				};
-				return View(model);
+					var subjectById = _subject.GetSubjectbyID(selectedSubject);
+					model.selectedSubject = subjectById;
+				}
 			}
 
+			return View(model);
 		}
 
 
 
 		public class IdAndGrade
 		{
-			public int Id{ get; set; }
+			public int Id { get; set; }
 			public string newGrade { get; set; }
 
 		}
@@ -151,13 +162,13 @@ namespace recordBook.Controllers
 		[HttpPost]
 		[Route("/Exams/ChangeGrades/")]
 		[Consumes("application/json")]
-		public async Task<IActionResult> ChangeGrades([FromBody] IdAndGrade request) 
+		public async Task<IActionResult> ChangeGrades([FromBody] IdAndGrade request)
 		{
 
-			Academic_performance oldAcademPerf = GetAcademic_performance().FirstOrDefault(z=>z.ID_Academic_performance == request.Id);
+			Academic_performance oldAcademPerf = GetAcademic_performance().FirstOrDefault(z => z.ID_Academic_performance == request.Id);
 			oldAcademPerf.Grade = request.newGrade;
 			await _academic_performance.UpdateAcademic_performance(oldAcademPerf);
-			var str = request.Id + " "+ request.newGrade;
+			var str = request.Id + " " + request.newGrade;
 			return Json(str);
 		}
 

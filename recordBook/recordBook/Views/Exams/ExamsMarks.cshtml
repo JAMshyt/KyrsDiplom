@@ -1,97 +1,155 @@
-﻿@using recordBook.Models
+﻿@using System.Security.Claims;
+@using recordBook.Models
 @using recordBook.Models.ViewModels
 
 @model ExamsViewModel
 @{
-	ViewData["Title"] = "Экзамены групы " + Model.selectedGroup.Name_group;
+	ViewData["Title"] = "Ваши оценки, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 }
 
 <h1>@ViewData["Title"]</h1>
 
 <form asp-controller="Exams" asp-action="ExamsMarks">
-	<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
-		@foreach (var groups in Model.Groups)
-		{
-			if (groups.ID_Group == Model.selectedGroup.ID_Group)
+	@if (User.FindFirst(ClaimTypes.Role)?.Value == "Teacher")
+	{
+		<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
+			@foreach (var groups in Model.Groups)
 			{
-				<option value="@groups.ID_Group" selected>@groups.Name_group</option>
-			}
-			else
-			{
-				<option value="@groups.ID_Group">@groups.Name_group</option>
-			}
-		}
-	</select>
-
-	<select name="selectedSubject" required onchange="this.form.submit()" style="width:200px; height:40px; text-align:center">
-		@foreach (var subj in Model.Subjects)
-		{
-			if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(subj.ID_Subject))
-			{
-				if (subj.ID_Subject == Model.selectedSubject.ID_Subject)
+				if (groups.ID_Group == Model.selectedGroup.ID_Group)
 				{
-					<option value="@subj.ID_Subject" selected>@subj.Name_subject</option>
+					<option value="@groups.ID_Group" selected>@groups.Name_group</option>
 				}
 				else
 				{
-					<option value="@subj.ID_Subject">@subj.Name_subject</option>
+					<option value="@groups.ID_Group">@groups.Name_group</option>
 				}
 			}
-		}
-	</select>
+		</select>
+
+
+		<select name="selectedSubject" required onchange="this.form.submit()" style="width:200px; height:40px; text-align:center">
+			@foreach (var subj in Model.Subjects)
+			{
+				if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(subj.ID_Subject))
+				{
+					if (subj.ID_Subject == Model.selectedSubject.ID_Subject)
+					{
+						<option value="@subj.ID_Subject" selected>@subj.Name_subject</option>
+					}
+					else
+					{
+						<option value="@subj.ID_Subject">@subj.Name_subject</option>
+					}
+				}
+			}
+		</select>
+	}
 </form>
 
-<table class="table" id="myTable" style="width:95%">
+@if (User.FindFirst(ClaimTypes.Role)?.Value == "Teacher")
+{
+	<table class="table" id="myTable" style="width:95%">
 
-	<thead>
-		<tr>
-			<th id="tableLabel">
-				<h6 style="margin-bottom : 0px; text-align:center;">Студент</h6>
-			</th>
-			<th id="tableLabel">
-				<h6 style="margin-bottom : 0px; text-align:center; display:inline">Оценка</h6>
-				<button type="button" id="ChangeGradeBtn" class="btn btn-warning">Изменить</button>
-			</th>
-			<th id="tableLabel">
-				<h6 style="margin-bottom : 0px; text-align:center">Тип работы</h6>
-			</th>
-			<th id="tableLabel">
-				<h6 style="margin-bottom : 0px; text-align:center">Дата сдачи</h6>
-			</th>
-		</tr>
-	</thead>
-	<tbody>
-		@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
-		{
-			//var data = item.Date.ToString("dd MMMM yyyy");
-			<tr id="columnGrade">
-				<td style="text-align:center; font-weight: bold">
-					<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
-				</td>
-				@foreach (var r in Model.Academic_Performances.Where(z => z.ID_Student == item.ID_Student).Where(y => y.ID_Subject == Model.selectedSubject.ID_Subject))
-				{
-					<td id="cellGrade" style="text-align:center;  padding-right:10%; font-weight: bold ">
-						<p class="labelsGrade">@r.Grade</p>
-						<select class="selectGrades" onchange="GradeIsChanged(@r.ID_Academic_performance,event)" style="width:200px; height:30px; text-align:center">
-							<option value="Отлично">Отлично</option>
-							<option value="Хорошо">Хорошо</option>
-							<option value="Удовлетворительно">Удовлетворительно</option>
-							<option value="Не удовлетворительно">Не удовлетворительно</option>
-							<option value="-" selected>-</option>
-						</select>
-					</td>
-
-					<td style="text-align:center;  font-weight: bold ">
-						<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
-					</td>
-					<td style="text-align:center;  font-weight: bold ">
-						<p id="label_s"> @r.Date.ToString("dd MMMM yyyy") </p>
-					</td>
-				}
+		<thead>
+			<tr>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center;">Студент</h6>
+				</th>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center; display:inline">Оценка</h6>
+					<button type="button" id="ChangeGradeBtn" class="btn btn-warning">Изменить</button>
+				</th>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center">Тип работы</h6>
+				</th>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center">Дата сдачи</h6>
+				</th>
 			</tr>
-		}
-	</tbody>
-</table>
+		</thead>
+		<tbody>
+			@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
+			{
+				//var data = item.Date.ToString("dd MMMM yyyy");
+				<tr id="columnGrade">
+					<td style="text-align:center; font-weight: bold">
+						<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
+					</td>
+					@foreach (var r in Model.Academic_Performances.Where(z => z.ID_Student == item.ID_Student).Where(y => y.ID_Subject == Model.selectedSubject.ID_Subject))
+					{
+						<td id="cellGrade" style="text-align:center;  padding-right:10%; font-weight: bold ">
+							<p class="labelsGrade">@r.Grade</p>
+							<select class="selectGrades" onchange="GradeIsChanged(@r.ID_Academic_performance,event)" style="width:200px; height:30px; text-align:center">
+								<option value="Отлично">Отлично</option>
+								<option value="Хорошо">Хорошо</option>
+								<option value="Удовлетворительно">Удовлетворительно</option>
+								<option value="Не удовлетворительно">Не удовлетворительно</option>
+								<option value="-" selected>-</option>
+							</select>
+						</td>
+
+						<td style="text-align:center;  font-weight: bold ">
+							<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
+						</td>
+						<td style="text-align:center;  font-weight: bold ">
+							<p id="label_s"> @r.Date.ToString("dd MMMM yyyy") </p>
+						</td>
+					}
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+else
+{
+	<table class="table" id="myTable" style="width:95%">
+
+		<thead>
+			<tr>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center;">Предмет</h6>
+				</th>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center; display:inline">Оценка</h6>
+				</th>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center">Тип работы</h6>
+				</th>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center">Дата сдачи</h6>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var subj in Model.Group_Subjects)
+			{
+				@foreach (var item in Model.Subjects.Where(q => q.ID_Subject == subj.ID_Subject))
+				{
+					//var data = item.Date.ToString("dd MMMM yyyy");
+					<tr id="columnGrade">
+						<td style="text-align:center; font-weight: bold">
+							<p id="label_s">@item.Name_subject</p>
+						</td>
+						@foreach (var r in Model.Academic_Performances.Where(y => y.ID_Subject == item.ID_Subject))
+						{
+							<td id="cellGrade" style="text-align:center;  padding-right:10%; font-weight: bold ">
+								<p class="labelsGrade">@r.Grade</p>
+							</td>
+
+							<td style="text-align:center;  font-weight: bold ">
+								<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
+							</td>
+							<td style="text-align:center;  font-weight: bold ">
+								<p id="label_s"> @r.Date.ToString("dd MMMM yyyy") </p>
+							</td>
+						}
+					</tr>
+				}
+			}
+		</tbody>
+	</table>
+}
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type='text/javascript'>
@@ -114,7 +172,7 @@
 
 	});
 
-	function GradeIsChanged(id,event) {
+	function GradeIsChanged(id, event) {
 		var grade = event.target.value;
 		$.ajax({
 			type: 'POST',
