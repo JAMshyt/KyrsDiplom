@@ -4,14 +4,21 @@
 
 @model ExamsViewModel
 @{
-	ViewData["Title"] = "Ваши оценки, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
+	@if (User.IsInRole("Student"))
+	{
+		ViewData["Title"] = "Ваши оценки, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
+	}
+	else
+	{
+		ViewData["Title"] = "Оценки группы " + Model.selectedGroup.Name_group;
+	}
 }
 
 <h1>@ViewData["Title"]</h1>
 
-<form asp-controller="Exams" asp-action="ExamsMarks">
-	@if (User.FindFirst(ClaimTypes.Role)?.Value == "Teacher")
-	{
+@if (User.IsInRole("Teacher"))
+{
+	<form asp-controller="Exams" asp-action="ExamsMarks">
 		<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
 			@foreach (var groups in Model.Groups)
 			{
@@ -43,11 +50,10 @@
 				}
 			}
 		</select>
-	}
-</form>
 
-@if (User.FindFirst(ClaimTypes.Role)?.Value == "Teacher")
-{
+	</form>
+
+
 	<table class="table" id="myTable" style="width:95%">
 
 		<thead>

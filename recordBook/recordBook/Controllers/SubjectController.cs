@@ -12,7 +12,7 @@ using recordBook.Models;
 using recordBook.Models.ViewModels;
 using recordBook.RInterface;
 
-namespace recordBook.Controllers.WorkerControllers
+namespace recordBook.Controllers
 {
     public class SubjectController : Controller
     {

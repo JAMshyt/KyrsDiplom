@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\StudentControllers\" />
     <Folder Include="Models\Migrations\" />
   </ItemGroup>
 

@@ -1,0 +1,162 @@
+﻿@using System.Security.Claims
+@using recordBook.Models
+@using recordBook.Models.ViewModels
+
+@model AttendanceViewModel
+@{
+	@if (User.IsInRole("Student"))
+	{
+		ViewData["Title"] = "Ваши оценки, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
+	}
+	else
+	{
+		ViewData["Title"] = "Оценки группы " + Model.selectedGroup.Name_group;
+	}
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (User.IsInRole("Teacher"))
+{
+	<form asp-controller="Attendance" asp-action="AttendanceOfStudents">
+		<select name="selectedGroup" required onchange="this.form.submit()" style="width:20%; height:40px; text-align:center">
+			@foreach (var groups in Model.Groups)
+			{
+				if (groups.ID_Group == Model.selectedGroup.ID_Group)
+				{
+					<option value="@groups.ID_Group" selected>@groups.Name_group</option>
+				}
+				else
+				{
+					<option value="@groups.ID_Group">@groups.Name_group</option>
+				}
+			}
+		</select>
+
+		<select name="selectedSubject" required onchange="this.form.submit()" style="width:30%; height:40px; text-align:center">
+			@foreach (var subj in Model.Subjects)
+			{
+				if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(subj.ID_Subject))
+				{
+					if (subj.ID_Subject == Model.selectedSubject.ID_Subject)
+					{
+						<option value="@subj.ID_Subject" selected>@subj.Name_subject</option>
+					}
+					else
+					{
+						<option value="@subj.ID_Subject">@subj.Name_subject</option>
+					}
+				}
+			}
+		</select>
+
+	</form>
+
+	<table class="table" id="myTable">
+
+		<thead>
+			<tr>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center;">Студент</h6>
+				</th>
+
+				@{
+					var RightAttendances = Model.Attendances.Where(z => z.ID_Subject == Model.selectedSubject.ID_Subject)
+					.Where(q => q.ID_Student == Model.Students
+					.Where(w => w.ID_Group == Model.selectedGroup.ID_Group)
+					.Select(r => r.ID_Student).FirstOrDefault());
+
+				}
+
+				@foreach (var item in RightAttendances)
+				{
+					<th id="tableLabel">
+						<h6 style="margin-bottom : 0px; text-align:center;">@item.Date_presence.ToString("dd.MM")</h6>
+					</th>
+				}
+			</tr>
+		</thead>
+
+		<tbody>
+			@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
+			{
+				<tr>
+					<td style="text-align:center; font-weight: bold">
+						<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
+					</td>
+					@foreach (var r in Model.Attendances.Where(z => z.ID_Student == item.ID_Student)
+							.Where(q => q.ID_Subject == Model.selectedSubject.ID_Subject))
+					{
+						<td style="text-align:center; font-weight: bold;">
+							@if (@r.Precense == true)
+							{
+								<input type="checkbox" checked disabled>
+							}
+							else
+							{
+								<input type="checkbox" disabled>
+							}
+						</td>
+					}
+				</tr>
+			}
+		</tbody>
+
+	</table>
+}
+else
+{
+	<table class="table" id="myTable">
+
+		<thead>
+			<tr>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center;">Предмет</h6>
+				</th>
+
+@* 				@{
+					var RightAttendances = Model.Attendances.Where(q => q.ID_Student == Model.Students.Select(r => r.ID_Student).FirstOrDefault());
+				}
+				@foreach (var item in RightAttendances)
+				{
+					<th id="tableLabel">
+						<h6 style="margin-bottom : 0px; text-align:center;">@item.Date_presence.ToString("dd.MM")</h6>
+					</th>
+				} *@
+
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center;">Посещаемость</h6>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var subj in Model.Group_Subjects)
+			{
+				@foreach (var item in Model.Subjects.Where(q => q.ID_Subject == subj.ID_Subject))
+				{
+					<tr>
+						<td style="text-align:center; font-weight: bold">
+							<p id="label_s">@item.Name_subject</p>
+						</td>
+
+						<td style="text-align:center; font-weight: bold;">
+							@foreach (var r in Model.Attendances.Where(z => z.ID_Student == Model.Students.Select(r => r.ID_Student).FirstOrDefault())
+												.Where(q => q.ID_Subject == subj.ID_Subject))
+							{
+								@if (@r.Precense == true)
+								{
+									<h6 style='margin-bottom:0px; text-align:center;'>@r.Date_presence.ToString("dd.MM")</h6>
+								}
+								else
+								{
+									<h6 style='margin-bottom:0px; text-align:center; color:red'>@r.Date_presence.ToString("dd.MM")</h6>
+								}
+							}
+						</td>
+
+					</tr>
+				}
+			}
+		</tbody>
+	</table>
+}

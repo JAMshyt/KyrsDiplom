@@ -178,23 +178,7 @@ namespace recordBook.Controllers
 			else return View(user);
 		}
 
-		public ViewResult AttendanceOfStudents(int selectedGroup, int selectedSubject) /*async Task<IActionResult>*/
-		{
-			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
-			if (selectedGroup > 0 & selectedSubject > 0)
-			{
-				var groupById = _group.GetGroupbyID(selectedGroup);
-				var subjectById = _subject.GetSubjectbyID(selectedSubject);
-				var model = new AttendanceViewModel { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Attendances = GetAttendance(), selectedGroup = groupById, selectedSubject = subjectById };
-				return View(model);
-			}
-			else
-			{
-				var model = new AttendanceViewModel { Groups = GetGroups(), Students = GetStudents(), Group_Subjects = GetGroup_Subject(), Subjects = GetSubjects(), Attendances = GetAttendance(), selectedGroup = GetGroups().FirstOrDefault(), selectedSubject = GetSubjects().FirstOrDefault() };
-				return View(model);
-			}
-		}
-
+		
 		#endregion
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
