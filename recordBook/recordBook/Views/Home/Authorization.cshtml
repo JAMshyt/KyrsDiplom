@@ -10,7 +10,7 @@
 		<span asp-validation-for="Login" style="color:red;"></span><br>
 		<input type="text" asp-for="Login" placeholder="Логин" style="width:400px;"><br>
 		<span asp-validation-for="Password" style="color:red;"></span><br>
-		<input type="text" asp-for="Password" placeholder="Пароль" style="width:400px;"><br>
+		<input type="password" asp-for="Password" placeholder="Пароль" style="width:400px;"><br>
 
 		@if (Model.ErrorText)
 		{

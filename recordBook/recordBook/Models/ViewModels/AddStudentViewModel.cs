@@ -18,6 +18,8 @@ namespace recordBook.Models.ViewModels
 
 		public IEnumerable<Group>? Groups { get; set; }
 		public bool studentAdded { get; set; }
+		public bool loginUnique { get; set; }
+		public bool EmailUnique { get; set; }
 
 		#region данные логина
 		[Required(ErrorMessage = "Введите логин")]

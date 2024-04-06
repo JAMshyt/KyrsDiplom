@@ -6,11 +6,11 @@
 @{
 	@if (User.IsInRole("Student"))
 	{
-		ViewData["Title"] = "Ваши оценки, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
+		ViewData["Title"] = "Ваша посещаемость, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 	}
 	else
 	{
-		ViewData["Title"] = "Оценки группы " + Model.selectedGroup.Name_group;
+		ViewData["Title"] = "Посещаемость группы " + Model.selectedGroup.Name_group;
 	}
 }
 
@@ -114,19 +114,38 @@ else
 					<h6 style="margin-bottom : 0px; text-align:center;">Предмет</h6>
 				</th>
 
-@* 				@{
-					var RightAttendances = Model.Attendances.Where(q => q.ID_Student == Model.Students.Select(r => r.ID_Student).FirstOrDefault());
-				}
-				@foreach (var item in RightAttendances)
-				{
-					<th id="tableLabel">
-						<h6 style="margin-bottom : 0px; text-align:center;">@item.Date_presence.ToString("dd.MM")</h6>
-					</th>
-				} *@
+				@* 				@{
+			var RightAttendances = Model.Attendances.Where(q => q.ID_Student == Model.Students.Select(r => r.ID_Student).FirstOrDefault());
+			}
+			@foreach (var item in RightAttendances)
+			{
+			<th id="tableLabel">
+			<h6 style="margin-bottom : 0px; text-align:center;">@item.Date_presence.ToString("dd.MM")</h6>
+			</th>
+			} *@
 
 				<th id="tableLabel">
 					<h6 style="margin-bottom : 0px; text-align:center;">Посещаемость</h6>
 				</th>
+				@{
+					var subjectWithMostEntries = Model.Group_Subjects
+					.Select(s => new
+					{
+						AttendanceCount = Model.Attendances.Count(a => a.ID_Subject == s.ID_Subject)
+					})
+					.OrderByDescending(x => x.AttendanceCount)
+					.FirstOrDefault();
+
+					int maxAttendanceCount = subjectWithMostEntries?.AttendanceCount ?? 0;  // запишем наибольшее количество записей
+
+				}
+
+				@for (int i = 1; i < maxAttendanceCount;i++)
+				{
+					<th id="tableLabel">
+					</th>
+				}
+
 			</tr>
 		</thead>
 		<tbody>
@@ -139,10 +158,9 @@ else
 							<p id="label_s">@item.Name_subject</p>
 						</td>
 
-						<td style="text-align:center; font-weight: bold;">
-							@foreach (var r in Model.Attendances.Where(z => z.ID_Student == Model.Students.Select(r => r.ID_Student).FirstOrDefault())
-												.Where(q => q.ID_Subject == subj.ID_Subject))
-							{
+						@foreach (var r in Model.Attendances.Where(q => q.ID_Subject == subj.ID_Subject))
+						{
+							<td style="text-align:center; font-weight: bold;">
 								@if (@r.Precense == true)
 								{
 									<h6 style='margin-bottom:0px; text-align:center;'>@r.Date_presence.ToString("dd.MM")</h6>
@@ -151,8 +169,8 @@ else
 								{
 									<h6 style='margin-bottom:0px; text-align:center; color:red'>@r.Date_presence.ToString("dd.MM")</h6>
 								}
-							}
-						</td>
+							</td>
+						}
 
 					</tr>
 				}

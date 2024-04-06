@@ -9,7 +9,7 @@
 <form asp-action="AddStudent" asp-controller="Student">
 	@if (Model.studentAdded)
 	{
-		<span style="color:green;">Студент @Model.Surname @Model.Name @Model.Patronymic добавлен </span>
+		<span style="color:green;">Студент @Model.Surname @Model.Name @Model.Patronymic добавлен </span><br>
 	}
 
 	<!-- #region заполнение студента-->
@@ -47,16 +47,25 @@
 	Аккаунт студента<br><br>
 	<div class="form-group">
 		<label asp-for="Login" class="control-label">Логин</label>
+		@if (!Model.loginUnique)
+		{
+			<span style="color:red;">Такой логин уже используется</span><br>
+		}
 		<input type="text" asp-for="Login" class="form-control" />
 	</div>
 
 	<div class="form-group">
 		<label asp-for="Password" class="control-label">Пароль</label>
+		<span asp-validation-for="Password" style="color:Red;"></span>
 		<input type="password" asp-for="Password" class="form-control" />
 	</div>
 
 	<div class="form-group">
 		<label asp-for="Email" class="control-label">Электронная почта</label>
+	@if (!Model.EmailUnique)
+	{
+		<span style="color:red;">Эта почта уже используется</span><br>
+	}
 		<input type="text" asp-for="Email" class="form-control" />
 	</div>
 	<!-- #endregion -->
