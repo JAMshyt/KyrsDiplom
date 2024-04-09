@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
+
 
 namespace recordBook.Models
 {
@@ -24,5 +24,6 @@ namespace recordBook.Models
         public int ID_Group { get; set; }
 		public int ID_Login { get; set; }
 
+        public byte[]? Photo { get; set; }
 	}
 }

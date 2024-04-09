@@ -134,7 +134,7 @@ namespace recordBook.Controllers
 			}
 			else
 			{
-				var model2 = new AddStudentViewModel { Groups = GetGroups(), EmailUnique = true, loginUnique = true };
+				var model2 = new AddStudentViewModel { Groups = GetGroups(), studentAdded = false, EmailUnique = true, loginUnique = true };
 				if (nullLogin != null && nullEmail != null)
 				{
 					model2.EmailUnique = false;

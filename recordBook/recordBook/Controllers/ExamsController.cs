@@ -97,6 +97,8 @@ namespace recordBook.Controllers
         {
             ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 
+
+
             var model = new ExamsViewModel
             {
                 Groups = GetGroups(),
@@ -107,7 +109,7 @@ namespace recordBook.Controllers
                 selectedGroup = GetGroups().FirstOrDefault(),
                 selectedSubject = GetSubjects().FirstOrDefault(),
                 Kind_of_works = GetKind_of_works(),
-            };
+			};
 
             if (User.FindFirst(ClaimTypes.Role)?.Value == "Teacher")
             {
@@ -172,5 +174,59 @@ namespace recordBook.Controllers
             return Json(str);
         }
 
-    }
+
+		public async Task<IActionResult> Debt(int selectedGroup, int selectedSubject)
+		{
+			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
+
+			var model = new ExamsViewModel
+			{
+				Groups = GetGroups(),
+				Students = GetStudents(),
+				Group_Subjects = GetGroup_Subject(),
+				Subjects = GetSubjects(),
+				Academic_Performances = GetAcademic_performance(),
+				selectedGroup = GetGroups().FirstOrDefault(),
+				selectedSubject = GetSubjects().FirstOrDefault(),
+				Kind_of_works = GetKind_of_works(),
+			};
+
+			if (User.FindFirst(ClaimTypes.Role)?.Value == "Teacher")
+			{
+
+
+				if (selectedGroup > 0 & selectedSubject > 0)
+				{
+					var groupById = _group.GetGroupbyID(selectedGroup);
+					var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
+					if (!subjectsOfSelectedGroup.Contains(selectedSubject))
+					{
+						selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
+					}
+					var subjectById = _subject.GetSubjectbyID(selectedSubject);
+					model.selectedGroup = groupById;
+					model.selectedSubject = subjectById;
+				}
+			}
+			else
+			{
+
+				model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+				model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+				model.Academic_Performances = GetAcademic_performance().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+				model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+				model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+
+
+				if (selectedSubject > 0)
+				{
+					var subjectById = _subject.GetSubjectbyID(selectedSubject);
+					model.selectedSubject = subjectById;
+				}
+			}
+
+			return View(model);
+		}
+
+	}
 }

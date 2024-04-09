@@ -11,5 +11,7 @@ namespace recordBook.Models
 		public string Name { get; set; }
 		public string Patronymic { get; set; }
 		public int ID_Login { get; set; }
+
+		public byte[]? Photo { get; set; }
 	}
 }

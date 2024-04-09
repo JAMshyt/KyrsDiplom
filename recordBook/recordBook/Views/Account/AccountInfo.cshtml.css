@@ -1,0 +1,12 @@
+﻿#info {
+    display: flex;
+    align-items: center;
+
+}
+
+#avatar {
+    max-width: 200px;
+}
+#textInfo {
+    margin-left: 10%
+}

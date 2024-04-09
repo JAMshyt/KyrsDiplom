@@ -9,5 +9,6 @@ namespace recordBook.Models
 		public string Login { get; set; }
 		public string Password { get; set; }
 		public string Email { get; set; }
+		public decimal Phone { get; set; }
 	}
 }

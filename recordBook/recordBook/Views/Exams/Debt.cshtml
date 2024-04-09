@@ -6,11 +6,11 @@
 @{
 	@if (User.IsInRole("Student"))
 	{
-		ViewData["Title"] = "Ваши оценки, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
+		ViewData["Title"] = "Ваши задолженности, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 	}
 	else
 	{
-		ViewData["Title"] = "Оценки группы " + Model.selectedGroup.Name_group;
+		ViewData["Title"] = "Задолженности группы " + Model.selectedGroup.Name_group;
 	}
 }
 
@@ -19,7 +19,7 @@
 
 @if (User.IsInRole("Teacher"))
 {
-	<form asp-controller="Exams" asp-action="ExamsMarks">
+	<form asp-controller="Exams" asp-action="Debt">
 		<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
 			@foreach (var groups in Model.Groups)
 			{
@@ -75,15 +75,21 @@
 			</tr>
 		</thead>
 		<tbody>
-			@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
+			
+			@foreach (var r in Model.Academic_Performances
+					.Where(i => i.ID_Subject == Model.selectedSubject.ID_Subject)
+					.Where(g => g.Grade == "Нет оценки"))
 			{
-				//var data = item.Date.ToString("dd MMMM yyyy");
-				<tr id="columnGrade">
-					<td style="text-align:center; font-weight: bold">
-						<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
-					</td>
-					@foreach (var r in Model.Academic_Performances.Where(z => z.ID_Student == item.ID_Student).Where(y => y.ID_Subject == Model.selectedSubject.ID_Subject))
-					{
+				bool groupCheck = Model.Students.Where(q => q.ID_Group == Model.selectedGroup.ID_Group).Any(q=>q.ID_Student == r.ID_Student);
+
+				if (groupCheck)
+				{
+					var student = Model.Students.FirstOrDefault(q => q.ID_Student == r.ID_Student);
+					<tr id="columnGrade">
+						<td style="text-align:center; font-weight: bold">
+							<p id="label_s">@student.Surname  @student.Name  @student.Patronymic</p>
+						</td>
+
 						<td id="cellGrade" style="text-align:center;  padding-right:10%; font-weight: bold ">
 							<p class="labelsGrade">@r.Grade</p>
 							<select class="selectGrades" onchange="GradeIsChanged(@r.ID_Academic_performance,event)" style="width:200px; height:30px; text-align:center">
@@ -101,9 +107,10 @@
 						<td style="text-align:center;  font-weight: bold ">
 							<p id="label_s"> @r.Date.ToString("dd MMMM yyyy") </p>
 						</td>
-					}
-				</tr>
+					</tr>
+				}
 			}
+
 		</tbody>
 	</table>
 }
@@ -130,15 +137,16 @@ else
 		<tbody>
 			@foreach (var subj in Model.Group_Subjects)
 			{
-				@foreach (var item in Model.Subjects.Where(q => q.ID_Subject == subj.ID_Subject))
+				@foreach (var r in Model.Academic_Performances
+						.Where(g => g.ID_Subject == subj.ID_Subject)
+						.Where(a => a.Grade == "Нет оценки"))
 				{
-					//var data = item.Date.ToString("dd MMMM yyyy");
+					var subjName = Model.Subjects.Where(q=>q.ID_Subject == r.ID_Subject).Select(q=>q.Name_subject).FirstOrDefault();
 					<tr id="columnGrade">
 						<td style="text-align:center; font-weight: bold">
-							<p id="label_s">@item.Name_subject</p>
+							<p id="label_s">@subjName.ToString()</p>
 						</td>
-						@foreach (var r in Model.Academic_Performances.Where(y => y.ID_Subject == item.ID_Subject))
-						{
+
 							<td id="cellGrade" style="text-align:center;  padding-right:10%; font-weight: bold ">
 								<p class="labelsGrade">@r.Grade</p>
 							</td>
@@ -149,7 +157,6 @@ else
 							<td style="text-align:center;  font-weight: bold ">
 								<p id="label_s"> @r.Date.ToString("dd MMMM yyyy") </p>
 							</td>
-						}
 					</tr>
 				}
 			}
