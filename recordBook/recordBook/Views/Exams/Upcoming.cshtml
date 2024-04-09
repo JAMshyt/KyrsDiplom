@@ -6,11 +6,11 @@
 @{
 	@if (User.IsInRole("Student"))
 	{
-		ViewData["Title"] = "Ваши задолженности, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
+		ViewData["Title"] = "Ваши предстоящие экзамены, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 	}
 	else
 	{
-		ViewData["Title"] = "Задолженности группы " + Model.selectedGroup.Name_group;
+		ViewData["Title"] = "Предстоящие экзамены группы " + Model.selectedGroup.Name_group;
 	}
 }
 
@@ -19,7 +19,7 @@
 
 @if (User.IsInRole("Teacher"))
 {
-	<form asp-controller="Exams" asp-action="Debt">
+	<form asp-controller="Exams" asp-action="Upcoming">
 		<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
 			@foreach (var groups in Model.Groups)
 			{
@@ -78,8 +78,8 @@
 
 			@foreach (var r in Model.Academic_Performances
 					.Where(i => i.ID_Subject == Model.selectedSubject.ID_Subject)
-					.Where(a => a.Grade == "Нет оценки" || a.Grade == "Не удовлетворительно")
-					.Where(q => q.Date < DateTime.Now))
+					.Where(a => a.Grade == "Нет оценки")
+					.Where(q => q.Date > DateTime.Now))
 			{
 				bool groupCheck = Model.Students.Where(q => q.ID_Group == Model.selectedGroup.ID_Group).Any(q => q.ID_Student == r.ID_Student);
 
@@ -125,9 +125,6 @@ else
 					<h6 style="margin-bottom : 0px; text-align:center;">Предмет</h6>
 				</th>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center; display:inline">Оценка</h6>
-				</th>
-				<th id="tableLabel">
 					<h6 style="margin-bottom : 0px; text-align:center">Тип работы</h6>
 				</th>
 				<th id="tableLabel">
@@ -140,8 +137,8 @@ else
 			{
 				@foreach (var r in Model.Academic_Performances
 						.Where(g => g.ID_Subject == subj.ID_Subject)
-						.Where(a => a.Grade == "Нет оценки" || a.Grade == "Не удовлетворительно")
-						.Where(q => q.Date < DateTime.Now))
+						.Where(a => a.Grade == "Нет оценки")
+						.Where(q => q.Date > DateTime.Now))
 				{
 					var subjName = Model.Subjects.Where(q => q.ID_Subject == r.ID_Subject).Select(q => q.Name_subject).FirstOrDefault();
 					<tr id="columnGrade">
