@@ -19,7 +19,7 @@
 @if (User.IsInRole("Teacher"))
 {
 	<form asp-controller="Attendance" asp-action="AttendanceOfStudents">
-		<select name="selectedGroup" required onchange="this.form.submit()" style="width:20%; height:40px; text-align:center">
+		<select name="selectedGroup" required onchange="this.form.submit()" style="width:15%; height:40px; text-align:center">
 			@foreach (var groups in Model.Groups)
 			{
 				if (groups.ID_Group == Model.selectedGroup.ID_Group)
@@ -33,7 +33,7 @@
 			}
 		</select>
 
-		<select name="selectedSubject" required onchange="this.form.submit()" style="width:30%; height:40px; text-align:center">
+		<select name="selectedSubject" required onchange="this.form.submit()" style="width:20%; height:40px; text-align:center">
 			@foreach (var subj in Model.Subjects)
 			{
 				if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(subj.ID_Subject))
@@ -50,7 +50,9 @@
 			}
 		</select>
 
+		<button type="button" id="ChangeAttendanceBtn" class="btn btn-warning">Изменить посещаемость</button>
 	</form>
+
 
 	<table class="table" id="myTable">
 
@@ -90,11 +92,11 @@
 						<td style="text-align:center; font-weight: bold;">
 							@if (@r.Precense == true)
 							{
-								<input type="checkbox" checked disabled>
+								<input type="checkbox" class="AttendaceCheckbox" onchange="AttendanceIsChanged(@r.ID_Attendance,event)" checked disabled>
 							}
 							else
 							{
-								<input type="checkbox" disabled>
+								<input type="checkbox" class="AttendaceCheckbox" onchange="AttendanceIsChanged(@r.ID_Attendance,event)" disabled>
 							}
 						</td>
 					}
@@ -136,11 +138,11 @@ else
 					.OrderByDescending(x => x.AttendanceCount)
 					.FirstOrDefault();
 
-					int maxAttendanceCount = subjectWithMostEntries?.AttendanceCount ?? 0;  // запишем наибольшее количество записей
+					int maxAttendanceCount = subjectWithMostEntries?.AttendanceCount ?? 0;
 
 				}
 
-				@for (int i = 1; i < maxAttendanceCount;i++)
+				@for (int i = 1; i < maxAttendanceCount; i++)
 				{
 					<th id="tableLabel">
 					</th>
@@ -178,3 +180,37 @@ else
 		</tbody>
 	</table>
 }
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type='text/javascript'>
+
+
+	$('#ChangeAttendanceBtn').click(function (id) {
+		if ($('#ChangeAttendanceBtn').text() == 'Изменить посещаемость') {
+			$('.AttendaceCheckbox').removeAttr("disabled");
+			$('#ChangeAttendanceBtn').text('Сохранить');
+		}
+		else {
+			$('#ChangeAttendanceBtn').text('Изменить посещаемость');
+			$('.AttendaceCheckbox').attr("disabled", true);;
+			location.reload()
+		}
+
+	});
+
+	function AttendanceIsChanged(id, event) {
+		console.log(id + " " + event.target.checked);
+		var Attendance = event.target.checked;
+		$.ajax({
+			type: 'POST',
+			url: '/Attendance/ChangeAttendance/',
+			contentType: 'application/json',
+			data: JSON.stringify({ id: id, newAttendance: Attendance }),
+			dataType: 'json',
+			success: function (data) {
+				console.log(data);
+			}
+
+		});
+	};
+</script>

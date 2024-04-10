@@ -77,13 +77,18 @@
 		<tbody>
 			@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
 			{
-				//var data = item.Date.ToString("dd MMMM yyyy");
-				<tr id="columnGrade">
-					<td style="text-align:center; font-weight: bold">
-						<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
-					</td>
-					@foreach (var r in Model.Academic_Performances.Where(z => z.ID_Student == item.ID_Student).Where(y => y.ID_Subject == Model.selectedSubject.ID_Subject))
-					{
+				@foreach (var r in Model.Academic_Performances
+						.Where(z => z.ID_Student == item.ID_Student)
+						.Where(i => i.ID_Subject == Model.selectedSubject.ID_Subject)
+						.Where(p => p.Grade != "Нет оценки"))
+				{
+					<tr id="columnGrade">
+						@if (item.ID_Student == r.ID_Student)
+						{
+							<td style="text-align:center; font-weight: bold">
+								<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
+							</td>
+						}
 						<td id="cellGrade" style="text-align:center;  padding-right:10%; font-weight: bold ">
 							<p class="labelsGrade">@r.Grade</p>
 							<select class="selectGrades" onchange="GradeIsChanged(@r.ID_Academic_performance,event)" style="width:200px; height:30px; text-align:center">
@@ -91,7 +96,7 @@
 								<option value="Хорошо">Хорошо</option>
 								<option value="Удовлетворительно">Удовлетворительно</option>
 								<option value="Не удовлетворительно">Не удовлетворительно</option>
-								<option value="-" selected>-</option>
+								<option value="Нет оценки" selected>Нет оценки</option>
 							</select>
 						</td>
 
@@ -101,8 +106,8 @@
 						<td style="text-align:center;  font-weight: bold ">
 							<p id="label_s"> @r.Date.ToString("dd MMMM yyyy") </p>
 						</td>
-					}
-				</tr>
+					</tr>
+				}
 			}
 		</tbody>
 	</table>
@@ -132,13 +137,18 @@ else
 			{
 				@foreach (var item in Model.Subjects.Where(q => q.ID_Subject == subj.ID_Subject))
 				{
-					//var data = item.Date.ToString("dd MMMM yyyy");
-					<tr id="columnGrade">
-						<td style="text-align:center; font-weight: bold">
-							<p id="label_s">@item.Name_subject</p>
-						</td>
-						@foreach (var r in Model.Academic_Performances.Where(y => y.ID_Subject == item.ID_Subject))
-						{
+					@foreach (var r in Model.Academic_Performances
+							.Where(y => y.ID_Subject == item.ID_Subject)
+							.Where(p => p.Grade != "Нет оценки"))
+					{
+
+						<tr id="columnGrade">
+							@if (item.ID_Subject == r.ID_Subject)
+							{
+								<td style="text-align:center; font-weight: bold">
+									<p id="label_s">@item.Name_subject</p>
+								</td>
+							}
 							<td id="cellGrade" style="text-align:center;  padding-right:10%; font-weight: bold ">
 								<p class="labelsGrade">@r.Grade</p>
 							</td>
@@ -149,8 +159,8 @@ else
 							<td style="text-align:center;  font-weight: bold ">
 								<p id="label_s"> @r.Date.ToString("dd MMMM yyyy") </p>
 							</td>
-						}
-					</tr>
+						</tr>
+					}
 				}
 			}
 		</tbody>

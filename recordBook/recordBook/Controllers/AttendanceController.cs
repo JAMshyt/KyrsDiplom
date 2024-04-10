@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using recordBook.Models;
 using recordBook.Models.ViewModels;
 using recordBook.RInterface;
+using static recordBook.Controllers.ExamsController;
 
 namespace recordBook.Controllers
 {
@@ -98,5 +99,27 @@ namespace recordBook.Controllers
 			}
 			return View(model);
 		}
+
+
+		public class IdAndAttendance
+		{
+			public int id { get; set; }
+			public bool newAttendance { get; set; }
+
+		}
+
+		[HttpPost]
+		[Route("/Attendance/ChangeAttendance/")]
+		[Consumes("application/json")]
+		public async Task<IActionResult> ChangeAttendance([FromBody] IdAndAttendance request)
+		{
+
+			Attendance oldAttendance = GetAttendance().FirstOrDefault(z => z.ID_Attendance == request.id);
+			oldAttendance.Precense = request.newAttendance;
+			await _attedance.UpdateAttendance(oldAttendance);
+			var str = request.id + " " + request.newAttendance;
+			return Json(str);
+		}
+
 	}
 }
