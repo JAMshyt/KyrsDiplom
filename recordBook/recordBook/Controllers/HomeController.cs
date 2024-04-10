@@ -23,34 +23,19 @@ namespace recordBook.Controllers
 		private readonly ILogger<HomeController> _logger;
 
 		private readonly IStudent _student;
-		private readonly IGroup _group;
-		private readonly ISubject _subject;
-		private readonly IKind_of_work _kind_of_work;
 		private readonly IDepartment_worker _department_worker;
-		private readonly IAcademic_performance _academic_performance;
-		private readonly IAttendance _attedance;
-		private readonly IDepartment_worker_Academic_performance _department_worker_academic_performance;
-		private readonly IGroup_Subject _group_subject;
 		private readonly ILogins _logins;
+		private readonly ICurator _curator;
 
 		public HomeController(ILogger<HomeController> logger, IStudent student,
-			IGroup group, ISubject subject, IKind_of_work kind_wf_work,
-			IDepartment_worker department_worker, IAcademic_performance academic_performance,
-			IAttendance attendance, IDepartment_worker_Academic_performance department_worker_academic_performance,
-			IGroup_Subject group_subject, ILogins logins
+			IDepartment_worker department_worker, ILogins logins, ICurator curator
 			)
 		{
 			_logger = logger;
 			_student = student;
-			_group = group;
-			_subject = subject;
-			_kind_of_work = kind_wf_work;
 			_department_worker = department_worker;
-			_academic_performance = academic_performance;
-			_attedance = attendance;
-			_department_worker_academic_performance = department_worker_academic_performance;
-			_group_subject = group_subject;
 			_logins = logins;
+			_curator = curator;
 		}
 
 		#region Get таблиц
@@ -60,52 +45,16 @@ namespace recordBook.Controllers
 			return students;
 		}
 
-		public List<Group> GetGroups()
-		{
-			var group = _group.GetAllGroup().ToList();
-			return group;
-		}
-
-		public List<Subject> GetSubjects()
-		{
-			var subjects = _subject.GetAllSubject().ToList();
-			return subjects;
-		}
-
-		public List<Kind_of_work> GetKind_of_works()
-		{
-			var kind_of_work = _kind_of_work.GetAllKind_of_work().ToList();
-			return kind_of_work;
-		}
-
 		public List<Department_worker> GetDepartment_worker()
 		{
 			var dep_wor = _department_worker.GetAllDepartment_worker().ToList();
 			return dep_wor;
 		}
 
-		public List<Academic_performance> GetAcademic_performance()
+		public List<Curator> GetCurators()
 		{
-			var acad_perf = _academic_performance.GetAllAcademic_performance().ToList();
-			return acad_perf;
-		}
-
-		public List<Attendance> GetAttendance()
-		{
-			var att = _attedance.GetAllAttendance().ToList();
-			return att;
-		}
-
-		public List<Department_worker_Academic_performance> GetDepartment_worker_Academic_performance()
-		{
-			var depWo_acPerf = _department_worker_academic_performance.GetAllDepartment_worker_Academic_performance().ToList();
-			return depWo_acPerf;
-		}
-
-		public List<Group_Subject> GetGroup_Subject()
-		{
-			var group_subj = _group_subject.GetAllGroup_Subject().ToList();
-			return group_subj;
+			var curators = _curator.GetAllCurator().ToList();
+			return curators;
 		}
 
 		public List<Logins> GetLogins()
@@ -144,15 +93,15 @@ namespace recordBook.Controllers
 						Student? student = GetStudents().FirstOrDefault(q => q.ID_Login == login.ID_Login);
 
 						var claims = new List<Claim> {
-						new Claim(ClaimTypes.NameIdentifier, login.Login),
-						new Claim(ClaimTypes.Email, login.Email),
-						new Claim(ClaimTypes.Name, student.Name),
-						new Claim(ClaimTypes.Surname, student.Surname),
-						new Claim(ClaimTypes.GivenName, student.Patronymic),
-						new Claim(ClaimTypes.MobilePhone, Convert.ToString(login.Phone)),
-						new Claim(ClaimTypes.Role, "Student"),
-						new Claim(ClaimTypes.GroupSid, Convert.ToString(student.ID_Group)),
-						new Claim(ClaimTypes.SerialNumber, Convert.ToString(student.ID_Student)),
+							new Claim(ClaimTypes.NameIdentifier, login.Login),
+							new Claim(ClaimTypes.Email, login.Email),
+							new Claim(ClaimTypes.Name, student.Name),
+							new Claim(ClaimTypes.Surname, student.Surname),
+							new Claim(ClaimTypes.GivenName, student.Patronymic),
+							new Claim(ClaimTypes.MobilePhone, Convert.ToString(login.Phone)),
+							new Claim(ClaimTypes.Role, "Student"),
+							new Claim(ClaimTypes.GroupSid, Convert.ToString(student.ID_Group)),
+							new Claim(ClaimTypes.SerialNumber, Convert.ToString(student.ID_Student)),
 						};
 						ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
 						await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
@@ -160,21 +109,43 @@ namespace recordBook.Controllers
 					}
 					catch
 					{
-						Department_worker? teacher = GetDepartment_worker().FirstOrDefault(q => q.ID_Login == login.ID_Login);
+						try
+						{
+							Department_worker? adm = GetDepartment_worker().FirstOrDefault(q => q.ID_Login == login.ID_Login);
 
-						var claims = new List<Claim> {
-						new Claim(ClaimTypes.NameIdentifier, login.Login),
-						new Claim(ClaimTypes.Email, login.Email),
-						new Claim(ClaimTypes.Name, teacher.Name),
-						new Claim(ClaimTypes.Surname, teacher.Surname),
-						new Claim(ClaimTypes.GivenName, teacher.Patronymic),
-						new Claim(ClaimTypes.MobilePhone, Convert.ToString(login.Phone)),
-						new Claim(ClaimTypes.Role, "Teacher"),
-						new Claim(ClaimTypes.SerialNumber, Convert.ToString(teacher.ID_Department_worker)),
-						};
-						ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
-						await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-						return RedirectToAction("AccountInfo", "Account");
+							var claims = new List<Claim> {
+								new Claim(ClaimTypes.NameIdentifier, login.Login),
+								new Claim(ClaimTypes.Email, login.Email),
+								new Claim(ClaimTypes.Name, adm.Name),
+								new Claim(ClaimTypes.Surname, adm.Surname),
+								new Claim(ClaimTypes.GivenName, adm.Patronymic),
+								new Claim(ClaimTypes.MobilePhone, Convert.ToString(login.Phone)),
+								new Claim(ClaimTypes.Role, "Adm"),
+								new Claim(ClaimTypes.SerialNumber, Convert.ToString(adm.ID_Department_worker)),
+							};
+							ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
+							await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+							return RedirectToAction("AccountInfo", "Account");
+						}
+						catch
+						{
+							Curator? curator = GetCurators().FirstOrDefault(q => q.ID_Login == login.ID_Login);
+
+							var claims = new List<Claim> {
+								new Claim(ClaimTypes.NameIdentifier, login.Login),
+								new Claim(ClaimTypes.Email, login.Email),
+								new Claim(ClaimTypes.Name, curator.Name),
+								new Claim(ClaimTypes.Surname, curator.Surname),
+								new Claim(ClaimTypes.GivenName, curator.Patronymic),
+								new Claim(ClaimTypes.MobilePhone, Convert.ToString(login.Phone)),
+								new Claim(ClaimTypes.Role, "Curator"),
+								new Claim(ClaimTypes.GroupSid, Convert.ToString(curator.ID_Group)),
+								new Claim(ClaimTypes.SerialNumber, Convert.ToString(curator.ID_Curator)),
+							};
+							ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
+							await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+							return RedirectToAction("AccountInfo", "Account");
+						}
 					}
 				}
 			}
@@ -185,7 +156,7 @@ namespace recordBook.Controllers
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 		public IActionResult Error()
 		{
-			
+
 			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 		}
 

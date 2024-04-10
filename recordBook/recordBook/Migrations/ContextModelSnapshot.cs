@@ -76,6 +76,36 @@ namespace recordBook.Migrations
                     b.ToTable("Attendance");
                 });
 
+            modelBuilder.Entity("recordBook.Models.Curator", b =>
+                {
+                    b.Property<int>("ID_Curator")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Curator"));
+
+                    b.Property<int>("ID_Group")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ID_Login")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Patronymic")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Surname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID_Curator");
+
+                    b.ToTable("Curator");
+                });
+
             modelBuilder.Entity("recordBook.Models.Department_worker", b =>
                 {
                     b.Property<int>("ID_Department_worker")
@@ -84,6 +114,9 @@ namespace recordBook.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Department_worker"));
 
+                    b.Property<int>("ID_Login")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -91,6 +124,9 @@ namespace recordBook.Migrations
                     b.Property<string>("Patronymic")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("Photo")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Surname")
                         .IsRequired()
@@ -201,6 +237,9 @@ namespace recordBook.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("Phone")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("ID_Login");
 
                     b.ToTable("Logins");
@@ -226,6 +265,9 @@ namespace recordBook.Migrations
 
                     b.Property<string>("Patronymic")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("Photo")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Surname")
                         .IsRequired()

@@ -86,6 +86,16 @@ button.accept-policy {
     border-top-right-radius: 25px;
 }
 
+.navLabel3 {
+    position: absolute;
+    writing-mode: vertical-lr;
+    margin-left: 250px;
+    margin-top: -110%;
+    z-index: 2;
+    border: 10px solid #13547156;
+    border-bottom-right-radius: 25px;
+    border-top-right-radius: 25px;
+}
 
 .navBoard:hover {
     position: absolute;

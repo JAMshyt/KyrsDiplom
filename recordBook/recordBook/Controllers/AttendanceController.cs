@@ -81,21 +81,30 @@ namespace recordBook.Controllers
 				selectedSubject = GetSubjects().FirstOrDefault()
 			};
 
-			if (User.IsInRole("Teacher"))
+			if (User.IsInRole("Adm"))
 			{
 				if (selectedGroup > 0 & selectedSubject > 0)
 				{
 					model.selectedGroup = _group.GetGroupbyID(selectedGroup);
 					model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
-
 				}
 			}
-			else
+			else if(User.IsInRole("Adm"))
 			{
 				model.Groups = GetGroups().Where(q=>q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
 				model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
 				model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
 				model.Attendances = GetAttendance().Where(q => q.ID_Student== Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+			}
+			else
+			{
+				if (selectedSubject > 0)
+				{
+					model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
+				}
+				model.Students = GetStudents().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+				model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+				model.selectedGroup = _group.GetGroupbyID(Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
 			}
 			return View(model);
 		}

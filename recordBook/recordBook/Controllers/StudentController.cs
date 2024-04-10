@@ -60,15 +60,23 @@ namespace recordBook.Controllers
 		public async Task<IActionResult> ShowStudents(int selectedGroup)
 		{
 			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
-			if (selectedGroup > 0)
+			if (User.IsInRole("Adm"))
 			{
-				var groupById = _group.GetGroupbyID(selectedGroup);
-				var model = new GroupsStudentsViewModel { Groups = GetGroups(), Students = GetStudents(), selectedGroup = groupById };
-				return View(model);
+				if (selectedGroup > 0)
+				{
+					var groupById = _group.GetGroupbyID(selectedGroup);
+					var model = new GroupsStudentsViewModel { Groups = GetGroups(), Students = GetStudents(), selectedGroup = groupById };
+					return View(model);
+				}
+				else
+				{
+					var model = new GroupsStudentsViewModel { Groups = GetGroups(), Students = GetStudents(), selectedGroup = GetGroups().FirstOrDefault() };
+					return View(model);
+				}
 			}
 			else
 			{
-				var model = new GroupsStudentsViewModel { Groups = GetGroups(), Students = GetStudents(), selectedGroup = GetGroups().FirstOrDefault() };
+				var model = new GroupsStudentsViewModel { Groups = GetGroups(), Students = GetStudents(), selectedGroup = GetGroups().FirstOrDefault(q=>q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value)) };
 				return View(model);
 			}
 		}

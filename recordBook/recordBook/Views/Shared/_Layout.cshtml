@@ -56,7 +56,7 @@
 			}
 		</style>
 		<form>
-			@if (User.IsInRole("Teacher"))
+			@if (User.IsInRole("Adm"))
 			{
 				<input type="submit" id="men1" class="sideMenu" asp-action="ShowStudents" asp-controller="Student" value="Просмотр групп"><br>
 				<input type="submit" class="sideMenu" asp-action="AttendanceOfStudents" asp-controller="Attendance" value="Посещаемость"><br>
@@ -67,14 +67,24 @@
 				<input type="submit" id="men2" class="sideMenu" asp-action="Upcoming" asp-controller="Exams" value="Предстоящие экзамены"><br>
 				<label class="navLabel">Навигация</label>
 			}
-			else
+			else if (User.IsInRole("Student"))
 			{
+
 				<input type="submit" id="men1" class="sideMenu" asp-action="AttendanceOfStudents" asp-controller="Attendance" value="Посещаемость"><br>
 				<input type="submit" class="sideMenu" asp-action="ExamsMarks" asp-controller="Exams" value="Экзамены"><br>
 				<input type="submit" class="sideMenu" asp-action="Debt" asp-controller="Exams" value="Задолженности"><br>
 				<input type="submit" id="men2" class="sideMenu" asp-action="Upcoming" asp-controller="Exams" value="Предстоящие экзамены"><br>
-
 				<label class="navLabel2">Навигация</label>
+
+			}
+			else
+			{
+				<input type="submit" id="men1" class="sideMenu" asp-action="ShowStudents" asp-controller="Student" value="Просмотр групп"><br>
+				<input type="submit" class="sideMenu" asp-action="AttendanceOfStudents" asp-controller="Attendance" value="Посещаемость группы"><br>
+				<input type="submit" class="sideMenu" asp-action="ExamsMarks" asp-controller="Exams" value="Экзамены группы"><br>
+				<input type="submit" class="sideMenu" asp-action="Debt" asp-controller="Exams" value="Задолженности группы"><br>
+				<input type="submit" id="men2" class="sideMenu" asp-action="Upcoming" asp-controller="Exams" value="Предстоящие экзамены&#13;&#10;группы"><br>
+				<label class="navLabel3">Навигация</label>
 			}
 		</form>
 

@@ -35,7 +35,7 @@ namespace recordBook.Repositories
 			return GetAllStudent().Where(x => x.ID_Student == Id).FirstOrDefaultAsync().Result;
 		}
 
-		public async Task UpdateStudentl(Student student)
+		public async Task UpdateStudent(Student student)
 		{
 			_context.Student.Update(student);
 			await _context.SaveChangesAsync();

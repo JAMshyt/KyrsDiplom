@@ -14,6 +14,7 @@ namespace recordBook.Models
 		public DbSet<Department_worker_Academic_performance> Department_worker_Academic_performance { get; set; }
 		public DbSet<Group_Subject> Group_Subject { get; set; }
 		public DbSet<Logins> Logins { get; set; }
+		public DbSet<Curator> Curator{ get; set; }
 
 
 		public Context(DbContextOptions<Context> options)

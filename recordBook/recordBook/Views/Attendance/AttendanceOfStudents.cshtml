@@ -8,15 +8,19 @@
 	{
 		ViewData["Title"] = "Ваша посещаемость, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 	}
-	else
+	else if (User.IsInRole("Adm"))
 	{
 		ViewData["Title"] = "Посещаемость группы " + Model.selectedGroup.Name_group;
+	}
+	else
+	{
+		ViewData["Title"] = "Посещаемость вашей группы (" + Model.selectedGroup.Name_group+")";
 	}
 }
 
 <h1>@ViewData["Title"]</h1>
 
-@if (User.IsInRole("Teacher"))
+@if (User.IsInRole("Adm"))
 {
 	<form asp-controller="Attendance" asp-action="AttendanceOfStudents">
 		<select name="selectedGroup" required onchange="this.form.submit()" style="width:15%; height:40px; text-align:center">
@@ -100,6 +104,79 @@
 							}
 						</td>
 					}
+				</tr>
+			}
+		</tbody>
+
+	</table>
+}
+else if (User.IsInRole("Curator"))
+{
+	<form asp-controller="Attendance" asp-action="AttendanceOfStudents">
+		<select name="selectedSubject" required onchange="this.form.submit()" style="width:20%; height:40px; text-align:center">
+			@foreach (var subj in Model.Subjects)
+			{
+				if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(subj.ID_Subject))
+				{
+					if (subj.ID_Subject == Model.selectedSubject.ID_Subject)
+					{
+						<option value="@subj.ID_Subject" selected>@subj.Name_subject</option>
+					}
+					else
+					{
+						<option value="@subj.ID_Subject">@subj.Name_subject</option>
+					}
+				}
+			}
+		</select>
+	</form>
+
+	<table class="table" id="myTable">
+
+		<thead>
+			<tr>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center;">Студент</h6>
+				</th>
+
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center;">Посещаемость</h6>
+				</th>
+
+				@{
+					var maxAttendanceCount = Model.Attendances.Where(q => q.ID_Subject == Model.selectedSubject.ID_Subject).Count(q => q.ID_Student == Model.Students.Select(q => q.ID_Student).FirstOrDefault());
+				}
+
+				@for (int i = 1; i < maxAttendanceCount; i++)
+				{
+					<th id="tableLabel">
+					</th>
+				}
+			</tr>
+		</thead>
+
+		<tbody>
+			@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
+			{
+				<tr>
+					<td style="text-align:center; font-weight: bold">
+						<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
+					</td>
+					@foreach (var r in Model.Attendances.Where(z => z.ID_Student == item.ID_Student)
+							.Where(q => q.ID_Subject == Model.selectedSubject.ID_Subject))
+					{
+						<td style="text-align:center; font-weight: bold;">
+							@if (@r.Precense == true)
+							{
+								<h6 style='margin-bottom:0px; text-align:center;'>@r.Date_presence.ToString("dd.MM")</h6>
+							}
+							else
+							{
+								<h6 style='margin-bottom:0px; text-align:center; color:red'>@r.Date_presence.ToString("dd.MM")</h6>
+							}
+						</td>
+					}
+
 				</tr>
 			}
 		</tbody>

@@ -6,7 +6,7 @@ namespace recordBook.RInterface
 	{
 		Task AddStudent(Student student);
 		Task DeleteStudent(Student student);
-		Task UpdateStudentl(Student student);
+		Task UpdateStudent(Student student);
 		Student? GetStudentbyID(int Id); 
 		IQueryable<Student> GetAllStudent();
 	}

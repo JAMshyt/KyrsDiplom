@@ -8,16 +8,20 @@
 	{
 		ViewData["Title"] = "Ваши предстоящие экзамены, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 	}
-	else
+	else if (User.IsInRole("Adm"))
 	{
 		ViewData["Title"] = "Предстоящие экзамены группы " + Model.selectedGroup.Name_group;
+	}
+	else
+	{
+		ViewData["Title"] = "Предстоящие экзамены вашей группы (" + Model.selectedGroup.Name_group+")";
 	}
 }
 
 <h1>@ViewData["Title"]</h1>
 
 
-@if (User.IsInRole("Teacher"))
+@if (User.IsInRole("Adm"))
 {
 	<form asp-controller="Exams" asp-action="Upcoming">
 		<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
@@ -115,7 +119,7 @@
 		</tbody>
 	</table>
 }
-else
+else if (User.IsInRole("Student"))
 {
 	<table class="table" id="myTable" style="width:95%">
 
@@ -155,6 +159,78 @@ else
 					</tr>
 				}
 			}
+		</tbody>
+	</table>
+}
+else
+{
+	<form asp-controller="Exams" asp-action="Upcoming">
+		<select name="selectedSubject" required onchange="this.form.submit()" style="width:200px; height:40px; text-align:center">
+			@foreach (var subj in Model.Subjects)
+			{
+				if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(subj.ID_Subject))
+				{
+					if (subj.ID_Subject == Model.selectedSubject.ID_Subject)
+					{
+						<option value="@subj.ID_Subject" selected>@subj.Name_subject</option>
+					}
+					else
+					{
+						<option value="@subj.ID_Subject">@subj.Name_subject</option>
+					}
+				}
+			}
+		</select>
+
+	</form>
+
+
+	<table class="table" id="myTable" style="width:95%">
+
+		<thead>
+			<tr>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center;">Студент</h6>
+				</th>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center">Тип работы</h6>
+				</th>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center">Дата сдачи</h6>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+
+			@foreach (var r in Model.Academic_Performances
+					.Where(i => i.ID_Subject == Model.selectedSubject.ID_Subject)
+					.Where(a => a.Grade == "Нет оценки")
+					.Where(q => q.Date > DateTime.Now))
+			{
+				bool groupCheck = Model.Students.Where(q => q.ID_Group == Model.selectedGroup.ID_Group).Any(q => q.ID_Student == r.ID_Student);
+
+				if (groupCheck)
+				{
+					var student = Model.Students.FirstOrDefault(q => q.ID_Student == r.ID_Student);
+					<tr id="columnGrade">
+						<td style="text-align:center; font-weight: bold">
+							<p id="label_s">@student.Surname  @student.Name  @student.Patronymic</p>
+						</td>
+
+						<td id="cellGrade" style="text-align:center;  padding-right:10%; font-weight: bold ">
+							<p class="labelsGrade">@r.Grade</p>
+						</td>
+
+						<td style="text-align:center;  font-weight: bold ">
+							<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
+						</td>
+						<td style="text-align:center;  font-weight: bold ">
+							<p id="label_s"> @r.Date.ToString("dd MMMM yyyy") </p>
+						</td>
+					</tr>
+				}
+			}
+
 		</tbody>
 	</table>
 }
