@@ -15,12 +15,14 @@ namespace recordBook.Controllers
 		private readonly ISubject _subject;
 		private readonly IGroup_Subject _group_subject;
 		private readonly ILogins _logins;
+		private readonly IAcademic_performance _academic_Performance;
+		private readonly IKind_of_work _kind_Of_Work;
 
 		private readonly ILogins _user;
 
 		public StudentController(ILogger<StudentController> logger, IStudent student,
 			IGroup group, ISubject subject, IGroup_Subject group_subject, ILogins user,
-			ILogins logins
+			ILogins logins, IAcademic_performance academic_Performance, IKind_of_work kind_Of_Work
 			)
 		{
 			_logger = logger;
@@ -29,6 +31,8 @@ namespace recordBook.Controllers
 			_subject = subject;
 			_group_subject = group_subject;
 			_logins = logins;
+			_academic_Performance = academic_Performance;
+			_kind_Of_Work = kind_Of_Work;
 		}
 
 
@@ -37,6 +41,12 @@ namespace recordBook.Controllers
 		{
 			var students = _student.GetAllStudent().ToList();
 			return students;
+		}
+
+		public List<Subject> GetSubject()
+		{
+			var subj = _subject.GetAllSubject().ToList();
+			return subj;
 		}
 
 		public List<Group> GetGroups()
@@ -49,6 +59,24 @@ namespace recordBook.Controllers
 			var logins = _logins.GetAllLogins().ToList();
 			return logins;
 		}
+
+		public List<Group_Subject> GetGroupSubject()
+		{
+			var gs = _group_subject.GetAllGroup_Subject().ToList();
+			return gs;
+		}
+
+		public List<Academic_performance> GetAcademicPerformance()
+		{
+			var ap = _academic_Performance.GetAllAcademic_performance().ToList();
+			return ap;
+		}
+
+		public List<Kind_of_work> GetKindOfWork()
+		{
+			var kow = _kind_Of_Work.GetAllKind_of_work().ToList();
+			return kow;
+		}
 		#endregion
 
 
@@ -60,47 +88,152 @@ namespace recordBook.Controllers
 		public async Task<IActionResult> ShowStudents(int selectedGroup)
 		{
 			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
+			var model = new GroupsStudentsViewModel
+			{
+				Groups = GetGroups(),
+				Students = GetStudents(),
+				subjects = GetSubject(),
+				academic_Performance = GetAcademicPerformance(),
+				kind_Of_Works = GetKindOfWork(),
+			};
+
 			if (User.IsInRole("Adm"))
 			{
 				if (selectedGroup > 0)
 				{
 					var groupById = _group.GetGroupbyID(selectedGroup);
-					var model = new GroupsStudentsViewModel { Groups = GetGroups(), Students = GetStudents(), selectedGroup = groupById };
+
+					model.selectedGroup = groupById;
+					model.group_Subject = GetGroupSubject().Where(q => q.ID_Group == groupById.ID_Group);
+
 					return View(model);
 				}
 				else
 				{
-					var model = new GroupsStudentsViewModel { Groups = GetGroups(), Students = GetStudents(), selectedGroup = GetGroups().FirstOrDefault() };
+
+					model.selectedGroup = GetGroups().FirstOrDefault();
+					model.group_Subject = GetGroupSubject().Where(q => q.ID_Group == GetGroups().FirstOrDefault().ID_Group);
 					return View(model);
 				}
 			}
 			else
 			{
-				var model = new GroupsStudentsViewModel { Groups = GetGroups(), Students = GetStudents(), selectedGroup = GetGroups().FirstOrDefault(q=>q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value)) };
+
+				model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+				model.group_Subject = GetGroupSubject().Where(q => q.ID_Group == GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value)).ID_Group);
+
 				return View(model);
 			}
 		}
 
+		public class IdAndDate
+		{
+			public int idsubj { get; set; }
+			public int group { get; set; }
+			public DateTime newDate { get; set; }
 
+		}
+		[HttpPost]
+		[Route("/Student/ChangeDate/")]
+		[Consumes("application/json")]
+		public async Task<IActionResult> ChangeDate([FromBody] IdAndDate request)
+		{
+			List<int> idStudent = GetStudents().Where(q => q.ID_Group == request.group).Select(q => q.ID_Student).ToList();
+			foreach (var r in idStudent)
+			{
+				Academic_performance oldAcademPerf = GetAcademicPerformance().FirstOrDefault(z => z.ID_Subject == request.idsubj && z.ID_Student == r);
+				oldAcademPerf.Date = request.newDate;
+				await _academic_Performance.UpdateAcademic_performance(oldAcademPerf);
+			}
+			var str = request.idsubj + " " + request.newDate;
+			return Json(str);
+		}
+
+
+		public class StudentId
+		{
+			public int Id { get; set; }
+		}
 		/// <summary>
 		/// удаляет студента
 		/// </summary>
-		/// <param name="Id">id студента</param>
-		/// <returns>возвращает обратно на сайт но не обновляет содержимое, чтобы студент убрался надо обновить страницу</returns>
-		[HttpGet]
-		[Route("Student/DropStudent/{Id:int}")]
-		public async Task<IActionResult> DropStudent(int Id)
+		/// <param name="studId">id студента</param>
+		/// <returns>возвращает на сайт</returns>
+		[HttpPost]
+		[Route("Student/DropStudent/")]
+		[Consumes("application/json")]
+		public async Task<IActionResult> DropStudent([FromBody] StudentId studId)
 		{
-			var stu = _student.GetStudentbyID(Id);
+			var stu = _student.GetStudentbyID(studId.Id);
 			if (stu != null)
 			{
 				await _student.DeleteStudent(stu);
 			}
-			return RedirectToAction(nameof(ShowStudents));
+			return Json(stu);
 		}
 
 
+		public class StudentIdNewGroup
+		{
+			public int id { get; set; }
+			public int newGroup { get; set; }
+		}
 		/// <summary>
+		/// Меняет группу у студента
+		/// </summary>
+		/// <param name="id">id студента</param>
+		/// <returns>обратно на сайт
+		/// </returns>
+		[HttpPost]
+		[Route("Student/ChangeStudentGroup/")]
+		[Consumes("application/json")]
+		public async Task<IActionResult> ChangeStudentGroup([FromBody] StudentIdNewGroup newGroup)
+		{
+			var stu = _student.GetStudentbyID(newGroup.id);
+			if (stu != null)
+			{
+				stu.ID_Group = newGroup.newGroup;
+				await _student.UpdateStudent(stu);
+			}
+			return Json(stu);
+		}
+
+		public class newExam
+		{
+			public int idSubj { get; set; }
+			public int idWork { get; set; }
+			public int idGroup { get; set; }
+		}
+		/// <summary>
+		/// Добавляет новый экзамен
+		/// </summary>
+		/// <param name="newGroup"></param>
+		/// <returns></returns>
+		[HttpPost]
+		[Route("Student/addExam/")]
+		[Consumes("application/json")]
+		public async Task<IActionResult> addExam([FromBody] newExam exam)
+		{
+
+			List<Student> StudentsInGroup = GetStudents().Where(q => q.ID_Group == exam.idGroup).ToList();
+			foreach (var r in StudentsInGroup)
+			{
+			var perf = new Academic_performance()
+			{
+				ID_Subject = exam.idSubj,
+				ID_Kind_of_work = exam.idWork,
+				Grade = "Нет оценки",
+				Date = null,
+				ID_Student = r.ID_Student
+			};
+				await _academic_Performance.AddAcademic_performance(perf);
+			}
+
+			return Json("");
+		}
+
+
+		/// <summary> 
 		/// страница добавления студента
 		/// </summary>
 		/// <returns></returns>
@@ -110,6 +243,8 @@ namespace recordBook.Controllers
 			var model2 = new AddStudentViewModel { Groups = GetGroups(), ID_Group = GetGroups().FirstOrDefault().ID_Group, studentAdded = false, loginUnique = true, EmailUnique = true };
 			return View(model2);
 		}
+
+
 
 		/// <summary>
 		/// добавляет студента, проверяет заполненность нужных полей

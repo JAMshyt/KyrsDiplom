@@ -106,7 +106,7 @@
 							<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
 						</td>
 						<td style="text-align:center;  font-weight: bold ">
-							<p id="label_s"> @r.Date.ToString("dd MMMM yyyy") </p>
+							<p id="label_s"> @r.Date?.ToString("dd MMMM yyyy") </p>
 						</td>
 					</tr>
 				}
@@ -157,7 +157,7 @@ else if (User.IsInRole("Student"))
 							<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
 						</td>
 						<td style="text-align:center;  font-weight: bold ">
-							<p id="label_s"> @r.Date.ToString("dd MMMM yyyy") </p>
+							<p id="label_s"> @r.Date?.ToString("dd MMMM yyyy") </p>
 						</td>
 					</tr>
 				}
@@ -231,7 +231,7 @@ else
 							<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
 						</td>
 						<td style="text-align:center;  font-weight: bold ">
-							<p id="label_s"> @r.Date.ToString("dd MMMM yyyy") </p>
+							<p id="label_s"> @r.Date?.ToString("dd MMMM yyyy") </p>
 						</td>
 					</tr>
 				}

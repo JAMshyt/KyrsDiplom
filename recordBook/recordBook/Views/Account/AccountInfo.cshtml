@@ -6,17 +6,46 @@
 @{
 	ViewData["Title"] = "Личный кабинет";
 }
-<div id="info">
-	<img id="avatar" src="data:image/jpeg;base64,@Model.Photo">
-
-	<div id="textInfo">
-		<h3>ФИО:</h3><span>@Model.Surname @Model.Name @Model.Patronymic</span>
-		<h3>Телефон:</h3><span>@User.FindFirst(ClaimTypes.MobilePhone)?.Value</span>
-		<h3>Почта:</h3><span>@User.FindFirst(ClaimTypes.Email)?.Value</span>
-		@if (User.FindFirst(ClaimTypes.Role)?.Value == "Student")
+@if (!Model.AdminWatching)
+{
+	<div id="info">
+		@if (Model.Photo != null)
 		{
-			<h3>Группа:</h3><span>@Model.Group.Name_group</span>
-			<h3>Специальность:</h3><span>@Model.Group.Decoding</span>
+		<img id="avatar" src="data:image/jpeg;base64,@Model.Photo">
 		}
+
+		<div id="textInfo">
+			<h3>ФИО:</h3><span>@Model.Surname @Model.Name @Model.Patronymic</span>
+			<h3>Телефон:</h3><span>@User.FindFirst(ClaimTypes.MobilePhone)?.Value</span>
+			<h3>Почта:</h3><span>@User.FindFirst(ClaimTypes.Email)?.Value</span>
+			@if (User.FindFirst(ClaimTypes.Role)?.Value == "Student")
+			{
+				<h3>Группа:</h3><span>@Model.Group.Name_group</span>
+				<h3>Специальность:</h3><span>@Model.Group.Decoding</span>
+			}
+		</div>
 	</div>
-</div>
+}
+else
+{
+	<div id="info">
+		@if (Model.Photo != null)
+		{
+			<img id="avatar" src="data:image/jpeg;base64,@Model.Photo">
+		}
+		<div id="textInfo">
+			<h3>ФИО:</h3><span>@Model.Surname @Model.Name @Model.Patronymic</span>
+			<h3>Телефон:</h3><span>@Model.Phone</span>
+			<h3>Почта:</h3><span>@Model.Email</span>
+			@if (Model.Group != null)
+			{
+				<h3>Группа:</h3>
+
+				<span>@Model.Group.Name_group</span>
+				<h3>Специальность:</h3>
+
+				<span>@Model.Group.Decoding</span>
+			}
+		</div>
+	</div>
+}

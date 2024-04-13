@@ -9,7 +9,7 @@ namespace recordBook.Models
 		public int ID_Subject { get; set; }
 		public int ID_Student { get; set; }
 		public int ID_Kind_of_work { get; set; }
-		public DateTime Date { get; set; }
+		public DateTime? Date { get; set; }
 		public string Grade { get; set; }
 	}
 }

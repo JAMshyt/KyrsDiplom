@@ -9,7 +9,7 @@
 	}
 	else
 	{
-		ViewData["Title"] = "Студенты вашей группы ( " + Model.selectedGroup.Name_group+")";
+		ViewData["Title"] = "Студенты вашей группы ( " + Model.selectedGroup.Name_group + ")";
 	}
 }
 
@@ -62,19 +62,37 @@
 			{
 				//var data = item.Date.ToString("dd MMMM yyyy");
 			<tr>
-				<td style="text-align:center;font-weight: bold">
+				<td style="text-align:center;font-weight: bold; width:10%">
 					<p id="label_s">@Html.DisplayFor(modelItem => item.Surname)</p>
 				</td>
-				<td style="text-align:center;font-weight: bold ">
+				<td style="text-align:center;font-weight: bold; width:10%">
 					<p id="label_s">@Html.DisplayFor(modelItem => item.Name)</p>
 				</td>
-				<td style="text-align:center;font-weight: bold ">
+				<td style="text-align:center;font-weight: bold; width:10%">
 					<p id="label_s">@Html.DisplayFor(modelItem => item.Patronymic)</p>
 				</td>
 					@if (User.IsInRole("Adm"))
 					{
-					<td style="text-align:center;font-weight: bold;">
-						<a class="btn btn-outline-danger" name="selectedStudent" id="deleteStudent" onclick="DropStudent(@item.ID_Student)" style="border:1px; font-weight:normal">Удалить</a>
+					<td style="text-align:center; width:30%">
+						<a class="btn btn-outline-danger" id="deleteStudent" onclick="DropStudent(@item.ID_Student)" style="border:1px; font-weight:normal">Удалить</a>
+						<a class="btn btn-outline-warning" onclick="showGroups(@item.ID_Student, event)" style="border:1px; font-weight:normal">Изменить группу</a>
+
+						<select class="chGroups" id="@item.ID_Student" onchange="ChangeGroupStudent(@item.ID_Student)" style="width:120px; height:40px; text-align:center">
+								@foreach (var groups in Model.Groups)
+								{
+									if (groups.ID_Group == Model.selectedGroup.ID_Group)
+									{
+									<option value="@groups.ID_Group" selected>@groups.Name_group</option>
+									}
+									else
+									{
+									<option value="@groups.ID_Group">@groups.Name_group</option>
+									}
+								}
+						</select>
+
+						<a class="btn btn-outline-info" onclick="showAccaunt(@item.ID_Login)" style="border:1px; font-weight:normal">Профиль</a>
+
 
 					</td>
 					}
@@ -84,20 +102,203 @@
 	</form>
 </table>
 
+<br></br>
+<h3>Предметы</h3>
+<table class="table" id="myTable">
+	<thead>
+		<tr>
+			<th id="tableLabel">
+				<h6 style="margin-bottom : 0px; text-align:center;">Дисциплина</h6>
+			</th>
+			<th id="tableLabel">
+				<h6 style="margin-bottom : 0px; text-align:center;">Тип сдачи</h6>
+			</th>
+			<th id="tableLabel">
+				<h6 style="margin-bottom : 0px; display:inline">Дата</h6>
+				@if (User.IsInRole("Adm"))
+				{
+					<button type="button" id="ChangeDateBtn" class="btn btn-warning">Изменить дату сдачи для всех</button>
+				}
+			</th>
+
+		</tr>
+	</thead>
+	<form asp-controller="Student" asp-action="ShowStudents">
+	<tbody>
+			@foreach (var item in Model.group_Subject)
+			{
+
+				var subj = Model.subjects.FirstOrDefault(q => q.ID_Subject == item.ID_Subject);
+
+				var mostCommonDate = Model.academic_Performance
+				.Where(q => q.ID_Subject == subj.ID_Subject)
+				.GroupBy(q => q.Date)
+				.OrderByDescending(g => g.Count())
+				.Select(g => g.Key)
+				.FirstOrDefault();
+
+				var data = mostCommonDate == new DateTime(0001, 1, 1, 0, 0, 0) ? null : mostCommonDate?.ToString("dd MMMM yyyy");
+
+				var kind = Model.kind_Of_Works.FirstOrDefault(q => q.ID_Kind_of_work == Model.academic_Performance.FirstOrDefault(q => q.ID_Subject == item.ID_Subject && q.Date == mostCommonDate)?.ID_Kind_of_work);
+
+			<tr>
+				<td style="text-align:center;font-weight: bold">
+					<p id="label_s">@subj.Name_subject</p>
+				</td>
+
+
+				<td style="text-align:center;font-weight: bold">
+						@if (kind != null)
+						{
+						<p id="label_s">@kind.Title_of_kind</p>
+						}
+						else
+						{
+						<button type="button" id="addExamBtn" onclick="ExamBtnClick(@item.ID_Subject,event)" class="btn btn-warning">Назначить экзамен</button>
+
+						<select class="kindsOfWorks" id="Exams_@item.ID_Subject" onchange="addKindOfWork(@item.ID_Subject, @Model.selectedGroup.ID_Group)" style="width:250px; height:40px; text-align:center">
+								@foreach (var kinds in Model.kind_Of_Works)
+								{
+
+								<option value="@kinds.ID_Kind_of_work">@kinds.Title_of_kind</option>
+
+								}
+						</select>
+						}
+				</td>
+
+				<td style="font-weight: bold">
+						@if (kind != null)
+						{
+						<p id="label_s">@data</p>
+						<input type="date" class="selectDates" onchange="DateIsChanged(@subj.ID_Subject,@Model.selectedGroup.ID_Group,event)" style="width:150px; height:30px; text-align:center">
+						}
+				</td>
+
+					@* 				@if (User.IsInRole("Adm"))
+			{
+			<td style="text-align:center;font-weight: bold;">
+			<a class="btn btn-outline-danger" name="selectedStudent" id="deleteStudent" onclick="DropStudent(@item.ID_Student)" style="border:1px; font-weight:normal">Удалить</a>
+
+			</td>
+			} *@
+			</tr>
+			}
+	</tbody>
+	</form>
+</table>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type='text/javascript'>
+	$(document).ready(function () {
+		$('.selectDates').hide();
+		$('.chGroups').hide();
+		$('.kindsOfWorks').hide();
+	});
 
-	var myTable = document.getElementById("myTable")
+	// Изменение дат
+	$('#ChangeDateBtn').click(function (id) {
+		if ($('#ChangeDateBtn').text() == 'Изменить дату сдачи для всех') {
+			$('.selectDates').show();
+			$('#ChangeDateBtn').text('Сохранить');
+		}
+		else {
+			$('.selectDates').hide();
+			$('#ChangeDateBtn').text('Изменить дату сдачи для всех');
+			location.reload()
+		}
 
-	function DropStudent(Id) {
-		fetch('/Student/DropStudent/' + Id)
-		// .then(function (response) {
-		// 	return response.text();
-		// })
-		// .then(function (html) {
-		// 	myTable.innerHTML = html;
-		// });
-		location.reload();
+	});
+
+	function DateIsChanged(subjId, idGroup, event) {
+		var dat = event.target.value;
+		$.ajax({
+			type: 'POST',
+			url: '/Student/ChangeDate/',
+			contentType: 'application/json',
+			data: JSON.stringify({ idsubj: subjId, group: idGroup, newDate: dat }),
+			dataType: 'json',
+		});
+	};
+
+	//изменение групп
+	function showGroups(id, event) {
+		var button = event.target.innerText;
+		if (button == "Изменить группу") {
+			event.target.innerText = "Сохранить"
+			$('#' + id).show();
+		}
+		else {
+			event.target.innerText = "Изменить группу"
+			$('#' + id).hide();
+			location.reload();
+		}
+	};
+
+	function ChangeGroupStudent(id) {
+		var group = event.target.value;
+		$.ajax({
+			type: 'POST',
+			url: '/Student/ChangeStudentGroup/',
+			contentType: 'application/json',
+			data: JSON.stringify({ id: id, newGroup: group }),
+			dataType: 'json',
+		});
 	}
+
+
+
+	//Добавление экзамена
+	function ExamBtnClick(id, event) {
+		var button = event.target.innerText;
+		if (button == "Назначить экзамен") {
+			event.target.innerText = "Сохранить"
+			$('#Exams_' + id).show();
+		}
+		else {
+			event.target.innerText = "Назначить экзамен"
+			$('#Exams_' + id).hide();
+			location.reload();
+		}
+	};
+
+	function addKindOfWork(idS, idG) {
+		var idW = event.target.value;
+		$.ajax({
+			type: 'POST',
+			url: '/Student/addExam/',
+			contentType: 'application/json',
+			data: JSON.stringify({ idSubj: idS, idWork: idW, idGroup: idG }),
+			dataType: 'json',
+		});
+	}
+
+
+	//профили студентов
+	function showAccaunt(id) {
+
+
+		window.location.href = '/Account/AccountInfoStudent' + id;
+
+	}
+
+	//удаление студента
+	function DropStudent(Id) {
+		if (confirm("Вы уверены, что хотите удалить этого студента?")) {
+			$.ajax({
+				type: 'POST',
+				url: '/Student/DropStudent/',
+				contentType: 'application/json',
+				data: JSON.stringify({ id: Id }),
+				dataType: 'json',
+				success: function (data) {
+					location.reload();
+
+				},
+			});
+		}
+	}
+
 
 </script>
 

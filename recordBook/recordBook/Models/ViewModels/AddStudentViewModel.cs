@@ -23,11 +23,11 @@ namespace recordBook.Models.ViewModels
 
 		#region данные логина
 		[Required(ErrorMessage = "Введите логин")]
-		[StringLength(20, ErrorMessage = "Длинна логина должна быть больше 3 но меньше 20", MinimumLength = 3)]
+		[StringLength(20, ErrorMessage = "Длинна логина должна быть больше 3 но меньше 20", MinimumLength = 4)]
 		public string Login { get; set; }
 
 		[Required(ErrorMessage = "Введите пароль")]
-		[StringLength(20, ErrorMessage = "Длинна пароля должна быть больше 3 но меньше 20", MinimumLength = 3)]
+		[StringLength(20, ErrorMessage = "Длинна пароля должна быть больше 3 но меньше 20", MinimumLength = 4)]
 		public string Password { get; set; }
 		public string Email { get; set; }
 		#endregion

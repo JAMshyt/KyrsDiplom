@@ -26,9 +26,11 @@ namespace recordBook.Controllers
 		private readonly IGroup _group;
 		private readonly IDepartment_worker _department_worker;
 		private readonly ICurator _curator;
+		private readonly ILogins _logins;
 
 		public AccountController(ILogger<AccountController> logger, IStudent student,
-			IDepartment_worker department_worker, ICurator curator, IGroup group
+			IDepartment_worker department_worker, ICurator curator, IGroup group,
+			ILogins logins
 			)
 		{
 			_logger = logger;
@@ -36,6 +38,7 @@ namespace recordBook.Controllers
 			_department_worker = department_worker;
 			_curator = curator;
 			_group = group;
+			_logins = logins;
 		}
 
 		#region Get таблиц
@@ -63,6 +66,12 @@ namespace recordBook.Controllers
 			var curs = _curator.GetAllCurator().ToList();
 			return curs;
 		}
+
+		public List<Logins> GetLogins()
+		{
+			var logs = _logins.GetAllLogins().ToList();
+			return logs;
+		}
 		#endregion
 
 		public ViewResult AccountInfo()
@@ -75,7 +84,7 @@ namespace recordBook.Controllers
 					var student = GetStudents().FirstOrDefault(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
 
 					byte[] photo = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value)).Select(q => q.Photo).FirstOrDefault();
-					string photoBase64 = Convert.ToBase64String(photo);
+					string? photoBase64 = photo != null ? Convert.ToBase64String(photo): null ;
 
 					model.Name = student.Name;
 					model.Surname = student.Surname;
@@ -87,7 +96,7 @@ namespace recordBook.Controllers
 					var dep_work = GetDepartment_Workers().FirstOrDefault(q => q.ID_Department_worker == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
 
 					byte[] photoAdm = GetDepartment_Workers().Where(q => q.ID_Department_worker == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value)).Select(q => q.Photo).FirstOrDefault();
-					string photoBase64Adm = Convert.ToBase64String(photoAdm);
+					string? photoBase64Adm = photoAdm != null ? Convert.ToBase64String(photoAdm) : null;
 
 					model.Name = dep_work.Name;
 					model.Surname = dep_work.Surname;
@@ -98,7 +107,7 @@ namespace recordBook.Controllers
 					var cur = GetCurators().FirstOrDefault(q => q.ID_Curator == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
 
 					byte[] photoCur = GetCurators().Where(q => q.ID_Curator == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value)).Select(q => q.Photo).FirstOrDefault();
-					string photoBase64Cur = Convert.ToBase64String(photoCur);
+					string? photoBase64Cur = photoCur != null ? Convert.ToBase64String(photoCur) : null;
 
 					model.Name = cur.Name;
 					model.Surname = cur.Surname;
@@ -110,6 +119,28 @@ namespace recordBook.Controllers
 			return View(model);
 		}
 
+
+		[HttpGet] 
+		[Route("/Account/AccountInfoStudent{idLogin:int}")] 
+		public ViewResult AccountInfoStudent(int idLogin)
+		{
+			var person = GetStudents().FirstOrDefault(q => q.ID_Login == idLogin);
+			var login = GetLogins().FirstOrDefault(q => q.ID_Login == person.ID_Login);
+			byte[] photoCur = person.Photo;
+			string? photoBase64 = photoCur != null ? Convert.ToBase64String(photoCur) : null;
+			var model = new AccountViewModel()
+			{
+				Surname = person.Surname,
+				Name = person.Name,
+				Patronymic = person.Patronymic,
+				Group = GetGroups().FirstOrDefault(q => q.ID_Group == person.ID_Group),
+				Photo = photoBase64,
+				Email = login.Email,
+				Phone = login.Phone,
+				AdminWatching = true,
+			};
+			return View("AccountInfo", model);
+		}
 
 	}
 }

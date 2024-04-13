@@ -74,7 +74,8 @@
 					<h6 style="margin-bottom : 0px; text-align:center">Тип работы</h6>
 				</th>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center">Дата сдачи</h6>
+					<h6 style="margin-bottom : 0px; margin-left : 20%; text-align:center; display:inline">Дата сдачи</h6>
+					<button type="button" id="ChangeDateBtn" class="btn btn-warning" >Изменить</button>
 				</th>
 			</tr>
 		</thead>
@@ -100,7 +101,8 @@
 								<option value="Хорошо">Хорошо</option>
 								<option value="Удовлетворительно">Удовлетворительно</option>
 								<option value="Не удовлетворительно">Не удовлетворительно</option>
-								<option value="Нет оценки" selected>Нет оценки</option>
+								<option value="Нет оценки">Нет оценки</option>
+								<option value="" selected></option>
 							</select>
 						</td>
 
@@ -108,7 +110,8 @@
 							<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
 						</td>
 						<td style="text-align:center;  font-weight: bold ">
-							<p id="label_s"> @r.Date.ToString("dd MMMM yyyy") </p>
+							<p id="label_s"> @r.Date?.ToString("dd MMMM yyyy") </p>
+							<input type="date" class="selectDates" onchange="DateIsChanged(@r.ID_Academic_performance,event)" style="width:150px; height:30px; text-align:center">
 						</td>
 					</tr>
 				}
@@ -161,7 +164,7 @@ else if (User.IsInRole("Student"))
 								<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
 							</td>
 							<td style="text-align:center;  font-weight: bold ">
-								<p id="label_s"> @r.Date.ToString("dd MMMM yyyy") </p>
+								<p id="label_s"> @r.Date?.ToString("dd MMMM yyyy") </p>
 							</td>
 						</tr>
 					}
@@ -233,7 +236,7 @@ else{
 							<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
 						</td>
 						<td style="text-align:center;  font-weight: bold ">
-							<p id="label_s"> @r.Date.ToString("dd MMMM yyyy") </p>
+							<p id="label_s"> @r.Date?.ToString("dd MMMM yyyy") </p>
 						</td>
 					</tr>
 				}
@@ -248,7 +251,7 @@ else{
 
 	$(document).ready(function () {
 		$('.selectGrades').hide();
-
+		$('.selectDates').hide();
 	});
 
 	$('#ChangeGradeBtn').click(function (id) {
@@ -259,6 +262,19 @@ else{
 		else {
 			$('.selectGrades').hide();
 			$('#ChangeGradeBtn').text('Изменить');
+			location.reload()
+		}
+
+	});
+
+	$('#ChangeDateBtn').click(function (id) {
+		if ($('#ChangeDateBtn').text() == 'Изменить') {
+			$('.selectDates').show();
+			$('#ChangeDateBtn').text('Сохранить');
+		}
+		else {
+			$('.selectDates').hide();
+			$('#ChangeDateBtn').text('Изменить');
 			location.reload()
 		}
 
@@ -275,6 +291,16 @@ else{
 		});
 	};
 
+	function DateIsChanged(id, event) {
+		var date = event.target.value;
+		$.ajax({
+			type: 'POST',
+			url: '/Exams/ChangeDates/',
+			contentType: 'application/json',
+			data: JSON.stringify({ id: id, newDate: date }),
+			dataType: 'json',
 
+		});
+	};
 
 </script>

@@ -210,7 +210,8 @@ else
 					var subjectWithMostEntries = Model.Group_Subjects
 					.Select(s => new
 					{
-						AttendanceCount = Model.Attendances.Count(a => a.ID_Subject == s.ID_Subject)
+						AttendanceCount = Model.Attendances.Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber).Value))
+						.Count(a => a.ID_Subject == s.ID_Subject)
 					})
 					.OrderByDescending(x => x.AttendanceCount)
 					.FirstOrDefault();
@@ -237,7 +238,8 @@ else
 							<p id="label_s">@item.Name_subject</p>
 						</td>
 
-						@foreach (var r in Model.Attendances.Where(q => q.ID_Subject == subj.ID_Subject))
+						@foreach (var r in Model.Attendances.Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber).Value))
+						.Where(q => q.ID_Subject == subj.ID_Subject))
 						{
 							<td style="text-align:center; font-weight: bold;">
 								@if (@r.Precense == true)

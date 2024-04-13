@@ -177,6 +177,25 @@ namespace recordBook.Controllers
 		}
 
 
+		public class IdAndDate
+		{
+			public int Id { get; set; }
+			public DateTime newDate { get; set; }
+
+		}
+		[HttpPost]
+		[Route("/Exams/ChangeDates/")]
+		[Consumes("application/json")]
+		public async Task<IActionResult> ChangeDates([FromBody] IdAndDate request)
+		{
+
+			Academic_performance oldAcademPerf = GetAcademic_performance().FirstOrDefault(z => z.ID_Academic_performance == request.Id);
+			oldAcademPerf.Date = request.newDate;
+			await _academic_performance.UpdateAcademic_performance(oldAcademPerf);
+			var str = request.Id + " " + request.newDate;
+			return Json(str);
+		}
+
 		public async Task<IActionResult> Debt(int selectedGroup, int selectedSubject)
 		{
 			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;

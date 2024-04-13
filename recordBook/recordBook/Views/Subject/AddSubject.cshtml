@@ -106,7 +106,7 @@
 			dataType: 'json',
 			success: function (response) {
 				if (response.subjectAdded && response.selectedGroups.length > 0) {
-					$('#message').html('<span style="color:green;">Группа ' + response.nameSubject + ' добавлена</span>');
+					$('#message').html('<span style="color:green;">Предмет ' + response.nameSubject + ' добавлена</span>');
 				}
 				else {
 					console.log(response);
