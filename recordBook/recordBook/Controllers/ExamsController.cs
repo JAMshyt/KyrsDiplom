@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using recordBook.Migrations;
 using recordBook.Models;
 using recordBook.Models.ViewModels;
 using recordBook.RInterface;
@@ -29,11 +30,12 @@ namespace recordBook.Controllers
 		//private readonly IDepartment_worker _department_worker;
 		private readonly IGroup_Subject _group_subject;
 		private readonly IAcademic_performance _academic_performance;
+		private readonly IRatingControl _ratingControl;
 
 		public ExamsController(ILogger<ExamsController> logger, IStudent student,
 			IGroup group, ISubject subject, IKind_of_work kind_wf_work,
 			/*IDepartment_worker department_worker,*/ IAcademic_performance academic_performance,
-			IGroup_Subject group_subject
+			IGroup_Subject group_subject, IRatingControl ratingControl
 			)
 		{
 			_logger = logger;
@@ -44,6 +46,7 @@ namespace recordBook.Controllers
 			//_department_worker = department_worker;
 			_group_subject = group_subject;
 			_academic_performance = academic_performance;
+			_ratingControl = ratingControl;
 		}
 
 		#region Get таблиц
@@ -84,6 +87,11 @@ namespace recordBook.Controllers
 			return kind_of_work;
 		}
 
+		public List<RatingControl> GetRatingControls()
+		{
+			var rait = _ratingControl.GetAllRatingControl().ToList();
+			return rait;
+		}
 		#endregion
 
 
@@ -151,51 +159,6 @@ namespace recordBook.Controllers
 		}
 
 
-
-		public class IdAndGrade
-		{
-			public int Id { get; set; }
-			public string newGrade { get; set; }
-
-		}
-
-		/// <summary>
-		/// Изменяет оценки
-		/// </summary>
-		/// <returns></returns>
-		[HttpPost]
-		[Route("/Exams/ChangeGrades/")]
-		[Consumes("application/json")]
-		public async Task<IActionResult> ChangeGrades([FromBody] IdAndGrade request)
-		{
-
-			Academic_performance oldAcademPerf = GetAcademic_performance().FirstOrDefault(z => z.ID_Academic_performance == request.Id);
-			oldAcademPerf.Grade = request.newGrade;
-			await _academic_performance.UpdateAcademic_performance(oldAcademPerf);
-			var str = request.Id + " " + request.newGrade;
-			return Json(str);
-		}
-
-
-		public class IdAndDate
-		{
-			public int Id { get; set; }
-			public DateTime newDate { get; set; }
-
-		}
-		[HttpPost]
-		[Route("/Exams/ChangeDates/")]
-		[Consumes("application/json")]
-		public async Task<IActionResult> ChangeDates([FromBody] IdAndDate request)
-		{
-
-			Academic_performance oldAcademPerf = GetAcademic_performance().FirstOrDefault(z => z.ID_Academic_performance == request.Id);
-			oldAcademPerf.Date = request.newDate;
-			await _academic_performance.UpdateAcademic_performance(oldAcademPerf);
-			var str = request.Id + " " + request.newDate;
-			return Json(str);
-		}
-
 		public async Task<IActionResult> Debt(int selectedGroup, int selectedSubject)
 		{
 			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
@@ -227,7 +190,7 @@ namespace recordBook.Controllers
 						model.selectedGroup = groupById;
 						model.selectedSubject = subjectById;
 					}
-						return View(model);
+					return View(model);
 
 				case "Student":
 					model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
@@ -273,7 +236,7 @@ namespace recordBook.Controllers
 				Kind_of_works = GetKind_of_works(),
 			};
 
-			switch(User.FindFirst(ClaimTypes.Role)?.Value)
+			switch (User.FindFirst(ClaimTypes.Role)?.Value)
 			{
 				case "Adm":
 					if (selectedGroup > 0 & selectedSubject > 0)
@@ -291,7 +254,7 @@ namespace recordBook.Controllers
 					return View(model);
 
 
-			case "Student":
+				case "Student":
 					model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
 					model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
 					model.Academic_Performances = GetAcademic_performance()
@@ -308,17 +271,305 @@ namespace recordBook.Controllers
 					return View(model);
 
 
-			case "Curator":
+				case "Curator":
+					model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+
+					model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
+
+					return View(model);
+			}
+
+			return View(model);
+		}
+
+
+
+		public async Task<IActionResult> Practices(int selectedGroup, int selectedSubject)
+		{
+			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
+
+			var model = new ExamsViewModel
+			{
+				Groups = GetGroups(),
+				Students = GetStudents(),
+				Group_Subjects = GetGroup_Subject(),
+				Subjects = GetSubjects(),
+				Academic_Performances = GetAcademic_performance(),
+				selectedGroup = GetGroups().FirstOrDefault(),
+				selectedSubject = GetSubjects().FirstOrDefault(),
+				Kind_of_works = GetKind_of_works(),
+			};
+
+			switch (User.FindFirst(ClaimTypes.Role)?.Value)
+			{
+				case "Adm":
+					if (selectedGroup > 0 | selectedSubject > 0)
+					{
+						var groupById = _group.GetGroupbyID(selectedGroup);
+						var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
+						if (!subjectsOfSelectedGroup.Contains(selectedSubject))
+						{
+							try
+							{
+								var subj = _subject.GetSubjectbyID(GetGroup_Subject()
+									.FirstOrDefault(q => q.ID_Group == groupById.ID_Group
+									&& GetAcademic_performance().Any(w => w.ID_Kind_of_work == 4 && w.ID_Subject == q.ID_Subject)).ID_Subject);
+								model.selectedSubject = subj;
+							}
+							catch
+							{
+
+								selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
+							}
+						}
+						else
+						{
+							var subjectById = _subject.GetSubjectbyID(selectedSubject);
+							model.selectedSubject = subjectById;
+						}
+						model.selectedGroup = groupById;
+					}
+					return View(model);
+
+
+				case "Student":
+					model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+					model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+					model.Academic_Performances = GetAcademic_performance()
+						.Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+					model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+					model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+
+
+					if (selectedSubject > 0)
+					{
+						var subjectById = _subject.GetSubjectbyID(selectedSubject);
+						model.selectedSubject = subjectById;
+					}
+					return View(model);
+
+
+				case "Curator":
+					var groupById2 = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+					model.selectedGroup = groupById2;
+					if (selectedSubject == 0)
+					{
+						var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(groupById2.ID_Group).Select(z => z.ID_Subject);
+
+						try
+						{
+							var subj = _subject.GetSubjectbyID(GetGroup_Subject()
+								.FirstOrDefault(q => q.ID_Group == groupById2.ID_Group
+								&& GetAcademic_performance().Any(w => w.ID_Kind_of_work == 4 && w.ID_Subject == q.ID_Subject)).ID_Subject);
+							model.selectedSubject = subj;
+						}
+						catch
+						{
+
+							selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
+						}
+					}
+					else
+					{
+						var subjectById = _subject.GetSubjectbyID(selectedSubject);
+						model.selectedSubject = subjectById;
+					}
+
+
+					return View(model);
+			}
+
+			return View(model);
+		}
+
+
+
+
+		public async Task<IActionResult> RatingList(int selectedGroup, int selectedSubject, int selectedSemester)
+		{
+			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
+
+			var maxSemester = GetRatingControls()
+				.Where(q => q.ID_Student == GetStudents().FirstOrDefault(q => q.ID_Group == GetGroups().FirstOrDefault().ID_Group).ID_Student)
+				.Max(q => q.Semester);
+
+			var model = new ExamsViewModel
+			{
+				Groups = GetGroups(),
+				Students = GetStudents(),
+				Group_Subjects = GetGroup_Subject(),
+				Subjects = GetSubjects(),
+				selectedGroup = GetGroups().FirstOrDefault(),
+				selectedSubject = GetSubjects().FirstOrDefault(),
+				RatingControls = GetRatingControls(),
+				selectedSemester = maxSemester,
+			};
+
+			switch (User.FindFirst(ClaimTypes.Role)?.Value)
+			{
+				case "Adm":
+					if (selectedGroup > 0 & selectedSubject > 0 & selectedSemester > 0)
+					{
+						var groupById = _group.GetGroupbyID(selectedGroup);
+						var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
+						if (!subjectsOfSelectedGroup.Contains(selectedSubject))
+						{
+							selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
+						}
+						var subjectById = _subject.GetSubjectbyID(selectedSubject);
+						model.selectedGroup = groupById;
+						model.selectedSubject = subjectById;
+						model.selectedSemester = selectedSemester;
+
+					}
+					return View(model);
+
+
+				case "Student":
+					model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+					model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+					model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+					model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+					model.selectedSemester = selectedSemester;
+					model.RatingControls = GetRatingControls().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+
+
+
+					if (selectedSubject > 0)
+					{
+						var subjectById = _subject.GetSubjectbyID(selectedSubject);
+						model.selectedSubject = subjectById;
+					}
+					return View(model);
+
+
+				case "Curator":
 					model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
 					if (selectedSubject > 0)
 					{
 						model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
 					}
+					model.selectedSemester = selectedSemester;
+
 					return View(model);
 			}
-			
+
 			return View(model);
 		}
+
+
+
+		#region классы для JSON запросов
+		public class IdAndGrade
+		{
+			public int Id { get; set; }
+			public string newGrade { get; set; }
+
+		}
+		public class IdAndDate
+		{
+			public int Id { get; set; }
+			public DateTime newDate { get; set; }
+		}
+
+		public class IdAndPoints
+		{
+			public int Id { get; set; }
+			public int newPoints { get; set; }
+
+		}
+
+		public class newRat
+		{
+			public int IdStudent { get; set; }
+			public int IdSubject { get; set; }
+			public int Semester { get; set; }
+			public int NumberRating { get; set; }
+			public int newPoints { get; set; }
+
+		}
+
+		#endregion
+
+
+		/// <summary>
+		/// Изменяет оценки за экзамены
+		/// </summary>
+		/// <returns></returns>
+		[HttpPost]
+		[Route("/Exams/ChangeGrades/")]
+		[Consumes("application/json")]
+		public async Task<IActionResult> ChangeGrades([FromBody] IdAndGrade request)
+		{
+
+			Academic_performance oldAcademPerf = GetAcademic_performance().FirstOrDefault(z => z.ID_Academic_performance == request.Id);
+			oldAcademPerf.Grade = request.newGrade;
+			await _academic_performance.UpdateAcademic_performance(oldAcademPerf);
+			var str = request.Id + " " + request.newGrade;
+			return Json(str);
+		}
+
+		/// <summary>
+		/// изменяет дату сдачи для студента
+		/// </summary>
+		/// <param name="request"></param>
+		/// <returns></returns>
+		[HttpPost]
+		[Route("/Exams/ChangeDates/")]
+		[Consumes("application/json")]
+		public async Task<IActionResult> ChangeDates([FromBody] IdAndDate request)
+		{
+
+			Academic_performance oldAcademPerf = GetAcademic_performance().FirstOrDefault(z => z.ID_Academic_performance == request.Id);
+			oldAcademPerf.Date = request.newDate;
+			await _academic_performance.UpdateAcademic_performance(oldAcademPerf);
+			var str = request.Id + " " + request.newDate;
+			return Json(str);
+		}
+
+		/// <summary>
+		/// Изменяет оценку за рейтинг контроль
+		/// </summary>
+		/// <param name="request"></param>
+		/// <returns></returns>
+		[HttpPost]
+		[Route("/Exams/ChangePoints/")]
+		[Consumes("application/json")]
+		public async Task<IActionResult> ChangePoints([FromBody] IdAndPoints request)
+		{
+
+			RatingControl oldRating = GetRatingControls().FirstOrDefault(z => z.ID_RatingControl == request.Id);
+			oldRating.Points = request.newPoints;
+			await _ratingControl.UpdateRatingControl(oldRating);
+			var str = request.Id + " " + request.newPoints;
+			return Json(str);
+		}
+
+
+		/// <summary>
+		/// Создает новый рейтинг для студента если небыло
+		/// </summary>
+		/// <param name="request"></param>
+		/// <returns></returns>
+		[HttpPost]
+		[Route("/Exams/NewRating/")]
+		[Consumes("application/json")]
+		public async Task<IActionResult> NewRating([FromBody] newRat request)
+		{
+
+			RatingControl newRating = new RatingControl()
+			{
+				ID_Student = request.IdStudent,
+				ID_Subject = request.IdSubject,
+				Semester = request.Semester,
+				RatingNumber = request.NumberRating,
+				Points = request.newPoints,
+			};
+			await _ratingControl.AddRatingControl(newRating);
+			var str = newRating;
+			return Json(str);
+		}
+
 
 	}
 }

@@ -36,7 +36,7 @@
 
 		<style>
 			.sideMenu {
-				width: 250px;
+				width: 260px;
 				text-align: center;
 				border: 10px solid #13547156;
 				margin: 0px 0px 0px 0px;
@@ -56,25 +56,29 @@
 			}
 		</style>
 		<form>
-			@if (User.IsInRole("Adm"))
+			@if (User.IsInRole("Adm")) 
 			{
 				<input type="submit" id="men1" class="sideMenu" asp-action="ShowStudents" asp-controller="Student" value="Просмотр групп"><br>
 				<input type="submit" class="sideMenu" asp-action="AttendanceOfStudents" asp-controller="Attendance" value="Посещаемость"><br>
 				<input type="submit" class="sideMenu" asp-action="ExamsMarks" asp-controller="Exams" value="Экзамены"><br>
-				<input type="submit" class="sideMenu" asp-action="AddStudent" asp-controller="Student" value="Добавить студента"><br>
-				<input type="submit" class="sideMenu" asp-action="AddSubject" asp-controller="Subject" value="Добавить предмет"><br>
+				<input type="submit" class="sideMenu" asp-action="RatingList" asp-controller="Exams" value="Рейтинги"><br>
 				<input type="submit" class="sideMenu" asp-action="Debt" asp-controller="Exams" value="Задолженности"><br>
-				<input type="submit" id="men2" class="sideMenu" asp-action="Upcoming" asp-controller="Exams" value="Предстоящие экзамены"><br>
-				<label class="navLabel">Навигация</label>
+				<input type="submit" class="sideMenu" asp-action="Upcoming" asp-controller="Exams" value="Предстоящие экзамены"><br>
+				<input type="submit" class="sideMenu" asp-action="Practices" asp-controller="Exams" value="Практики"><br>
+				<input type="submit" class="sideMenu" asp-action="AddStudent" asp-controller="Student" value="Добавить студента"><br>
+				<input type="submit" id="men2" class="sideMenu" asp-action="AddSubject" asp-controller="Subject" value="Добавить предмет"><br>
+				<label class="navLabel">&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Навигация &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp</label>
 			}
 			else if (User.IsInRole("Student"))
 			{
 
 				<input type="submit" id="men1" class="sideMenu" asp-action="AttendanceOfStudents" asp-controller="Attendance" value="Посещаемость"><br>
 				<input type="submit" class="sideMenu" asp-action="ExamsMarks" asp-controller="Exams" value="Оценки"><br>
+				<input type="submit" class="sideMenu" asp-action="RatingList" asp-controller="Exams" value="Рейтинги"><br>
 				<input type="submit" class="sideMenu" asp-action="Debt" asp-controller="Exams" value="Задолженности"><br>
+				<input type="submit" class="sideMenu" asp-action="Practices" asp-controller="Exams" value="Практики"><br>
 				<input type="submit" id="men2" class="sideMenu" asp-action="Upcoming" asp-controller="Exams" value="Предстоящие экзамены"><br>
-				<label class="navLabel2">Навигация</label>
+				<label class="navLabel2">&nbsp &nbsp Навигация &nbsp &nbsp</label>
 
 			}
 			else
@@ -82,9 +86,11 @@
 				<input type="submit" id="men1" class="sideMenu" asp-action="ShowStudents" asp-controller="Student" value="Просмотр группы"><br>
 				<input type="submit" class="sideMenu" asp-action="AttendanceOfStudents" asp-controller="Attendance" value="Посещаемость группы"><br>
 				<input type="submit" class="sideMenu" asp-action="ExamsMarks" asp-controller="Exams" value="Экзамены группы"><br>
+				<input type="submit" class="sideMenu" asp-action="RatingList" asp-controller="Exams" value="Рейтинги группы"><br>
 				<input type="submit" class="sideMenu" asp-action="Debt" asp-controller="Exams" value="Задолженности группы"><br>
+				<input type="submit" class="sideMenu" asp-action="Practices" asp-controller="Exams" value="Практики"><br>
 				<input type="submit" id="men2" class="sideMenu" asp-action="Upcoming" asp-controller="Exams" value="Предстоящие экзамены&#13;&#10;группы"><br>
-				<label class="navLabel3">Навигация</label>
+				<label class="navLabel3">&nbsp &nbsp &nbsp &nbsp &nbsp Навигация &nbsp &nbsp &nbsp &nbsp &nbsp</label>
 			}
 		</form>
 

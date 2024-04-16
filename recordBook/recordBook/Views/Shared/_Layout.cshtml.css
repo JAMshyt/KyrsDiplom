@@ -56,7 +56,7 @@ button.accept-policy {
     transition-duration: 1.5s;
     position: absolute;
     font-size: 20px;
-    margin-top: 110px;
+    margin-top: 50px;
     margin-left: -250px;
     border: 0px solid #13547156;
     border-radius: 50px;
@@ -67,8 +67,8 @@ button.accept-policy {
 .navLabel {
     position: absolute;
     writing-mode: vertical-lr;
-    margin-left: 250px;
-    margin-top: -130%;
+    margin-left: 260px;
+    margin-top: -180%;
     z-index: 2;
     border: 10px solid #13547156;
     border-bottom-right-radius: 25px;
@@ -78,8 +78,8 @@ button.accept-policy {
 .navLabel2 {
     position: absolute;
     writing-mode: vertical-lr;
-    margin-left: 250px;
-    margin-top: -85%;
+    margin-left: 260px;
+    margin-top: -120%;
     z-index: 2;
     border: 10px solid #13547156;
     border-bottom-right-radius: 25px;
@@ -89,8 +89,8 @@ button.accept-policy {
 .navLabel3 {
     position: absolute;
     writing-mode: vertical-lr;
-    margin-left: 250px;
-    margin-top: -110%;
+    margin-left: 260px;
+    margin-top: -157%;
     z-index: 2;
     border: 10px solid #13547156;
     border-bottom-right-radius: 25px;

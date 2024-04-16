@@ -85,7 +85,7 @@
 				@foreach (var r in Model.Academic_Performances
 						.Where(z => z.ID_Student == item.ID_Student)
 						.Where(i => i.ID_Subject == Model.selectedSubject.ID_Subject)
-						.Where(p => p.Grade != "Нет оценки" && p.Grade != "Не удовлетворительно"))
+						.Where(p => p.Grade != "Нет оценки" && p.Grade != "Не удовлетворительно" & p.ID_Kind_of_work != 4))
 				{
 					<tr id="columnGrade">
 						@if (item.ID_Student == r.ID_Student)
@@ -146,7 +146,7 @@ else if (User.IsInRole("Student"))
 				{
 					@foreach (var r in Model.Academic_Performances
 							.Where(y => y.ID_Subject == item.ID_Subject)
-							.Where(p => p.Grade != "Нет оценки" && p.Grade != "Не удовлетворительно"))
+							.Where(p => p.Grade != "Нет оценки" && p.Grade != "Не удовлетворительно" & p.ID_Kind_of_work != 4))
 					{
 
 						<tr id="columnGrade">
@@ -219,7 +219,7 @@ else{
 				@foreach (var r in Model.Academic_Performances
 						.Where(z => z.ID_Student == item.ID_Student)
 						.Where(i => i.ID_Subject == Model.selectedSubject.ID_Subject)
-						.Where(p => p.Grade != "Нет оценки" && p.Grade != "Не удовлетворительно"))
+						.Where(p => p.Grade != "Нет оценки" && p.Grade != "Не удовлетворительно" & p.ID_Kind_of_work != 4))
 				{
 					<tr id="columnGrade">
 						@if (item.ID_Student == r.ID_Student)

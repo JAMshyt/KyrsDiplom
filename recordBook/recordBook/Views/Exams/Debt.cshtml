@@ -79,7 +79,7 @@
 			@foreach (var r in Model.Academic_Performances
 					.Where(i => i.ID_Subject == Model.selectedSubject.ID_Subject)
 					.Where(a => a.Grade == "Нет оценки" || a.Grade == "Не удовлетворительно")
-					.Where(q => q.Date < DateTime.Now))
+					.Where(q => q.Date < DateTime.Now & q.ID_Kind_of_work != 4))
 			{
 				bool groupCheck = Model.Students.Where(q => q.ID_Group == Model.selectedGroup.ID_Group).Any(q => q.ID_Student == r.ID_Student);
 
@@ -141,7 +141,7 @@ else if (User.IsInRole("Student"))
 				@foreach (var r in Model.Academic_Performances
 						.Where(g => g.ID_Subject == subj.ID_Subject)
 						.Where(a => a.Grade == "Нет оценки" || a.Grade == "Не удовлетворительно")
-						.Where(q => q.Date < DateTime.Now))
+						.Where(q => q.Date < DateTime.Now & q.ID_Kind_of_work != 4))
 				{
 					var subjName = Model.Subjects.Where(q => q.ID_Subject == r.ID_Subject).Select(q => q.Name_subject).FirstOrDefault();
 					<tr id="columnGrade">
@@ -211,7 +211,7 @@ else
 			@foreach (var r in Model.Academic_Performances
 					.Where(i => i.ID_Subject == Model.selectedSubject.ID_Subject)
 					.Where(a => a.Grade == "Нет оценки" || a.Grade == "Не удовлетворительно")
-					.Where(q => q.Date < DateTime.Now))
+					.Where(q => q.Date < DateTime.Now & q.ID_Kind_of_work !=4))
 			{
 				bool groupCheck = Model.Students.Where(q => q.ID_Group == Model.selectedGroup.ID_Group).Any(q => q.ID_Student == r.ID_Student);
 

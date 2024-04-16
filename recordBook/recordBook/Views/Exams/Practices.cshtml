@@ -6,15 +6,11 @@
 @{
 	@if (User.IsInRole("Student"))
 	{
-		ViewData["Title"] = "Ваши предстоящие экзамены, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
-	}
-	else if (User.IsInRole("Adm"))
-	{
-		ViewData["Title"] = "Предстоящие экзамены группы " + Model.selectedGroup.Name_group;
+		ViewData["Title"] = "Ваши практики, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 	}
 	else
 	{
-		ViewData["Title"] = "Предстоящие экзамены вашей группы (" + Model.selectedGroup.Name_group+")";
+		ViewData["Title"] = "Практики группы " + Model.selectedGroup.Name_group;
 	}
 }
 
@@ -23,7 +19,7 @@
 
 @if (User.IsInRole("Adm"))
 {
-	<form asp-controller="Exams" asp-action="Upcoming">
+	<form asp-controller="Exams" asp-action="Practices">
 		<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
 			@foreach (var groups in Model.Groups)
 			{
@@ -38,21 +34,28 @@
 			}
 		</select>
 
+		@{
+			var subjectsWithPractice = Model.Group_Subjects
+			.Where(q => q.ID_Group == Model.selectedGroup.ID_Group
+			&& Model.Academic_Performances.Any(w => w.ID_Kind_of_work == 4 && w.ID_Subject == q.ID_Subject))
+			.Select(q => q.ID_Subject)
+			.Distinct();
+		}
+
 
 		<select name="selectedSubject" required onchange="this.form.submit()" style="width:200px; height:40px; text-align:center">
-			@foreach (var subj in Model.Subjects)
+			@foreach (var subj in Model.Subjects.Where(s => subjectsWithPractice.Contains(s.ID_Subject)))
 			{
-				if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(subj.ID_Subject))
+
+				if (subj.ID_Subject == Model.selectedSubject.ID_Subject)
 				{
-					if (subj.ID_Subject == Model.selectedSubject.ID_Subject)
-					{
-						<option value="@subj.ID_Subject" selected>@subj.Name_subject</option>
-					}
-					else
-					{
-						<option value="@subj.ID_Subject">@subj.Name_subject</option>
-					}
+					<option value="@subj.ID_Subject" selected>@subj.Name_subject</option>
 				}
+				else
+				{
+					<option value="@subj.ID_Subject">@subj.Name_subject</option>
+				}
+
 			}
 		</select>
 
@@ -74,18 +77,14 @@
 					<h6 style="margin-bottom : 0px; text-align:center">Тип работы</h6>
 				</th>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; margin-left : 20%; text-align:center; display:inline">Дата сдачи</h6>
-					<button type="button" id="ChangeDateBtn" class="btn btn-warning">Изменить</button>
-
+					<h6 style="margin-bottom : 0px; text-align:center">Дата сдачи</h6>
 				</th>
 			</tr>
 		</thead>
 		<tbody>
 
 			@foreach (var r in Model.Academic_Performances
-					.Where(i => i.ID_Subject == Model.selectedSubject.ID_Subject)
-					.Where(a => a.Grade == "Нет оценки")
-					.Where(q => q.Date > DateTime.Now & q.ID_Kind_of_work != 4))
+					.Where(q => q.ID_Kind_of_work == 4 && q.ID_Subject == Model.selectedSubject.ID_Subject))
 			{
 				bool groupCheck = Model.Students.Where(q => q.ID_Group == Model.selectedGroup.ID_Group).Any(q => q.ID_Student == r.ID_Student);
 
@@ -104,7 +103,7 @@
 								<option value="Хорошо">Хорошо</option>
 								<option value="Удовлетворительно">Удовлетворительно</option>
 								<option value="Не удовлетворительно">Не удовлетворительно</option>
-								<option value="Нет оценки" selected>Нет оценки</option>
+								<option value="-" selected>-</option>
 							</select>
 						</td>
 
@@ -113,8 +112,6 @@
 						</td>
 						<td style="text-align:center;  font-weight: bold ">
 							<p id="label_s"> @r.Date?.ToString("dd MMMM yyyy") </p>
-							<input type="date" class="selectDates" onchange="DateIsChanged(@r.ID_Academic_performance,event)" style="width:150px; height:30px; text-align:center">
-
 						</td>
 					</tr>
 				}
@@ -125,12 +122,21 @@
 }
 else if (User.IsInRole("Student"))
 {
+	var subjectsWithPractice = Model.Group_Subjects
+		.Where(q => q.ID_Group == Model.selectedGroup.ID_Group
+		&& Model.Academic_Performances.Any(w => w.ID_Kind_of_work == 4 && w.ID_Subject == q.ID_Subject))
+		.Select(q => q.ID_Subject)
+		.Distinct();
+
 	<table class="table" id="myTable" style="width:95%">
 
 		<thead>
 			<tr>
 				<th id="tableLabel">
 					<h6 style="margin-bottom : 0px; text-align:center;">Предмет</h6>
+				</th>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center;">Оценка</h6>
 				</th>
 				<th id="tableLabel">
 					<h6 style="margin-bottom : 0px; text-align:center">Тип работы</h6>
@@ -141,17 +147,19 @@ else if (User.IsInRole("Student"))
 			</tr>
 		</thead>
 		<tbody>
-			@foreach (var subj in Model.Group_Subjects)
+			@foreach (var subj in Model.Group_Subjects.Where(s=> subjectsWithPractice.Contains(s.ID_Subject)))
 			{
 				@foreach (var r in Model.Academic_Performances
-						.Where(g => g.ID_Subject == subj.ID_Subject)
-						.Where(a => a.Grade == "Нет оценки")
-						.Where(q => q.Date > DateTime.Now & q.ID_Kind_of_work != 4))
+						.Where(q => q.ID_Kind_of_work == 4 & q.ID_Subject == subj.ID_Subject))
 				{
 					var subjName = Model.Subjects.Where(q => q.ID_Subject == r.ID_Subject).Select(q => q.Name_subject).FirstOrDefault();
 					<tr id="columnGrade">
 						<td style="text-align:center; font-weight: bold">
 							<p id="label_s">@subjName.ToString()</p>
+						</td>
+
+						<td id="cellGrade" style="text-align:center;  font-weight: bold ">
+							<p class="labelsGrade">@r.Grade</p>
 						</td>
 
 						<td style="text-align:center;  font-weight: bold ">
@@ -168,21 +176,29 @@ else if (User.IsInRole("Student"))
 }
 else
 {
-	<form asp-controller="Exams" asp-action="Upcoming">
+	<form asp-controller="Exams" asp-action="Practices">
+		@{
+			var subjectsWithPractice = Model.Group_Subjects
+			.Where(q => q.ID_Group == Model.selectedGroup.ID_Group
+			&& Model.Academic_Performances.Any(w => w.ID_Kind_of_work == 4 && w.ID_Subject == q.ID_Subject))
+			.Select(q => q.ID_Subject)
+			.Distinct();
+		}
+
+
 		<select name="selectedSubject" required onchange="this.form.submit()" style="width:200px; height:40px; text-align:center">
-			@foreach (var subj in Model.Subjects)
+			@foreach (var subj in Model.Subjects.Where(s => subjectsWithPractice.Contains(s.ID_Subject)))
 			{
-				if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(subj.ID_Subject))
+
+				if (subj.ID_Subject == Model.selectedSubject.ID_Subject)
 				{
-					if (subj.ID_Subject == Model.selectedSubject.ID_Subject)
-					{
-						<option value="@subj.ID_Subject" selected>@subj.Name_subject</option>
-					}
-					else
-					{
-						<option value="@subj.ID_Subject">@subj.Name_subject</option>
-					}
+					<option value="@subj.ID_Subject" selected>@subj.Name_subject</option>
 				}
+				else
+				{
+					<option value="@subj.ID_Subject">@subj.Name_subject</option>
+				}
+
 			}
 		</select>
 
@@ -197,7 +213,7 @@ else
 					<h6 style="margin-bottom : 0px; text-align:center;">Студент</h6>
 				</th>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center">Тип работы</h6>
+					<h6 style="margin-bottom : 0px; text-align:center; display:inline">Оценка</h6>
 				</th>
 				<th id="tableLabel">
 					<h6 style="margin-bottom : 0px; text-align:center">Дата сдачи</h6>
@@ -207,9 +223,7 @@ else
 		<tbody>
 
 			@foreach (var r in Model.Academic_Performances
-					.Where(i => i.ID_Subject == Model.selectedSubject.ID_Subject)
-					.Where(a => a.Grade == "Нет оценки")
-					.Where(q => q.Date > DateTime.Now & q.ID_Kind_of_work != 4))
+					.Where(q => q.ID_Kind_of_work == 4 && q.ID_Subject == Model.selectedSubject.ID_Subject))
 			{
 				bool groupCheck = Model.Students.Where(q => q.ID_Group == Model.selectedGroup.ID_Group).Any(q => q.ID_Student == r.ID_Student);
 
@@ -220,9 +234,11 @@ else
 						<td style="text-align:center; font-weight: bold">
 							<p id="label_s">@student.Surname  @student.Name  @student.Patronymic</p>
 						</td>
-						<td style="text-align:center;  font-weight: bold ">
-							<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
+
+						<td id="cellGrade" style="text-align:center;  padding-right:10%; font-weight: bold ">
+							<p class="labelsGrade">@r.Grade</p>
 						</td>
+
 						<td style="text-align:center;  font-weight: bold ">
 							<p id="label_s"> @r.Date?.ToString("dd MMMM yyyy") </p>
 						</td>
@@ -240,9 +256,8 @@ else
 
 	$(document).ready(function () {
 		$('.selectGrades').hide();
-		$('.selectDates').hide();
-	});
 
+	});
 
 	$('#ChangeGradeBtn').click(function (id) {
 		if ($('#ChangeGradeBtn').text() == 'Изменить') {
@@ -268,29 +283,6 @@ else
 		});
 	};
 
-	$('#ChangeDateBtn').click(function (id) {
-		if ($('#ChangeDateBtn').text() == 'Изменить') {
-			$('.selectDates').show();
-			$('#ChangeDateBtn').text('Сохранить');
-		}
-		else {
-			$('.selectDates').hide();
-			$('#ChangeDateBtn').text('Изменить');
-			location.reload()
-		}
 
-	});
-
-	function DateIsChanged(id, event) {
-		var date = event.target.value;
-		$.ajax({
-			type: 'POST',
-			url: '/Exams/ChangeDates/',
-			contentType: 'application/json',
-			data: JSON.stringify({ id: id, newDate: date }),
-			dataType: 'json',
-
-		});
-	};
 
 </script>

@@ -38,6 +38,7 @@ namespace recordBook
 			services.AddScoped<IGroup_Subject, Group_SubjectRepositories>();
 			services.AddScoped<ILogins, LoginsRepositories>();
 			services.AddScoped<ICurator, CuratorRepositories>();
+			services.AddScoped<IRatingControl, RatingControlRepositories>();
 
 			services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 	.AddCookie(options => options.LoginPath = "/Authorization");
