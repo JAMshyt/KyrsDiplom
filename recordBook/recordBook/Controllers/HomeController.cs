@@ -15,6 +15,8 @@ using recordBook.Models;
 using recordBook.Models.ViewModels;
 using recordBook.RInterface;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using static recordBook.Controllers.StudentController;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace recordBook.Controllers
 {
@@ -26,9 +28,11 @@ namespace recordBook.Controllers
 		private readonly IDepartment_worker _department_worker;
 		private readonly ILogins _logins;
 		private readonly ICurator _curator;
+		private readonly IGroup _group;
 
 		public HomeController(ILogger<HomeController> logger, IStudent student,
-			IDepartment_worker department_worker, ILogins logins, ICurator curator
+			IDepartment_worker department_worker, ILogins logins, ICurator curator,
+			IGroup group
 			)
 		{
 			_logger = logger;
@@ -36,6 +40,7 @@ namespace recordBook.Controllers
 			_department_worker = department_worker;
 			_logins = logins;
 			_curator = curator;
+			_group = group;
 		}
 
 		#region Get таблиц
@@ -55,6 +60,12 @@ namespace recordBook.Controllers
 		{
 			var curators = _curator.GetAllCurator().ToList();
 			return curators;
+		}
+
+		public List<Group> GetGroups()
+		{
+			var group = _group.GetAllGroup().ToList();
+			return group;
 		}
 
 		public List<Logins> GetLogins()
@@ -131,6 +142,8 @@ namespace recordBook.Controllers
 						{
 							Curator? curator = GetCurators().FirstOrDefault(q => q.ID_Login == login.ID_Login);
 
+							List<Group>? curGroups = GetGroups().Where(q => q.ID_Curator == curator.ID_Curator).ToList();
+
 							var claims = new List<Claim> {
 								new Claim(ClaimTypes.NameIdentifier, login.Login),
 								new Claim(ClaimTypes.Email, login.Email),
@@ -139,9 +152,11 @@ namespace recordBook.Controllers
 								new Claim(ClaimTypes.GivenName, curator.Patronymic),
 								new Claim(ClaimTypes.MobilePhone, Convert.ToString(login.Phone)),
 								new Claim(ClaimTypes.Role, "Curator"),
-								new Claim(ClaimTypes.GroupSid, Convert.ToString(curator.ID_Group)),
-								new Claim(ClaimTypes.SerialNumber, Convert.ToString(curator.ID_Curator)),
+								new Claim(ClaimTypes.SerialNumber, Convert.ToString(curator.ID_Curator))
 							};
+							claims.AddRange(curGroups.Select(group => new Claim(ClaimTypes.GroupSid, group.ID_Group.ToString())));
+
+
 							ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
 							await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 							return RedirectToAction("AccountInfo", "Account");

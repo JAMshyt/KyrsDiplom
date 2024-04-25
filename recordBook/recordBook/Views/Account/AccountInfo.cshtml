@@ -18,10 +18,20 @@
 			<h3>ФИО:</h3><span>@Model.Surname @Model.Name @Model.Patronymic</span>
 			<h3>Телефон:</h3><span>@User.FindFirst(ClaimTypes.MobilePhone)?.Value</span>
 			<h3>Почта:</h3><span>@User.FindFirst(ClaimTypes.Email)?.Value</span>
-			@if (User.FindFirst(ClaimTypes.Role)?.Value == "Student")
+			@if (User.IsInRole("Student"))
 			{
 				<h3>Группа:</h3><span>@Model.Group.Name_group</span>
 				<h3>Специальность:</h3><span>@Model.Group.Decoding</span>
+				<h3>Выпускающая кафедра:</h3><span>@Model.Group.Decoding</span>
+			}
+			else if (User.IsInRole("Adm"))
+			{
+				<h3>Институт:</h3>
+
+				<span>@Model.Institute_title</span>
+				<h3>Должность:</h3>
+
+				<span>@Model.Job_title</span>
 			}
 		</div>
 	</div>

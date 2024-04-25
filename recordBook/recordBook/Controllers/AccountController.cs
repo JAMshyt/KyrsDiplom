@@ -82,6 +82,7 @@ namespace recordBook.Controllers
 			{
 				case "Student":
 					var student = GetStudents().FirstOrDefault(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+					var group = GetGroups().FirstOrDefault(q => q.ID_Group == student.ID_Group);
 
 					byte[] photo = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value)).Select(q => q.Photo).FirstOrDefault();
 					string? photoBase64 = photo != null ? Convert.ToBase64String(photo): null ;
@@ -89,8 +90,9 @@ namespace recordBook.Controllers
 					model.Name = student.Name;
 					model.Surname = student.Surname;
 					model.Patronymic = student.Patronymic;
-					model.Group = GetGroups().FirstOrDefault(q => q.ID_Group == student.ID_Group);
+					model.Group = group;
 					model.Photo = photoBase64;
+					model.Graduating_department = group.Graduating_department;
 					return View(model);
 				case "Adm":
 					var dep_work = GetDepartment_Workers().FirstOrDefault(q => q.ID_Department_worker == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
@@ -102,6 +104,8 @@ namespace recordBook.Controllers
 					model.Surname = dep_work.Surname;
 					model.Patronymic = dep_work.Patronymic;
 					model.Photo = photoBase64Adm;
+					model.Institute_title = dep_work.Institute_title;
+					model.Job_title = dep_work.Job_title;
 					return View(model);
 				case "Curator":
 					var cur = GetCurators().FirstOrDefault(q => q.ID_Curator == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));

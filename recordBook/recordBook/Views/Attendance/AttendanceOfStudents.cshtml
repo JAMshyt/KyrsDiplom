@@ -14,7 +14,7 @@
 	}
 	else
 	{
-		ViewData["Title"] = "Посещаемость вашей группы (" + Model.selectedGroup.Name_group+")";
+		ViewData["Title"] = "Посещаемость вашей группы (" + Model.selectedGroup.Name_group + ")";
 	}
 }
 
@@ -113,6 +113,20 @@
 else if (User.IsInRole("Curator"))
 {
 	<form asp-controller="Attendance" asp-action="AttendanceOfStudents">
+		<select name="selectedGroup" required onchange="this.form.submit()" style="width:15%; height:40px; text-align:center">
+			@foreach (var groups in Model.Groups)
+			{
+				if (groups.ID_Group == Model.selectedGroup.ID_Group)
+				{
+					<option value="@groups.ID_Group" selected>@groups.Name_group</option>
+				}
+				else
+				{
+					<option value="@groups.ID_Group">@groups.Name_group</option>
+				}
+			}
+		</select>
+
 		<select name="selectedSubject" required onchange="this.form.submit()" style="width:20%; height:40px; text-align:center">
 			@foreach (var subj in Model.Subjects)
 			{
@@ -129,6 +143,7 @@ else if (User.IsInRole("Curator"))
 				}
 			}
 		</select>
+
 	</form>
 
 	<table class="table" id="myTable">
@@ -211,7 +226,7 @@ else
 					.Select(s => new
 					{
 						AttendanceCount = Model.Attendances.Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber).Value))
-						.Count(a => a.ID_Subject == s.ID_Subject)
+					.Count(a => a.ID_Subject == s.ID_Subject)
 					})
 					.OrderByDescending(x => x.AttendanceCount)
 					.FirstOrDefault();
@@ -239,7 +254,7 @@ else
 						</td>
 
 						@foreach (var r in Model.Attendances.Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber).Value))
-						.Where(q => q.ID_Subject == subj.ID_Subject))
+								.Where(q => q.ID_Subject == subj.ID_Subject))
 						{
 							<td style="text-align:center; font-weight: bold;">
 								@if (@r.Precense == true)

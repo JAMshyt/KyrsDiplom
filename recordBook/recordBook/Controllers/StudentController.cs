@@ -116,11 +116,30 @@ namespace recordBook.Controllers
 					return View(model);
 				}
 			}
-			else
+			else if(User.IsInRole("Student"))
 			{
 
 				model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
 				model.group_Subject = GetGroupSubject().Where(q => q.ID_Group == GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value)).ID_Group);
+
+				return View(model);
+			}
+			else
+			{
+				var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
+				var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
+				model.Groups = selectedGroups;
+				model.group_Subject = GetGroupSubject().Where(subject =>subject.ID_Group == selectedGroups.FirstOrDefault().ID_Group);
+				model.selectedGroup = selectedGroups.FirstOrDefault();
+
+				if (selectedGroup > 0)
+				{
+					var groupById = _group.GetGroupbyID(selectedGroup);
+					model.group_Subject = GetGroupSubject().Where(q => q.ID_Group == groupById.ID_Group);
+					model.selectedGroup = groupById;
+
+					return View(model);
+				}
 
 				return View(model);
 			}

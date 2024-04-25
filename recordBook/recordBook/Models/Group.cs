@@ -9,5 +9,7 @@ namespace recordBook.Models
 		public string Name_group { get; set; }
 		public string Decoding { get; set; }
 		public string Course { get; set; }
+		public int ID_Curator { get; set; }	
+		public string? Graduating_department { get; set; }
 	}
 }

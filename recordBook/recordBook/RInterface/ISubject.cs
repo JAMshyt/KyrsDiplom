@@ -7,7 +7,7 @@ namespace recordBook.RInterface
 		Task AddSubject(Subject subject);
 		Task DeleteSubject(Subject subject);
 		Task UpdateSubject(Subject subject);
-		Subject? GetSubjectbyID(int Id); 
+		Subject? GetSubjectbyID(int? Id); 
 		IQueryable<Subject> GetAllSubject();
 	}
 }

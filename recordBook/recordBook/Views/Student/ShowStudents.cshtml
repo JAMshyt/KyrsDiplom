@@ -9,13 +9,12 @@
 	}
 	else
 	{
-		ViewData["Title"] = "Студенты вашей группы ( " + Model.selectedGroup.Name_group + ")";
+		ViewData["Title"] = "Студенты вашей группы (" + Model.selectedGroup.Name_group + ")";
 	}
 }
 
 <h1>@ViewData["Title"]</h1>
-@if (User.IsInRole("Adm"))
-{
+
 	<p>Выберите группу</p>
 
 	<form asp-controller="Student" asp-action="ShowStudents">
@@ -33,7 +32,7 @@
 			}
 		</select>
 	</form>
-}
+
 
 <table class="table" id="myTable">
 
@@ -115,10 +114,10 @@
 			</th>
 			<th id="tableLabel">
 				<h6 style="margin-bottom : 0px; display:inline">Дата</h6>
-				@if (User.IsInRole("Adm"))
+@* 				@if (User.IsInRole("Adm"))
 				{
 					<button type="button" id="ChangeDateBtn" class="btn btn-warning">Изменить дату сдачи для всех</button>
-				}
+				} *@
 			</th>
 
 		</tr>
@@ -154,7 +153,7 @@
 						}
 						else
 						{
-						<button type="button" id="addExamBtn" onclick="ExamBtnClick(@item.ID_Subject,event)" class="btn btn-warning">Назначить экзамен</button>
+@* 						<button type="button" id="addExamBtn" onclick="ExamBtnClick(@item.ID_Subject,event)" class="btn btn-warning">Назначить экзамен</button>
 
 						<select class="kindsOfWorks" id="Exams_@item.ID_Subject" onchange="addKindOfWork(@item.ID_Subject, @Model.selectedGroup.ID_Group)" style="width:250px; height:40px; text-align:center">
 								@foreach (var kinds in Model.kind_Of_Works)
@@ -163,7 +162,7 @@
 								<option value="@kinds.ID_Kind_of_work">@kinds.Title_of_kind</option>
 
 								}
-						</select>
+						</select> *@
 						}
 				</td>
 
@@ -171,17 +170,9 @@
 						@if (kind != null)
 						{
 						<p id="label_s">@data</p>
-						<input type="date" class="selectDates" onchange="DateIsChanged(@subj.ID_Subject,@Model.selectedGroup.ID_Group,event)" style="width:150px; height:30px; text-align:center">
+						@* <input type="date" class="selectDates" onchange="DateIsChanged(@subj.ID_Subject,@Model.selectedGroup.ID_Group,event)" style="width:150px; height:30px; text-align:center"> *@
 						}
 				</td>
-
-					@* 				@if (User.IsInRole("Adm"))
-			{
-			<td style="text-align:center;font-weight: bold;">
-			<a class="btn btn-outline-danger" name="selectedStudent" id="deleteStudent" onclick="DropStudent(@item.ID_Student)" style="border:1px; font-weight:normal">Удалить</a>
-
-			</td>
-			} *@
 			</tr>
 			}
 	</tbody>

@@ -88,15 +88,12 @@ namespace recordBook.Controllers
 					model.selectedGroup = _group.GetGroupbyID(selectedGroup);
 					model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
 				}
-			}
-			else if(User.IsInRole("Adm"))
-			{
-				model.Groups = GetGroups().Where(q=>q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+				model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
 				model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
 				model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-				model.Attendances = GetAttendance().Where(q => q.ID_Student== Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+				model.Attendances = GetAttendance().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
 			}
-			else
+			else if(User.IsInRole("Student"))
 			{
 				if (selectedSubject > 0)
 				{
@@ -105,6 +102,20 @@ namespace recordBook.Controllers
 				model.Students = GetStudents().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
 				model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
 				model.selectedGroup = _group.GetGroupbyID(Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+			}
+			else
+			{
+				var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
+				var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
+				model.Groups = selectedGroups;
+				model.Group_Subjects = GetGroup_Subject().Where(subject => selectedGroups.Any(group => group.ID_Group == subject.ID_Group));
+				model.selectedGroup = selectedGroups.FirstOrDefault();
+
+				if (selectedGroup > 0 & selectedSubject > 0)
+				{
+					model.selectedGroup = _group.GetGroupbyID(selectedGroup);
+					model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
+				}
 			}
 			return View(model);
 		}

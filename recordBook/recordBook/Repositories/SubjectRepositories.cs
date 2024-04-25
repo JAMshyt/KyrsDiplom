@@ -29,7 +29,7 @@ namespace recordBook.Repositories
 			return _context.Subject.AsQueryable();
 		}
 
-		public Subject? GetSubjectbyID(int Id)
+		public Subject? GetSubjectbyID(int? Id)
 		{
 			return GetAllSubject().Where(x => x.ID_Subject == Id).FirstOrDefaultAsync().Result;
 		}

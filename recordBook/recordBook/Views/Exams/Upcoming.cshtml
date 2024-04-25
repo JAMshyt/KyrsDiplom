@@ -169,6 +169,21 @@ else if (User.IsInRole("Student"))
 else
 {
 	<form asp-controller="Exams" asp-action="Upcoming">
+		<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
+			@foreach (var groups in Model.Groups)
+			{
+				if (groups.ID_Group == Model.selectedGroup.ID_Group)
+				{
+					<option value="@groups.ID_Group" selected>@groups.Name_group</option>
+				}
+				else
+				{
+					<option value="@groups.ID_Group">@groups.Name_group</option>
+				}
+			}
+		</select>
+
+
 		<select name="selectedSubject" required onchange="this.form.submit()" style="width:200px; height:40px; text-align:center">
 			@foreach (var subj in Model.Subjects)
 			{

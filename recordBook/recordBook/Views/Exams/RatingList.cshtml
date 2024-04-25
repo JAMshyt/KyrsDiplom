@@ -14,7 +14,7 @@
 	}
 	else
 	{
-		ViewData["Title"] = "Рейтинги вашей группы ( " + Model.selectedGroup.Name_group + ")";
+		ViewData["Title"] = "Рейтинги вашей группы (" + Model.selectedGroup.Name_group + ")";
 	}
 }
 
@@ -249,6 +249,20 @@ else if (User.IsInRole("Student"))
 else
 {
 	<form asp-controller="Exams" asp-action="RatingList">
+		<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
+
+			@foreach (var groups in Model.Groups)
+			{
+				if (groups.ID_Group == Model.selectedGroup.ID_Group)
+				{
+					<option value="@groups.ID_Group" selected>@groups.Name_group</option>
+				}
+				else
+				{
+					<option value="@groups.ID_Group">@groups.Name_group</option>
+				}
+			}
+		</select>
 
 		<select name="selectedSubject" required onchange="this.form.submit()" style="width:200px; height:40px; text-align:center">
 			@foreach (var subj in Model.Subjects)
@@ -268,8 +282,8 @@ else
 		</select>
 
 		@{
-			var maxSemester = Model.RatingControls
-			.Where(q => q.ID_Student == Model.Students.FirstOrDefault(q => q.ID_Group == Model.selectedGroup.ID_Group).ID_Student)
+			var maxSemester = Model.RatingControls?
+			.Where(q => q.ID_Student == Model.Students.FirstOrDefault(q => q.ID_Group == Model.selectedGroup?.ID_Group)?.ID_Student)
 			.Select(q => q.Semester)
 			.Distinct()
 			.OrderByDescending(s => s);
@@ -304,8 +318,8 @@ else
 				</th>
 
 				@{
-					var CountSemester = Model.RatingControls
-					.Where(q => q.ID_Student == Model.Students.FirstOrDefault(q => q.ID_Group == Model.selectedGroup.ID_Group).ID_Student)
+					var CountSemester = Model.RatingControls?
+					.Where(q => q.ID_Student == Model.Students.FirstOrDefault(q => q.ID_Group == Model.selectedGroup.ID_Group)?.ID_Student)
 					.Select(q => q.RatingNumber)
 					.Distinct()
 					.OrderBy(s => s);
