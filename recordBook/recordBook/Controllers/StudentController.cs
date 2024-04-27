@@ -1,4 +1,6 @@
 ﻿using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using recordBook.Models;
 using recordBook.Models.ViewModels;
@@ -279,7 +281,42 @@ namespace recordBook.Controllers
 			{
 				if (ModelState.IsValid)
 				{
-					var login = new Logins() { Login = addStu.Login, Password = addStu.Password, Email = addStu.Email };
+					string CreateSalt()
+					{
+						byte[] salt = new byte[16];
+						using (var rng = RandomNumberGenerator.Create())
+						{
+							rng.GetBytes(salt);
+						}
+						return Convert.ToBase64String(salt).Substring(0, 16);
+					}
+
+					string HashPassword(string password, string salt)
+					{
+						byte[] saltBytes = Convert.FromBase64String(salt);
+						byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+
+						byte[] combinedBytes = new byte[saltBytes.Length + passwordBytes.Length];
+						Array.Copy(saltBytes, 0, combinedBytes, 0, saltBytes.Length);
+						Array.Copy(passwordBytes, 0, combinedBytes, saltBytes.Length, passwordBytes.Length);
+
+						using (var sha512 = SHA512.Create())
+						{
+							byte[] hashedBytes = sha512.ComputeHash(combinedBytes);
+							return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+						}
+					}
+
+					string salt = CreateSalt();
+					string hashedPassword = HashPassword(addStu.Password, salt);
+
+					var login = new Logins()
+					{
+						Login = addStu.Login,
+						Password = hashedPassword,
+						Email = addStu.Email,
+						Salt = salt 
+					};
 					await _logins.AddLogin(login);
 
 					var idNewLogin = GetLogins().FirstOrDefault(q => q.Login == addStu.Login);

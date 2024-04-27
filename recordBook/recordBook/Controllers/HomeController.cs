@@ -17,6 +17,7 @@ using recordBook.RInterface;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using static recordBook.Controllers.StudentController;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using System.Text;
 
 namespace recordBook.Controllers
 {
@@ -90,8 +91,40 @@ namespace recordBook.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				Logins? login = GetLogins().FirstOrDefault(q => q.Login == user.Login && q.Password == user.Password);
-				if (login is null)
+				string CreateSalt()
+				{
+					byte[] salt = new byte[16];
+					using (var rng = RandomNumberGenerator.Create())
+					{
+						rng.GetBytes(salt);
+					}
+					return Convert.ToBase64String(salt).Substring(0, 16);
+				}
+
+				string HashPassword(string password, string salt)
+				{
+					byte[] saltBytes = Convert.FromBase64String(salt);
+					byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+
+					byte[] combinedBytes = new byte[saltBytes.Length + passwordBytes.Length];
+					Array.Copy(saltBytes, 0, combinedBytes, 0, saltBytes.Length);
+					Array.Copy(passwordBytes, 0, combinedBytes, saltBytes.Length, passwordBytes.Length);
+
+					using (var sha512 = SHA512.Create())
+					{
+						byte[] hashedBytes = sha512.ComputeHash(combinedBytes);
+						return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+					}
+				}
+
+
+
+				Logins? login = GetLogins().FirstOrDefault(q => q.Login == user.Login);
+
+				string salt = CreateSalt();
+				string hashedPassword = HashPassword(user.Password, login.Salt);
+
+				if (login is null || hashedPassword != login.Password)
 				{
 					user.ErrorText = true;
 					return View(user);
