@@ -88,10 +88,6 @@ namespace recordBook.Controllers
 					model.selectedGroup = _group.GetGroupbyID(selectedGroup);
 					model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
 				}
-				model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-				model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
-				model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-				model.Attendances = GetAttendance().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
 			}
 			else if(User.IsInRole("Student"))
 			{

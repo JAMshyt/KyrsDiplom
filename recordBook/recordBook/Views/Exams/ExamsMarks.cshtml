@@ -265,6 +265,8 @@ else{
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.0/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+
 <script type='text/javascript'>
 
 	$(document).ready(function () {
@@ -321,23 +323,58 @@ else{
 		});
 	};
 
-	function exportToExcel() {
-		var table = document.getElementById('CuratorTable');
-		var ws = XLSX.utils.table_to_sheet(table, { sheet: "Sheet JS" });
-		var wb = XLSX.utils.book_new();
-		XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+	async function exportToExcel() {
+		const ExcelJS = window.ExcelJS;
 
-		// Экспортируем таблицу в xlsx
-		var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-		function s2ab(s) {
-			var buf = new ArrayBuffer(s.length);
-			var view = new Uint8Array(buf);
-			for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
-			return buf;
+		var workbook = new ExcelJS.Workbook();
+		var worksheet = workbook.addWorksheet('Sheet1');
+
+		// Находим таблицу на сайте
+		var table = document.getElementById('CuratorTable');
+
+		// Получаем данные из HTML-таблицы
+		var data = [];
+		for (var i = 0; i < table.rows.length; i++) {
+			var rowData = [];
+			for (var j = 0; j < table.rows[i].cells.length; j++) {
+				rowData.push(table.rows[i].cells[j].innerText.trim());
+			}
+			data.push(rowData);
 		}
 
-		var blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
-		saveAs(blob, 'table_export.xlsx');
+		// Заполняем ячейки в файле Excel данными из таблицы
+		data.forEach((row, rowIndex) => {
+			row.forEach((cell, cellIndex) => {
+				if (rowIndex === 0) {
+					// Устанавливаем стиль для шапки таблицы (первой строки) с содержащимся текстом
+					const excelCell = worksheet.getCell(String.fromCharCode(65 + cellIndex) + (rowIndex + 1));
+					excelCell.value = cell;
+					if (cell.trim() !== "") {
+						excelCell.fill = {
+							type: 'pattern',
+							pattern: 'solid',
+							fgColor: { argb: 'FFC0C0C0' } // Серый цвет фона
+						};
+						excelCell.font = { bold: true };
+					}
+				} else {
+					worksheet.getCell(String.fromCharCode(65 + cellIndex) + (rowIndex + 1)).value = cell;
+				}
+			});
+		});
+
+		// Автоматически устанавливаем ширину столбцов
+		worksheet.columns.forEach(column => {
+			let maxLength = 0;
+			column.eachCell({ includeEmpty: true }, cell => {
+				maxLength = Math.max(maxLength, (cell.value || '').toString().length);
+			});
+			column.width = maxLength + 2;
+		});
+
+		// Скачиваем Excel файл
+		const buffer = await workbook.xlsx.writeBuffer();
+		saveAs(new Blob([buffer], { type: "application/octet-stream" }), "ExamsMarks.xlsx");
 	}
 
 </script>
