@@ -63,7 +63,7 @@
 		<thead>
 			<tr>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center;">Студент</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify;">Студент</h6>
 				</th>
 
 				@{
@@ -87,7 +87,7 @@
 			@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
 			{
 				<tr>
-					<td style="text-align:center; font-weight: bold">
+					<td style="text-align:justify; font-weight: bold">
 						<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
 					</td>
 					@foreach (var r in Model.Attendances.Where(z => z.ID_Student == item.ID_Student)
@@ -151,11 +151,11 @@ else if (User.IsInRole("Curator"))
 		<thead>
 			<tr>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center;">Студент</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify;">Студент</h6>
 				</th>
 
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center;">Посещаемость</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify;">Посещаемость</h6>
 				</th>
 
 				@{
@@ -174,13 +174,13 @@ else if (User.IsInRole("Curator"))
 			@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
 			{
 				<tr>
-					<td style="text-align:center; font-weight: bold">
+					<td style="text-align:justify; font-weight: bold">
 						<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
 					</td>
 					@foreach (var r in Model.Attendances.Where(z => z.ID_Student == item.ID_Student)
 							.Where(q => q.ID_Subject == Model.selectedSubject.ID_Subject))
 					{
-						<td style="text-align:center; font-weight: bold;">
+						<td style="text-align:justify; font-weight: bold;">
 							@if (@r.Precense == true)
 							{
 								<h6 style='margin-bottom:0px; text-align:center;'>@r.Date_presence.ToString("dd.MM")</h6>
@@ -205,7 +205,7 @@ else
 		<thead>
 			<tr>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center;">Предмет</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify;">Предмет</h6>
 				</th>
 
 				@* 				@{
@@ -219,7 +219,7 @@ else
 			} *@
 
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center;">Посещаемость</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify;">Посещаемость</h6>
 				</th>
 				@{
 					var subjectWithMostEntries = Model.Group_Subjects
@@ -249,21 +249,21 @@ else
 				@foreach (var item in Model.Subjects.Where(q => q.ID_Subject == subj.ID_Subject))
 				{
 					<tr>
-						<td style="text-align:center; font-weight: bold">
+						<td style="text-align:justify; font-weight: bold">
 							<p id="label_s">@item.Name_subject</p>
 						</td>
 
 						@foreach (var r in Model.Attendances.Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber).Value))
 								.Where(q => q.ID_Subject == subj.ID_Subject))
 						{
-							<td style="text-align:center; font-weight: bold;">
+							<td style="text-align:justify; font-weight: bold;">
 								@if (@r.Precense == true)
 								{
-									<h6 style='margin-bottom:0px; text-align:center;'>@r.Date_presence.ToString("dd.MM")</h6>
+									<h6 style='margin-bottom:0px; text-align:justify;'>@r.Date_presence.ToString("dd.MM")</h6>
 								}
 								else
 								{
-									<h6 style='margin-bottom:0px; text-align:center; color:red'>@r.Date_presence.ToString("dd.MM")</h6>
+									<h6 style='margin-bottom:0px; text-align:justify; color:red'>@r.Date_presence.ToString("dd.MM")</h6>
 								}
 							</td>
 						}

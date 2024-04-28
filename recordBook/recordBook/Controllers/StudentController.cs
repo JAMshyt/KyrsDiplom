@@ -316,7 +316,7 @@ namespace recordBook.Controllers
 						Password = hashedPassword,
 						Email = addStu.Email,
 						Salt = salt,
-						Phone = addStu.Phone
+						Phone = Convert.ToDecimal(addStu.Phone)
 					};
 					await _logins.AddLogin(login);
 

@@ -39,18 +39,18 @@
 	<thead>
 		<tr>
 			<th id="tableLabel">
-				<h6 style="margin-bottom : 0px; text-align:center;">Фамилия</h6>
+				<h6 style="margin-bottom : 0px; text-align:justify;">Фамилия</h6>
 			</th>
 			<th id="tableLabel">
-				<h6 style="margin-bottom : 0px; text-align:center;">Имя</h6>
+				<h6 style="margin-bottom : 0px; text-align:justify;">Имя</h6>
 			</th>
 			<th id="tableLabel">
-				<h6 style="margin-bottom : 0px; text-align:center;">Отчество</h6>
+				<h6 style="margin-bottom : 0px; text-align:justify;">Отчество</h6>
 			</th>
 			@if (User.IsInRole("Adm"))
 			{
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center;">Действие</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify;">Действие</h6>
 				</th>
 			}
 		</tr>
@@ -61,18 +61,18 @@
 			{
 				//var data = item.Date.ToString("dd MMMM yyyy");
 			<tr>
-				<td style="text-align:center;font-weight: bold; width:10%">
+				<td style="text-align:justify;font-weight: bold; width:10%">
 					<p id="label_s">@Html.DisplayFor(modelItem => item.Surname)</p>
 				</td>
-				<td style="text-align:center;font-weight: bold; width:10%">
+				<td style="text-align:justify;font-weight: bold; width:10%">
 					<p id="label_s">@Html.DisplayFor(modelItem => item.Name)</p>
 				</td>
-				<td style="text-align:center;font-weight: bold; width:10%">
+				<td style="text-align:justify;font-weight: bold; width:10%">
 					<p id="label_s">@Html.DisplayFor(modelItem => item.Patronymic)</p>
 				</td>
 					@if (User.IsInRole("Adm"))
 					{
-					<td style="text-align:center; width:30%">
+					<td style="text-align:justify; width:30%">
 						<a class="btn btn-outline-danger" id="deleteStudent" onclick="DropStudent(@item.ID_Student)" style="border:1px; font-weight:normal">Удалить</a>
 						<a class="btn btn-outline-warning" onclick="showGroups(@item.ID_Student, event)" style="border:1px; font-weight:normal">Изменить группу</a>
 
@@ -107,10 +107,10 @@
 	<thead>
 		<tr>
 			<th id="tableLabel">
-				<h6 style="margin-bottom : 0px; text-align:center;">Дисциплина</h6>
+				<h6 style="margin-bottom : 0px; text-align:justify;">Дисциплина</h6>
 			</th>
 			<th id="tableLabel">
-				<h6 style="margin-bottom : 0px; text-align:center;">Тип сдачи</h6>
+				<h6 style="margin-bottom : 0px; text-align:justify;">Тип сдачи</h6>
 			</th>
 			<th id="tableLabel">
 				<h6 style="margin-bottom : 0px; display:inline">Дата</h6>
@@ -141,12 +141,12 @@
 				var kind = Model.kind_Of_Works.FirstOrDefault(q => q.ID_Kind_of_work == Model.academic_Performance.FirstOrDefault(q => q.ID_Subject == item.ID_Subject && q.Date == mostCommonDate)?.ID_Kind_of_work);
 
 			<tr>
-				<td style="text-align:center;font-weight: bold">
+				<td style="text-align:justify;font-weight: bold">
 					<p id="label_s">@subj.Name_subject</p>
 				</td>
 
 
-				<td style="text-align:center;font-weight: bold">
+				<td style="text-align:justify;font-weight: bold">
 						@if (kind != null)
 						{
 						<p id="label_s">@kind.Title_of_kind</p>

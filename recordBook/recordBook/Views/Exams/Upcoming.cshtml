@@ -64,17 +64,17 @@
 		<thead>
 			<tr>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center;">Студент</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify;">Студент</h6>
 				</th>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center; display:inline">Оценка</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Оценка</h6>
 					<button type="button" id="ChangeGradeBtn" class="btn btn-warning">Изменить</button>
 				</th>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center">Тип работы</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify">Тип работы</h6>
 				</th>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; margin-left : 20%; text-align:center; display:inline">Дата сдачи</h6>
+					<h6 style="margin-bottom : 0px; margin-left : 20%; text-align:justify; display:inline">Дата сдачи</h6>
 					<button type="button" id="ChangeDateBtn" class="btn btn-warning">Изменить</button>
 
 				</th>
@@ -93,13 +93,13 @@
 				{
 					var student = Model.Students.FirstOrDefault(q => q.ID_Student == r.ID_Student);
 					<tr id="columnGrade">
-						<td style="text-align:center; font-weight: bold">
+						<td style="text-align:justify; font-weight: bold">
 							<p id="label_s">@student.Surname  @student.Name  @student.Patronymic</p>
 						</td>
 
-						<td id="cellGrade" style="text-align:center;  padding-right:10%; font-weight: bold ">
+						<td id="cellGrade" style="text-align:justify;  padding-right:10%; font-weight: bold ">
 							<p class="labelsGrade">@r.Grade</p>
-							<select class="selectGrades" onchange="GradeIsChanged(@r.ID_Academic_performance,event)" style="width:200px; height:30px; text-align:center">
+							<select class="selectGrades" onchange="GradeIsChanged(@r.ID_Academic_performance,event)" style="width:200px; height:30px; text-align:justify">
 								<option value="Отлично">Отлично</option>
 								<option value="Хорошо">Хорошо</option>
 								<option value="Удовлетворительно">Удовлетворительно</option>
@@ -108,10 +108,10 @@
 							</select>
 						</td>
 
-						<td style="text-align:center;  font-weight: bold ">
+						<td style="text-align:justify;  font-weight: bold ">
 							<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
 						</td>
-						<td style="text-align:center;  font-weight: bold ">
+						<td style="text-align:justify;  font-weight: bold ">
 							<p id="label_s"> @r.Date?.ToString("dd MMMM yyyy") </p>
 							<input type="date" class="selectDates" onchange="DateIsChanged(@r.ID_Academic_performance,event)" style="width:150px; height:30px; text-align:center">
 
@@ -130,13 +130,13 @@ else if (User.IsInRole("Student"))
 		<thead>
 			<tr>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center;">Предмет</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify;">Предмет</h6>
 				</th>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center">Тип работы</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify">Тип работы</h6>
 				</th>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center">Дата сдачи</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify">Дата сдачи</h6>
 				</th>
 			</tr>
 		</thead>
@@ -150,14 +150,14 @@ else if (User.IsInRole("Student"))
 				{
 					var subjName = Model.Subjects.Where(q => q.ID_Subject == r.ID_Subject).Select(q => q.Name_subject).FirstOrDefault();
 					<tr id="columnGrade">
-						<td style="text-align:center; font-weight: bold">
+						<td style="text-align:justify; font-weight: bold">
 							<p id="label_s">@subjName.ToString()</p>
 						</td>
 
-						<td style="text-align:center;  font-weight: bold ">
+						<td style="text-align:justify;  font-weight: bold ">
 							<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
 						</td>
-						<td style="text-align:center;  font-weight: bold ">
+						<td style="text-align:justify;  font-weight: bold ">
 							<p id="label_s"> @r.Date?.ToString("dd MMMM yyyy") </p>
 						</td>
 					</tr>
@@ -209,13 +209,13 @@ else
 		<thead>
 			<tr>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center;">Студент</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify;">Студент</h6>
 				</th>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center">Тип работы</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify">Тип работы</h6>
 				</th>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center">Дата сдачи</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify">Дата сдачи</h6>
 				</th>
 			</tr>
 		</thead>
@@ -232,13 +232,13 @@ else
 				{
 					var student = Model.Students.FirstOrDefault(q => q.ID_Student == r.ID_Student);
 					<tr id="columnGrade">
-						<td style="text-align:center; font-weight: bold">
+						<td style="text-align:justify; font-weight: bold">
 							<p id="label_s">@student.Surname  @student.Name  @student.Patronymic</p>
 						</td>
-						<td style="text-align:center;  font-weight: bold ">
+						<td style="text-align:justify;  font-weight: bold ">
 							<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
 						</td>
-						<td style="text-align:center;  font-weight: bold ">
+						<td style="text-align:justify;  font-weight: bold ">
 							<p id="label_s"> @r.Date?.ToString("dd MMMM yyyy") </p>
 						</td>
 					</tr>

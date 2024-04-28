@@ -91,7 +91,7 @@
 		<thead>
 			<tr>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center;">Студент</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify;">Студент</h6>
 				</th>
 
 				@{
@@ -104,7 +104,7 @@
 					foreach (var r in CountRait)
 					{
 						<th id="tableLabel">
-							<h6 style="margin-bottom : 0px; text-align:center; display:inline">Рейтинг№@r</h6>
+							<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
 						</th>
 					}
 
@@ -118,7 +118,7 @@
 
 				<tr id="columnGrade">
 
-					<td style="text-align:center; font-weight: bold">
+					<td style="text-align:justify; font-weight: bold">
 						<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
 					</td>
 
@@ -150,7 +150,7 @@
 					{
 						for (int i = 1; i <= CountRait.Count(); i++)
 						{
-							<td id="cellPoint" style="text-align:center;  padding-right:10%; font-weight: bold ">
+							<td id="cellPoint" style="text-align:justify;  padding-right:10%; font-weight: bold ">
 								<input type="number" class="enterPoints" onchange="newRating(@item.ID_Student,@Model.selectedSubject.ID_Subject,@Model.selectedSemester,@i,event)" style="width:100px; height:30px; text-align:center">
 							</td>
 						}
@@ -198,7 +198,7 @@ else if (User.IsInRole("Student"))
 		<thead>
 			<tr>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center;">Дисциплина</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify;">Дисциплина</h6>
 				</th>
 
 				@{
@@ -211,7 +211,7 @@ else if (User.IsInRole("Student"))
 					foreach (var r in CountSemester)
 					{
 						<th id="tableLabel">
-							<h6 style="margin-bottom : 0px; text-align:center; display:inline">Рейтинг№@r</h6>
+							<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
 						</th>
 					}
 
@@ -227,7 +227,7 @@ else if (User.IsInRole("Student"))
 
 					<tr id="columnGrade">
 
-						<td style="text-align:center; font-weight: bold">
+						<td style="text-align:justify; font-weight: bold">
 							<p id="label_s">@item.Name_subject</p>
 						</td>
 
@@ -314,7 +314,7 @@ else
 		<thead>
 			<tr>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:center;">Студент</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify;">Студент</h6>
 				</th>
 
 				@{
@@ -327,7 +327,7 @@ else
 					foreach (var r in CountSemester)
 					{
 						<th id="tableLabel">
-							<h6 style="margin-bottom : 0px; text-align:center; display:inline">Рейтинг№@r</h6>
+							<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
 						</th>
 					}
 
@@ -341,16 +341,16 @@ else
 
 				<tr id="columnGrade">
 
-					<td style="text-align:center; font-weight: bold">
+					<td style="text-align:justify; font-weight: bold">
 						<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
 					</td>
+
 
 
 					@foreach (var r in Model.RatingControls.Where(q => q.ID_Student == item.ID_Student &&
 							q.ID_Subject == Model.selectedSubject.ID_Subject &&
 							q.Semester == Model.selectedSemester))
 					{
-
 						<td id="cellPoint" style="text-align:center;  padding-right:10%; font-weight: bold ">
 							<p class="labelsGrade">@r.Points</p>
 						</td>
@@ -466,7 +466,7 @@ else
 		// Скачиваем Excel файл
 		const buffer = await workbook.xlsx.writeBuffer();
 		saveAs(new Blob([buffer], { type: "application/octet-stream" }), "RatingList.xlsx");
-	
+
 	}
 
 </script>
