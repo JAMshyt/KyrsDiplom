@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace recordBook.Models.ViewModels
 {
@@ -30,6 +31,11 @@ namespace recordBook.Models.ViewModels
 		[StringLength(20, ErrorMessage = "Длинна пароля должна быть больше 3 но меньше 20", MinimumLength = 4)]
 		public string Password { get; set; }
 		public string Email { get; set; }
+		[Required(ErrorMessage ="Введите номер телефона")]
+		[MinLength(5,ErrorMessage ="Слишком короткий")]
+		[MaxLength(15, ErrorMessage = "Неверная длинна")]
+
+		public string Phone { get; set; }
 		#endregion
 	}
 }

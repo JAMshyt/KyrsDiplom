@@ -43,7 +43,7 @@
 	<!-- #endregion -->
 	<br>
 	<hr style="height:3px">
-	<!-- #region заполнение студента-->
+	<!-- #region заполнение логина-->
 	Аккаунт студента<br><br>
 	<div class="form-group">
 		<label asp-for="Login" class="control-label">Логин</label>
@@ -68,6 +68,13 @@
 	}
 		<input type="text" asp-for="Email" class="form-control" />
 	</div>
+
+	<div class="form-group">
+		<label asp-for="Phone" class="control-label">Телефон</label>
+		<span asp-validation-for="Phone" style="color:Red;"></span>
+		<input type="number" asp-for="Phone" class="form-control" />
+	</div>
+
 	<!-- #endregion -->
 
 	<div class="form-group">

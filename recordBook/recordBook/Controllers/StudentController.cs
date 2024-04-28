@@ -315,7 +315,8 @@ namespace recordBook.Controllers
 						Login = addStu.Login,
 						Password = hashedPassword,
 						Email = addStu.Email,
-						Salt = salt 
+						Salt = salt,
+						Phone = addStu.Phone
 					};
 					await _logins.AddLogin(login);
 
