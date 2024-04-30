@@ -1,0 +1,6 @@
+﻿@media (max-width: 768px) {
+
+    h1, select[name="selectedGroup"], .table, #tt, #exportButton {
+        margin-left: 12%;
+    }
+}

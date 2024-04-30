@@ -99,7 +99,7 @@
 
 						<td id="cellGrade" style="text-align:justify;  padding-right:10%; font-weight: bold ">
 							<p class="labelsGrade">@r.Grade</p>
-							<select class="selectGrades" onchange="GradeIsChanged(@r.ID_Academic_performance,event)" style="width:200px; height:30px; text-align:justify">
+							<select class="selectGrades" onchange="GradeIsChanged(@r.ID_Academic_performance,event)" style="max-width:200px; width:90%; height:30px; text-align:justify">
 								<option value="Отлично">Отлично</option>
 								<option value="Хорошо">Хорошо</option>
 								<option value="Удовлетворительно">Удовлетворительно</option>
@@ -108,12 +108,12 @@
 							</select>
 						</td>
 
-						<td style="text-align:justify;  font-weight: bold ">
+						<td style="text-align:justify;   max-width: 100px; word-wrap: break-word; font-weight: bold ">
 							<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
 						</td>
 						<td style="text-align:justify;  font-weight: bold ">
 							<p id="label_s"> @r.Date?.ToString("dd MMMM yyyy") </p>
-							<input type="date" class="selectDates" onchange="DateIsChanged(@r.ID_Academic_performance,event)" style="width:150px; height:30px; text-align:center">
+							<input type="date" class="selectDates" onchange="DateIsChanged(@r.ID_Academic_performance,event)" style="max-width:150px; width:80%; height:30px; text-align:center">
 
 						</td>
 					</tr>

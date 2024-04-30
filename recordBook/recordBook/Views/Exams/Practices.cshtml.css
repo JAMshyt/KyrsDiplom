@@ -1,0 +1,6 @@
+﻿@media (max-width: 768px) {
+    h1, select, .table, #exportButton {
+        margin-left: 12%;
+        margin-bottom: 3%;
+    }
+}

@@ -1,0 +1,9 @@
+﻿@media (max-width: 768px) {
+
+    #grSel, h1, h3, select {
+        margin-left: 12%;
+    }
+    .table {
+        margin-left: 12%;
+    }
+}

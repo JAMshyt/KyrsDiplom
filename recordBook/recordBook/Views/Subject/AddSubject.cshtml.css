@@ -1,24 +1,36 @@
-﻿.form-group2 {
-    position: fixed;
-    display: inline-block;
-    width: 30%;
-    /*top:50px;*/
+﻿@media (max-width: 768px) {
+
+    .form-group, table, #txt, #end {
+        margin-left: 12%;
+    }
 }
 
+@media (min-width: 768px) {
+    .form-group2 {
+        position: relative;
+        display: inline-block;
+        width: 30%;
+        /*top:50px;*/
+    }
 
-.form-group3 {
-    position: fixed;
-    display: inline-block;
-    width: 40%;
-    margin-left: 35%;
-}
+    .form-group3 {
+        position: fixed;
+        display: inline-block;
+        width: 40%;
+        margin-left: 5%;
+    }
 
-.grSelectBtn {
-    text-align: center;
-    width: 100px;
-    border: solid;
-    border-color: gray;
-    border-width: 1px;
-    height: 45px;
-    border-radius: 100px;
+    .grSelectBtn {
+        text-align: center;
+        width: 100px;
+        border: solid;
+        border-color: gray;
+        border-width: 1px;
+        height: 45px;
+        border-radius: 100px;
+    }
+
+    #end {
+        position: relative;
+    }
 }

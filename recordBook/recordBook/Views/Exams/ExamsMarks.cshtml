@@ -94,9 +94,9 @@
 								<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
 							</td>
 						}
-						<td id="cellGrade" style="text-align:justify;  padding-right:10%; font-weight: bold ">
+						<td id="cellGrade" style="text-align:justify;  font-weight: bold ">
 							<p class="labelsGrade">@r.Grade</p>
-							<select class="selectGrades" onchange="GradeIsChanged(@r.ID_Academic_performance,event)" style="width:200px; height:30px; text-align:justify">
+							<select class="selectGrades" onchange="GradeIsChanged(@r.ID_Academic_performance,event)" style="max-width:200px; width:80%; height:30px; text-align:justify">
 								<option value="Отлично">Отлично</option>
 								<option value="Хорошо">Хорошо</option>
 								<option value="Удовлетворительно">Удовлетворительно</option>
@@ -111,7 +111,7 @@
 						</td>
 						<td style="text-align:justify;  font-weight: bold ">
 							<p id="label_s"> @r.Date?.ToString("dd MMMM yyyy") </p>
-							<input type="date" class="selectDates" onchange="DateIsChanged(@r.ID_Academic_performance,event)" style="width:150px; height:30px; text-align:center">
+							<input type="date" class="selectDates" onchange="DateIsChanged(@r.ID_Academic_performance,event)" style="max-width:150px; width:80%; height:30px; text-align:center">
 						</td>
 					</tr>
 				}

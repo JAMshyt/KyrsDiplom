@@ -13,7 +13,7 @@
 	}
 
 	<!-- #region заполнение студента-->
-	Информация о студенте<br><br>
+	<p id="txt">Информация о студенте</p>
 	<div class="form-group">
 		<label asp-for="Surname" class="control-label">Фамилия</label>
 		<span asp-validation-for="Surname" style="color:Red;"></span>
@@ -44,7 +44,7 @@
 	<br>
 	<hr style="height:3px">
 	<!-- #region заполнение логина-->
-	Аккаунт студента<br><br>
+	<p id="txt">Аккаунт студента</p>
 	<div class="form-group">
 		<label asp-for="Login" class="control-label">Логин</label>
 		@if (!Model.loginUnique)

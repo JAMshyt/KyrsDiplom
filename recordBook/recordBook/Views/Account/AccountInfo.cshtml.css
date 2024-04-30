@@ -1,12 +1,24 @@
-﻿#info {
-    display: flex;
-    align-items: center;
-
+﻿@media screen and (min-width: 525px) {
+    #info {
+        display: flex;
+        align-items: center;
+    }
 }
 
-#avatar {
-    max-width: 200px;
+@media screen and (max-width: 525px) {
+    #info {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        text-align: left;
+        margin-left:5%;
+    }
 }
-#textInfo {
-    margin-left: 10%
-}
+
+    #avatar {
+        max-width: 200px;
+    }
+
+    #textInfo {
+        margin-left: 10%
+    }

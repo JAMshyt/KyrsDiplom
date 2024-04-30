@@ -64,7 +64,7 @@
 			.OrderByDescending(s => s);
 		}
 		<br><br>
-		<p>
+		<p id="tt">
 			Семестр
 			<select name="selectedSemester" required onchange="this.form.submit()" style="width:50px; height:40px; text-align:center">
 				@foreach (var sem in maxSemester)
@@ -136,12 +136,12 @@
 													q.RatingNumber == @i))
 								{
 									<p class="labelsGrade">@r.Points</p>
-									<input type="number" class="enterPoints" onchange="newPoint(@r.ID_RatingControl,event)" style="width:100px; height:30px; text-align:center">
+									<input type="number" class="enterPoints" onchange="newPoint(@r.ID_RatingControl,event)" style="max-width:100px; width:60%; height:30px; text-align:center">
 									emptyRat = false;
 								}
 								@if (emptyRat)
 								{
-									<input type="number" class="enterPoints" onchange="newRating(@item.ID_Student,@Model.selectedSubject.ID_Subject,@Model.selectedSemester,@i,event)" style="width:100px; height:30px; text-align:center">
+									<input type="number" class="enterPoints" onchange="newRating(@item.ID_Student,@Model.selectedSubject.ID_Subject,@Model.selectedSemester,@i,event)" style="max-width:100px; width:60%; height:30px; text-align:center">
 								}
 							</td>
 						}
@@ -173,7 +173,7 @@ else if (User.IsInRole("Student"))
 			.OrderByDescending(s => s);
 		}
 		<br><br>
-		<p>
+		<p id="tt">
 			Семестр
 			<select name="selectedSemester" required onchange="this.form.submit()" style="width:50px; height:40px; text-align:center">
 				@foreach (var sem in maxSemester)
@@ -289,7 +289,7 @@ else
 			.OrderByDescending(s => s);
 		}
 		<br><br>
-		<p>
+		<p id="tt">
 			Семестр
 			<select name="selectedSemester" required onchange="this.form.submit()" style="width:50px; height:40px; text-align:center">
 				@foreach (var sem in maxSemester)

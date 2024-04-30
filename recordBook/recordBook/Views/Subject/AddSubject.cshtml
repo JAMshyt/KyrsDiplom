@@ -18,7 +18,7 @@
 		<label asp-for="NameSubject" class="control-label">Название</label>
 		<input type="text" asp-for="NameSubject" id="nameOfGroup" class="form-control" style="width:30%" />
 	</div>
-	<p style="margin-top:50px; margin-bottom:20px;">Выберите группы, которые изучают предмет</p>
+	<p id="txt" style="margin-top:50px; margin-bottom:20px;">Выберите группы, которые изучают предмет</p>
 	<div class="form-group1">
 		<div class="form-group2">
 			<table class="table" id="myTable">
@@ -46,7 +46,6 @@
 				</tbody>
 
 			</table>
-			<input type="submit" value="Добавить" id="end" class="btn btn-success" style="width:100px;" />
 
 		</div>
 
@@ -65,6 +64,7 @@
 			</table>
 		</div>
 	</div>
+			<input type="submit" value="Добавить" id="end" class="btn btn-success" style="width:100px;" />
 </form>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

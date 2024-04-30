@@ -2,3 +2,19 @@
     width: 20px;
     height: 20px;
 }
+
+@media (max-width: 768px) {
+
+    h1, select {
+        margin-left: 12%;
+    }
+
+    #ChangeAttendanceBtn{
+        margin-top:3%;
+        margin-left:12%;
+    }
+
+    .table {
+        margin-left: 12%;
+    }
+}

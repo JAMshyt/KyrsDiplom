@@ -23,7 +23,7 @@
 @if (User.IsInRole("Adm"))
 {
 	<form asp-controller="Attendance" asp-action="AttendanceOfStudents">
-		<select name="selectedGroup" required onchange="this.form.submit()" style="width:15%; height:40px; text-align:center">
+		<select name="selectedGroup" required onchange="this.form.submit()" style="width:25%; height:40px; text-align:center">
 			@foreach (var groups in Model.Groups)
 			{
 				if (groups.ID_Group == Model.selectedGroup.ID_Group)
@@ -37,7 +37,7 @@
 			}
 		</select>
 
-		<select name="selectedSubject" required onchange="this.form.submit()" style="width:20%; height:40px; text-align:center">
+		<select name="selectedSubject" required onchange="this.form.submit()" style="width:40%; height:40px; text-align:center">
 			@foreach (var subj in Model.Subjects)
 			{
 				if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(subj.ID_Subject))

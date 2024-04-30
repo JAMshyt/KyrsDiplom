@@ -2,21 +2,127 @@ html {
   font-size: 14px;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+a.navbar-brand {
+    white-space: normal;
+    text-align: center;
+    word-break: break-all;
+    font-size:25px;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+@media (max-width: 768px) {
+    .navBoard {
+        display: none;
+    }
+
+    .sideMenu {
+        display: none;
+    }
+
+    .navLabel {
+        display: none;
+    }
+
+    .navLabel2 {
+        display: none;
+    }
+
+    .navLabel3 {
+        display: none;
+    }
 }
 
-html {
-  position: relative;
-  min-height: 100%;
-}
 
-body {
-  margin-bottom: 60px;
-}
+    @media (min-width: 768px) {
+        html {
+            font-size: 16px;
+        }
+
+
+        .sideMenu {
+            width: 260px;
+            text-align: center;
+            border: 10px solid #13547156;
+            margin: 0px 0px 0px 0px;
+            padding: 5%;
+            cursor: pointer;
+            background-color: white;
+        }
+
+        #men1 {
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+        }
+
+        #men2 {
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
+        }
+
+        .navBoard {
+            transition-duration: 1.5s;
+            position: absolute;
+            font-size: 20px;
+            margin-top: 50px;
+            margin-left: -250px;
+            border: 0px solid #13547156;
+            border-radius: 50px;
+            z-index: 1;
+        }
+
+
+            .navBoard:hover {
+                position: absolute;
+                transition-duration: 1s;
+                font-size: 20px;
+                margin-left: 0px;
+            }
+
+
+
+        .navLabel {
+            position: absolute;
+            writing-mode: vertical-lr;
+            margin-left: 260px;
+            margin-top: -180%;
+            z-index: 2;
+            border: 10px solid #13547156;
+            border-bottom-right-radius: 25px;
+            border-top-right-radius: 25px;
+        }
+
+        .navLabel2 {
+            position: absolute;
+            writing-mode: vertical-lr;
+            margin-left: 260px;
+            margin-top: -120%;
+            z-index: 2;
+            border: 10px solid #13547156;
+            border-bottom-right-radius: 25px;
+            border-top-right-radius: 25px;
+        }
+
+        .navLabel3 {
+            position: absolute;
+            writing-mode: vertical-lr;
+            margin-left: 260px;
+            margin-top: -157%;
+            z-index: 2;
+            border: 10px solid #13547156;
+            border-bottom-right-radius: 25px;
+            border-top-right-radius: 25px;
+        }
+    }
+
+
+    .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+        box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    }
+
+    html {
+        position: relative;
+        min-height: 100%;
+    }
+
+    body {
+        margin-bottom: 60px;
+    }

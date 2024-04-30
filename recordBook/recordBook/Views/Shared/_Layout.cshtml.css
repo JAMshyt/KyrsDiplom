@@ -5,10 +5,11 @@ a.navbar-brand {
   white-space: normal;
   text-align: center;
   word-break: break-all;
+
 }
 
 a {
-  color: #0077cc;
+    color: #0077cc;
 }
 
 .btn-primary {
@@ -52,55 +53,8 @@ button.accept-policy {
     margin-right:50px;
 }
 
-.navBoard {
-    transition-duration: 1.5s;
-    position: absolute;
-    font-size: 20px;
-    margin-top: 50px;
-    margin-left: -250px;
-    border: 0px solid #13547156;
-    border-radius: 50px;
-    z-index: 1;
-    
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
 }
-
-.navLabel {
-    position: absolute;
-    writing-mode: vertical-lr;
-    margin-left: 260px;
-    margin-top: -180%;
-    z-index: 2;
-    border: 10px solid #13547156;
-    border-bottom-right-radius: 25px;
-    border-top-right-radius: 25px;
-}
-
-.navLabel2 {
-    position: absolute;
-    writing-mode: vertical-lr;
-    margin-left: 260px;
-    margin-top: -120%;
-    z-index: 2;
-    border: 10px solid #13547156;
-    border-bottom-right-radius: 25px;
-    border-top-right-radius: 25px;
-}
-
-.navLabel3 {
-    position: absolute;
-    writing-mode: vertical-lr;
-    margin-left: 260px;
-    margin-top: -157%;
-    z-index: 2;
-    border: 10px solid #13547156;
-    border-bottom-right-radius: 25px;
-    border-top-right-radius: 25px;
-}
-
-.navBoard:hover {
-    position: absolute;
-    transition-duration: 1s;
-    font-size: 20px;
-    margin-left: 0px;
-}
-
