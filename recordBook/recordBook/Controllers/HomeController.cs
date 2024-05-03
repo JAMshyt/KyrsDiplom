@@ -85,6 +85,12 @@ namespace recordBook.Controllers
 			return View(user);
 		}
 
+		public ViewResult Registration()
+		{
+			RegistrationViewModel user = new RegistrationViewModel();
+			return View(user);
+		}
+
 
 		[HttpPost]
 		public async Task<ActionResult> Authorization(AuthorizationViewModel user)
@@ -116,9 +122,6 @@ namespace recordBook.Controllers
 						return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
 					}
 				}
-
-
-
 				Logins? login = GetLogins().FirstOrDefault(q => q.Login == user.Login);
 
 				string salt = CreateSalt();
@@ -199,9 +202,16 @@ namespace recordBook.Controllers
 			}
 			else return View(user);
 		}
-		#endregion
 
-		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+		[HttpPost]
+		public async Task<ActionResult> Registration(AuthorizationViewModel user)
+		{ 
+			return View(user);
+		}
+
+			#endregion
+
+			[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 		public IActionResult Error()
 		{
 

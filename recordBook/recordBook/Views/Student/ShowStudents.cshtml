@@ -16,22 +16,22 @@
 <h1>@ViewData["Title"]</h1>
 
 
-	<p id="grSel">Выберите группу</p>
-	<form asp-controller="Student" asp-action="ShowStudents">
-		<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
-			@foreach (var groups in Model.Groups)
+<p id="grSel">Выберите группу</p>
+<form asp-controller="Student" asp-action="ShowStudents">
+	<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
+		@foreach (var groups in Model.Groups)
+		{
+			if (groups.ID_Group == Model.selectedGroup.ID_Group)
 			{
-				if (groups.ID_Group == Model.selectedGroup.ID_Group)
-				{
-					<option value="@groups.ID_Group" selected>@groups.Name_group</option>
-				}
-				else
-				{
-					<option value="@groups.ID_Group">@groups.Name_group</option>
-				}
+				<option value="@groups.ID_Group" selected>@groups.Name_group</option>
 			}
-		</select>
-	</form>
+			else
+			{
+				<option value="@groups.ID_Group">@groups.Name_group</option>
+			}
+		}
+	</select>
+</form>
 
 
 <table class="table" id="myTable">
@@ -46,7 +46,7 @@
 			<th id="tableLabel">
 				<h6 style="margin-bottom : 0px; text-align:justify;">Отчество</h6>
 			</th>
-			@if (User.IsInRole("Adm"))
+			@if (!User.IsInRole("Student"))
 			{
 				<th id="tableLabel">
 					<h6 style="margin-bottom : 0px; text-align:justify;">Действие</h6>
@@ -58,7 +58,6 @@
 	<tbody>
 			@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
 			{
-				//var data = item.Date.ToString("dd MMMM yyyy");
 			<tr>
 				<td style="text-align:justify;font-weight: bold; width:10%">
 					<p id="label_s">@Html.DisplayFor(modelItem => item.Surname)</p>
@@ -69,28 +68,30 @@
 				<td style="text-align:justify;font-weight: bold; width:10%">
 					<p id="label_s">@Html.DisplayFor(modelItem => item.Patronymic)</p>
 				</td>
-					@if (User.IsInRole("Adm"))
+					@if (!User.IsInRole("Student"))
 					{
 					<td style="text-align:justify; width:30%">
-						<a class="btn btn-outline-danger" id="deleteStudent" onclick="DropStudent(@item.ID_Student)" style="border:1px; font-weight:normal">Удалить</a>
-						<a class="btn btn-outline-warning" onclick="showGroups(@item.ID_Student, event)" style="border:1px; font-weight:normal">Изменить группу</a>
+							@if (User.IsInRole("Adm"))
+							{
+							<a class="btn btn-outline-danger" id="deleteStudent" onclick="DropStudent(@item.ID_Student)" style="border:1px; font-weight:normal">Удалить</a>
+							<a class="btn btn-outline-warning" onclick="showGroups(@item.ID_Student, event)" style="border:1px; font-weight:normal">Изменить группу</a>
 
-						<select class="chGroups" id="@item.ID_Student" onchange="ChangeGroupStudent(@item.ID_Student)" style="width:120px; height:40px; text-align:center">
-								@foreach (var groups in Model.Groups)
-								{
-									if (groups.ID_Group == Model.selectedGroup.ID_Group)
+							<select class="chGroups" id="@item.ID_Student" onchange="ChangeGroupStudent(@item.ID_Student)" style="width:120px; height:40px; text-align:center">
+									@foreach (var groups in Model.Groups)
 									{
-									<option value="@groups.ID_Group" selected>@groups.Name_group</option>
+										if (groups.ID_Group == Model.selectedGroup.ID_Group)
+										{
+										<option value="@groups.ID_Group" selected>@groups.Name_group</option>
+										}
+										else
+										{
+										<option value="@groups.ID_Group">@groups.Name_group</option>
+										}
 									}
-									else
-									{
-									<option value="@groups.ID_Group">@groups.Name_group</option>
-									}
-								}
-						</select>
-
+							</select>
 						<a class="btn btn-outline-info" onclick="showAccaunt(@item.ID_Login)" style="border:1px; font-weight:normal">Профиль</a>
-
+							}
+						<a class="btn btn-outline-info" onclick="showDebt(@item.ID_Student)" style="border:1px; font-weight:normal">Задолженности</a>
 
 					</td>
 					}
@@ -113,10 +114,10 @@
 			</th>
 			<th id="tableLabel">
 				<h6 style="margin-bottom : 0px; display:inline">Дата</h6>
-@* 				@if (User.IsInRole("Adm"))
+				@if (User.IsInRole("Adm"))
 				{
 					<button type="button" id="ChangeDateBtn" class="btn btn-warning">Изменить дату сдачи для всех</button>
-				} *@
+				}
 			</th>
 
 		</tr>
@@ -152,7 +153,7 @@
 						}
 						else
 						{
-@* 						<button type="button" id="addExamBtn" onclick="ExamBtnClick(@item.ID_Subject,event)" class="btn btn-warning">Назначить экзамен</button>
+						<button type="button" id="addExamBtn" onclick="ExamBtnClick(@item.ID_Subject,event)" class="btn btn-warning">Назначить экзамен</button>
 
 						<select class="kindsOfWorks" id="Exams_@item.ID_Subject" onchange="addKindOfWork(@item.ID_Subject, @Model.selectedGroup.ID_Group)" style="width:250px; height:40px; text-align:center">
 								@foreach (var kinds in Model.kind_Of_Works)
@@ -161,7 +162,7 @@
 								<option value="@kinds.ID_Kind_of_work">@kinds.Title_of_kind</option>
 
 								}
-						</select> *@
+						</select>
 						}
 				</td>
 
@@ -169,7 +170,7 @@
 						@if (kind != null)
 						{
 						<p id="label_s">@data</p>
-						@* <input type="date" class="selectDates" onchange="DateIsChanged(@subj.ID_Subject,@Model.selectedGroup.ID_Group,event)" style="width:150px; height:30px; text-align:center"> *@
+						<input type="date" class="selectDates" onchange="DateIsChanged(@subj.ID_Subject,@Model.selectedGroup.ID_Group,event)" style="width:150px; height:30px; text-align:center">
 						}
 				</td>
 			</tr>
@@ -266,10 +267,11 @@
 
 	//профили студентов
 	function showAccaunt(id) {
-
-
 		window.location.href = '/Account/AccountInfoStudent' + id;
+	} 
 
+	function showDebt(id) {
+		window.location.href = '/Exams/DebtsOfStudent' + id;
 	}
 
 	//удаление студента

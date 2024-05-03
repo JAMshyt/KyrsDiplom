@@ -232,7 +232,6 @@ else if (User.IsInRole("Student"))
 						</td>
 
 						@foreach (var r in Model.RatingControls.Where(q => q.ID_Subject == item.ID_Subject &&
-								q.ID_Student == Model.Students.FirstOrDefault().ID_Student &&
 								q.Semester == Model.selectedSemester))
 						{
 							<td id="cellPoint" style="text-align:center;  padding-right:10%; font-weight: bold ">

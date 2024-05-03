@@ -93,6 +93,7 @@ namespace recordBook.Controllers
 					model.Group = group;
 					model.Photo = photoBase64;
 					model.Graduating_department = group.Graduating_department;
+					model.Financing_source = group.Financing_source;
 					return View(model);
 				case "Adm":
 					var dep_work = GetDepartment_Workers().FirstOrDefault(q => q.ID_Department_worker == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));

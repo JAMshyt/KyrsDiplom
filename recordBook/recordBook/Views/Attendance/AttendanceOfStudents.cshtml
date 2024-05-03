@@ -146,7 +146,7 @@ else if (User.IsInRole("Curator"))
 
 	</form>
 
-	<table class="table" id="myTable">
+	<table class="table" id="CuratorTable">
 
 		<thead>
 			<tr>
@@ -155,14 +155,14 @@ else if (User.IsInRole("Curator"))
 				</th>
 
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:justify;">Посещаемость</h6>
+					<h6 style="margin-bottom : 0px; text-align:center;">Посещаемость</h6>
 				</th>
 
 				@{
-					var maxAttendanceCount = Model.Attendances.Where(q => q.ID_Subject == Model.selectedSubject.ID_Subject).Count(q => q.ID_Student == Model.Students.Select(q => q.ID_Student).FirstOrDefault());
+					int maxAttendanceCount = Model.Attendances.Where(q => q.ID_Student == Model.Students.Select(q => q.ID_Student).FirstOrDefault()).Count(); //q => q.ID_Student == Model.Students.Select(q => q.ID_Student).FirstOrDefault()
 				}
 
-				@for (int i = 1; i < maxAttendanceCount; i++)
+				@for (int i = 0; i < maxAttendanceCount; i++)
 				{
 					<th id="tableLabel">
 					</th>
@@ -195,8 +195,8 @@ else if (User.IsInRole("Curator"))
 				</tr>
 			}
 		</tbody>
-
 	</table>
+	<button id="exportButton" class="btn btn-info" onclick="exportToExcel()">Сохранить в Excel</button>
 }
 else
 {
@@ -273,11 +273,78 @@ else
 			}
 		</tbody>
 	</table>
+
 }
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.0/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
 <script type='text/javascript'>
 
+	async function exportToExcel() {
+		const ExcelJS = window.ExcelJS;
+
+		var workbook = new ExcelJS.Workbook();
+		var worksheet = workbook.addWorksheet('Sheet1');
+
+		// Находим таблицу на сайте
+		var table = document.getElementById('CuratorTable');
+
+		// Получаем данные из HTML-таблицы
+		var data = [];
+		for (var i = 0; i < table.rows.length; i++) {
+			var rowData = [];
+			for (var j = 0; j < table.rows[i].cells.length; j++) {
+				rowData.push(table.rows[i].cells[j].innerText.trim());
+			}
+			data.push(rowData);
+		}
+
+		// Заполняем ячейки в файле Excel данными из таблицы
+		data.forEach((row, rowIndex) => {
+			row.forEach((cell, cellIndex) => {
+				if (rowIndex === 0) {
+					// Установка стиля для шапки таблицы
+					const excelCell = worksheet.getCell(String.fromCharCode(65 + cellIndex) + (rowIndex + 1));
+					excelCell.value = cell;
+					if (cell.trim() !== "") {
+						excelCell.fill = {
+							type: 'pattern',
+							pattern: 'solid',
+							fgColor: { argb: 'FFC0C0C0' } // Серый цвет фона
+						};
+						excelCell.font = { bold: true };
+					}
+				} else {
+					const tableCell = table.rows[rowIndex].cells[cellIndex];
+					const h6Element = tableCell.querySelector('h6');
+						const excelCell = worksheet.getCell(String.fromCharCode(65 + cellIndex) + (rowIndex + 1));
+						excelCell.value = cell;
+					if (h6Element) {
+						const computedStyles = window.getComputedStyle(h6Element);
+						const fontColor = computedStyles.color;
+						if (fontColor === 'rgb(255, 0, 0)') {
+							excelCell.font = { color: { argb: 'FF0000' } };
+						}
+					}
+				}
+			});
+		});
+
+		// Автоматически устанавливаем ширину столбцов
+		worksheet.columns.forEach(column => {
+			let maxLength = 0;
+			column.eachCell({ includeEmpty: true }, cell => {
+				maxLength = Math.max(maxLength, (cell.value || '').toString().length);
+			});
+			column.width = maxLength + 2;
+		});
+
+		// Скачиваем Excel файл
+		const buffer = await workbook.xlsx.writeBuffer();
+		saveAs(new Blob([buffer], { type: "application/octet-stream" }), "Attendance.xlsx");
+	}
 
 	$('#ChangeAttendanceBtn').click(function (id) {
 		if ($('#ChangeAttendanceBtn').text() == 'Изменить посещаемость') {
@@ -293,7 +360,6 @@ else
 	});
 
 	function AttendanceIsChanged(id, event) {
-		console.log(id + " " + event.target.checked);
 		var Attendance = event.target.checked;
 		$.ajax({
 			type: 'POST',
@@ -301,10 +367,6 @@ else
 			contentType: 'application/json',
 			data: JSON.stringify({ id: id, newAttendance: Attendance }),
 			dataType: 'json',
-			success: function (data) {
-				console.log(data);
-			}
-
 		});
 	};
 </script>

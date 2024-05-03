@@ -405,7 +405,7 @@ namespace recordBook.Controllers
 
 
 
-		public async Task<IActionResult> RatingList(int selectedGroup, int selectedSubject, int selectedSemester)
+		public async Task<IActionResult> RatingList(int selectedGroup, int selectedSubject, int SelectedSemester)
 		{
 			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 
@@ -428,7 +428,7 @@ namespace recordBook.Controllers
 			switch (User.FindFirst(ClaimTypes.Role)?.Value)
 			{
 				case "Adm":
-					if (selectedGroup > 0 & selectedSubject > 0 & selectedSemester > 0)
+					if (selectedGroup > 0 & selectedSubject > 0 & SelectedSemester > 0)
 					{
 						var groupById = _group.GetGroupbyID(selectedGroup);
 						var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
@@ -439,7 +439,7 @@ namespace recordBook.Controllers
 						var subjectById = _subject.GetSubjectbyID(selectedSubject);
 						model.selectedGroup = groupById;
 						model.selectedSubject = subjectById;
-						model.selectedSemester = selectedSemester;
+						model.selectedSemester = SelectedSemester;
 
 					}
 					return View(model);
@@ -450,9 +450,11 @@ namespace recordBook.Controllers
 					model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
 					model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
 					model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-					model.selectedSemester = selectedSemester;
-					model.RatingControls = GetRatingControls().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
-
+					var maxSem = GetRatingControls()
+	.Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value))
+	.Max(q => q.Semester);
+					model.selectedSemester = SelectedSemester < 1 ? maxSem : SelectedSemester;
+					model.RatingControls = GetRatingControls().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value) );
 
 
 					if (selectedSubject > 0)
@@ -460,6 +462,7 @@ namespace recordBook.Controllers
 						var subjectById = _subject.GetSubjectbyID(selectedSubject);
 						model.selectedSubject = subjectById;
 					}
+
 					return View(model);
 
 
@@ -481,7 +484,7 @@ namespace recordBook.Controllers
 						.Where(q => q.ID_Student == GetStudents().FirstOrDefault(q => q.ID_Group == selectedGroups.FirstOrDefault()?.ID_Group)?.ID_Student)
 						.Max(q => q.Semester);
 
-					model.selectedSemester = selectedSemester < 1 ? sem : selectedSemester;
+					model.selectedSemester = SelectedSemester < 1 ? sem : SelectedSemester;
 
 					return View(model);
 			}
@@ -489,7 +492,19 @@ namespace recordBook.Controllers
 			return View(model);
 		}
 
-
+		[HttpGet]
+		[Route("/Exams/DebtsOfStudent{idStudent:int}")]
+		public ViewResult DebtsOfStudent(int idStudent)
+		{
+			var model = new ExamsViewModel()
+			{
+				Students = GetStudents().Where(q => q.ID_Student == idStudent),
+				Academic_Performances = GetAcademic_performance().Where(q => q.ID_Student == idStudent),
+				Kind_of_works = GetKind_of_works(),
+				Subjects = GetSubjects()
+			};
+			return View(model);
+		}
 
 		#region классы для JSON запросов
 		public class IdAndGrade
