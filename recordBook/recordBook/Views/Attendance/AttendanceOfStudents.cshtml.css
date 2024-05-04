@@ -5,16 +5,14 @@
 
 @media (max-width: 768px) {
 
-    h1, select {
+    h1, select, .table, .leg {
+        margin-left: 12%;
+        margin-top: 3%;
+    }
+
+    #ChangeAttendanceBtn, #exportButton {
+        margin-top: 3%;
         margin-left: 12%;
     }
 
-    #ChangeAttendanceBtn{
-        margin-top:3%;
-        margin-left:12%;
-    }
-
-    .table {
-        margin-left: 12%;
-    }
 }

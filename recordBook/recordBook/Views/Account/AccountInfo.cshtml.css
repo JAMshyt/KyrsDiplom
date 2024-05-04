@@ -15,9 +15,14 @@
     }
 }
 
-    #avatar {
-        max-width: 200px;
-    }
+#formFile {
+    max-width: 300px;
+    margin-top:10px;
+}
+
+#avatar {
+    max-width: 200px;
+}
 
     #textInfo {
         margin-left: 10%

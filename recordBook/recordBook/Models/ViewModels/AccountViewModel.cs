@@ -4,10 +4,12 @@ namespace recordBook.Models.ViewModels
 {
 	public class AccountViewModel
 	{
+		public int ID { get; set; }
 		public string Surname { get; set; }
 		public string Name { get; set; }
 		public string? Patronymic { get; set; }
 		public Group? Group { get; set; } //группа студента
+		public IEnumerable<Group>? Groups { get; set; }
 		public string Email { get; set; }
 		public string Financing_source { get; set; }
 		public decimal Phone { get; set; }

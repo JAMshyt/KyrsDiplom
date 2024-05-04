@@ -360,8 +360,10 @@ else
 			}
 		</tbody>
 	</table>
-	<button id="exportButton" class="btn btn-info" onclick="exportToExcel()">Сохранить в Excel</button>
+	string group = Model.selectedGroup.Name_group;
+	string subj = Model.selectedSubject.Name_subject;
 
+	<button id="exportButton" class="btn btn-info" onclick="exportToExcel('@group','@subj')">Сохранить в Excel</button>
 }
 
 
@@ -413,7 +415,7 @@ else
 		});
 	}
 
-	async function exportToExcel() {
+	async function exportToExcel(selectedGroup, selectedSubject) {
 		const ExcelJS = window.ExcelJS;
 
 		var workbook = new ExcelJS.Workbook();
@@ -462,9 +464,10 @@ else
 			column.width = maxLength + 2;
 		});
 
+		var Title = "Рейтинги " + selectedGroup + " " + selectedSubject + ".xlsx";
 		// Скачиваем Excel файл
 		const buffer = await workbook.xlsx.writeBuffer();
-		saveAs(new Blob([buffer], { type: "application/octet-stream" }), "RatingList.xlsx");
+		saveAs(new Blob([buffer], { type: "application/octet-stream" }), Title);
 
 	}
 

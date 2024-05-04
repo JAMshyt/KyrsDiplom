@@ -4,6 +4,7 @@
 
 @model AccountViewModel
 @{
+	ViewData["User"] = User.FindFirst(ClaimTypes.Surname).Value + " " + User.FindFirst(ClaimTypes.Name).Value + " " + User.FindFirst(ClaimTypes.GivenName)?.Value;
 	ViewData["Title"] = "Личный кабинет";
 }
 @if (!Model.AdminWatching)
@@ -16,6 +17,7 @@
 
 		<div id="textInfo">
 			<h3>ФИО:</h3><span>@Model.Surname @Model.Name @Model.Patronymic</span>
+			<in></in>
 			@if (User.IsInRole("Student"))
 			{
 				<h3>Группа:</h3>
@@ -46,23 +48,105 @@
 else
 {
 	<div id="info">
-		@if (Model.Photo != null)
-		{
-			<img id="avatar" src="data:image/jpeg;base64,@Model.Photo">
-		}
-		<div id="textInfo">
-			<h3>ФИО:</h3><span>@Model.Surname @Model.Name @Model.Patronymic</span>
-			<h3>Телефон:</h3><span>@Model.Phone</span>
-			<h3>Почта:</h3><span>@Model.Email</span>
-			@if (Model.Group != null)
+		<div id="photo">
+			@if (Model.Photo != null)
 			{
-				<h3>Группа:</h3>
-
-				<span>@Model.Group.Name_group</span>
-				<h3>Специальность:</h3>
-
-				<span>@Model.Group.Decoding</span>
+				<img id="avatar" src="data:image/jpeg;base64,@Model.Photo">
 			}
+			<input class="form-control" onchange="InfoIsChanged(@Model.ID,event,'Photo')" type="file" id="formFile">
+		</div>
+		<div id="textInfo">
+			<button type="button" id="ChangeBtn" class="btn btn-warning" style="width:150px; height:40px; text-align:center">Редактировать</button>
+			<h3>ФИО:</h3><span>@Model.Surname @Model.Name @Model.Patronymic</span>
+			<input type="text" onchange="InfoIsChanged(@Model.ID,event,'Sur')" asp-for="Surname" class="form-control" />
+			<input type="text" onchange="InfoIsChanged(@Model.ID,event,'Name')" asp-for="Name" class="form-control" />
+			<input type="text" onchange="InfoIsChanged(@Model.ID,event,'Patr')" asp-for="Patronymic" class="form-control" />
+
+			<h3>Группа:</h3>
+			<span>@Model.Group.Name_group</span>
+			<br>
+			<select asp-for="Group" onchange="InfoIsChanged(@Model.ID,event,'Group')" class="Gr" style="width:120px; height:40px; text-align:center; margin-top:10px;">
+				@foreach (var groups in Model.Groups)
+				{
+					if (Model.Group.ID_Group != null & groups.ID_Group == Model.Group.ID_Group)
+					{
+						<option value="@groups.ID_Group" selected>@groups.Name_group</option>
+
+					}
+					else
+					{
+						<option value="@groups.ID_Group">
+							@groups.Name_group
+						</option>
+					}
+				}
+			</select>
+
+			<h3>Специальность:</h3>
+			<span>@Model.Group.Decoding</span><br>
+			<span asp-for="Group.Decoding" class="Gr" style="color:red">Меняется в зависимости от группы</span>
+
+			<h3>Выпускающая кафедра:</h3>
+			<span>@Model.Graduating_department</span><br>
+			<span asp-for="Group.Decoding" class="Gr" style="color:red">Меняется в зависимости от группы</span>
+
+			<h3>Источник финансирования:</h3>
+			<span>@Model.Financing_source</span><br>
+			<span asp-for="Group.Decoding" class="Gr" style="color:red">Меняется в зависимости от группы</span>
+
+			<h3>Телефон:</h3><span>@Model.Phone</span>
+			<input type="text" onchange="InfoIsChanged(@Model.ID,event,'Phone')" asp-for="Phone" class="form-control" />
+
+			<h3>Почта:</h3><span>@Model.Email</span>
+			<input type="text" onchange="InfoIsChanged(@Model.ID,event,'Email')" asp-for="Email" class="form-control" />
+
 		</div>
 	</div>
 }
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type='text/javascript'>
+
+	$(document).ready(function () {
+		$('.form-control').hide();
+		$('.Gr').hide();
+	});
+
+	$('#ChangeBtn').click(function (id) {
+		if ($('#ChangeBtn').text() == 'Редактировать') {
+			$('.form-control').show();
+			$('.Gr').show();
+			$('#ChangeBtn').text('Сохранить');
+
+		}
+		else {
+			location.reload()
+		}
+
+	});
+
+	function InfoIsChanged(id, event, whatChange) {
+
+		var info = event.target.value;
+		var file = event.target.files ? event.target.files[0] : null;
+
+		var formData = new FormData();
+		formData.append('Id', id);
+		formData.append('Change', whatChange);
+		formData.append('Info', info);
+		if (file) {
+			formData.append('file', file);
+		}
+
+		$.ajax({
+			type: 'POST',
+			url: '/Account/InfoIsChanged/',
+			data: formData,
+			processData: false,  // предотвращаем преобразование в строку
+			contentType: false,  // не устанавливаем contentType, браузер сам укажет multipart/form-data
+			success: function (result) {
+				// обработка успешного ответа
+			}
+		});
+	}
+
+</script>
