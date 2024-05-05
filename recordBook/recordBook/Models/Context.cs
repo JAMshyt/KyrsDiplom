@@ -16,7 +16,7 @@ namespace recordBook.Models
 		public DbSet<Logins> Logins { get; set; }
 		public DbSet<Curator> Curator{ get; set; }
 		public DbSet<RatingControl> RatingControl { get; set; }
-
+		public DbSet<LoginsStudent> LoginsStudent { get; set; }
 
 		public Context(DbContextOptions<Context> options)
 			: base(options)

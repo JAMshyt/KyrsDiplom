@@ -6,14 +6,14 @@ namespace recordBook.Models.ViewModels
     public class AddStudentViewModel
     {
 		#region данные студента
+		[Required(ErrorMessage = "Введите номер зачетной книжки")]
+		public int NumberBook { get; set; }
 		[Required(ErrorMessage = "Введите фамилию")]
         public string Surname { get; set; }
 
         [Required(ErrorMessage = "Введите имя")]
         public string Name { get; set; }
-
 		public string? Patronymic { get; set; }
-
         public int ID_Group { get; set; }
 		#endregion
 

@@ -22,7 +22,7 @@ namespace recordBook.Models
 
         [Required(ErrorMessage = "Выберите группу")]
         public int ID_Group { get; set; }
-		public int ID_Login { get; set; }
+		public int NumberOfBook { get; set; }
 
         public byte[]? Photo { get; set; }
 	}

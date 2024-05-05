@@ -9,6 +9,7 @@ namespace recordBook.Models.ViewModels
 		public string Name { get; set; }
 		public string? Patronymic { get; set; }
 		public Group? Group { get; set; } //группа студента
+		public int? NumberOfBook { get; set; } //зачетка студента
 		public IEnumerable<Group>? Groups { get; set; }
 		public string Email { get; set; }
 		public string Financing_source { get; set; }

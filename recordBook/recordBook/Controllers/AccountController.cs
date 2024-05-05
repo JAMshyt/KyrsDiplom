@@ -30,10 +30,11 @@ namespace recordBook.Controllers
 		private readonly IDepartment_worker _department_worker;
 		private readonly ICurator _curator;
 		private readonly ILogins _logins;
+		private readonly ILoginsStudent _loginsStudent;
 
 		public AccountController(ILogger<AccountController> logger, IStudent student,
 			IDepartment_worker department_worker, ICurator curator, IGroup group,
-			ILogins logins
+			ILogins logins, ILoginsStudent loginsStudent
 			)
 		{
 			_logger = logger;
@@ -42,6 +43,7 @@ namespace recordBook.Controllers
 			_curator = curator;
 			_group = group;
 			_logins = logins;
+			_loginsStudent = loginsStudent;
 		}
 
 		#region Get таблиц
@@ -75,6 +77,12 @@ namespace recordBook.Controllers
 			var logs = _logins.GetAllLogins().ToList();
 			return logs;
 		}
+
+		public List<LoginsStudent> GetLoginsStudents()
+		{
+			var logs = _loginsStudent.GetAllLoginsStudent().ToList();
+			return logs;
+		}
 		#endregion
 
 		public ViewResult AccountInfo()
@@ -99,6 +107,7 @@ namespace recordBook.Controllers
 					model.Graduating_department = group.Graduating_department;
 					model.Financing_source = group.Financing_source;
 					model.Groups = GetGroups();
+					model.NumberOfBook = student.NumberOfBook;
 					return View(model);
 				case "Adm":
 					var dep_work = GetDepartment_Workers().FirstOrDefault(q => q.ID_Department_worker == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
@@ -138,8 +147,8 @@ namespace recordBook.Controllers
 		[Route("/Account/AccountInfoStudent{idLogin:int}")]
 		public ViewResult AccountInfoStudent(int idLogin)
 		{
-			var person = GetStudents().FirstOrDefault(q => q.ID_Login == idLogin);
-			var login = GetLogins().FirstOrDefault(q => q.ID_Login == person.ID_Login);
+			var person = GetStudents().FirstOrDefault(q => q.NumberOfBook == idLogin);
+			var login = GetLoginsStudents().FirstOrDefault(q => q.Number_RecordBook == person.NumberOfBook);
 			byte[] photoCur = person.Photo;
 			string? photoBase64 = photoCur != null ? Convert.ToBase64String(photoCur) : null;
 			var group = GetGroups().FirstOrDefault(q => q.ID_Group == person.ID_Group);
@@ -157,7 +166,8 @@ namespace recordBook.Controllers
 				AdminWatching = true,
 				Graduating_department = group.Graduating_department,
 				Financing_source = group.Financing_source,
-				Groups = GetGroups()
+				Groups = GetGroups(),
+				NumberOfBook = person.NumberOfBook,
 			};
 			return View("AccountInfo", model);
 		}
@@ -206,15 +216,21 @@ namespace recordBook.Controllers
 					break;
 
 				case "Phone":
-					Logins login = GetLogins().FirstOrDefault(x => x.ID_Login == oldStudent.ID_Login);
+					LoginsStudent login = GetLoginsStudents().FirstOrDefault(x => x.Number_RecordBook == oldStudent.NumberOfBook);
 					login.Phone = Convert.ToDecimal(request.Info);
-					await _logins.UpdateLogin(login);
+					await _loginsStudent.UpdateLoginStudent(login);
 					break;
 
+				//case "Book":
+				//	LoginsStudent login2 = GetLoginsStudents().FirstOrDefault(x => x.Number_RecordBook == oldStudent.NumberOfBook);
+				//	login2.Number_RecordBook = Convert.ToInt32(request.Info);
+				//	await _loginsStudent.UpdateLoginStudent(login2);
+				//	break;
+
 				case "Email":
-					Logins login2 = GetLogins().FirstOrDefault(x => x.ID_Login == oldStudent.ID_Login);
-					login2.Email = request.Info;
-					await _logins.UpdateLogin(login2);
+					LoginsStudent login3 = GetLoginsStudents().FirstOrDefault(x => x.Number_RecordBook == oldStudent.NumberOfBook);
+					login3.Email = request.Info;
+					await _loginsStudent.UpdateLoginStudent(login3);
 					break;
 
 				case "Photo":

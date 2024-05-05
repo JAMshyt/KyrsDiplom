@@ -4,9 +4,9 @@ namespace recordBook.RInterface
 {
 	public interface ILogins
 	{
-		Task AddLogin(Logins kind_of_work);
-		Task DeleteLogin(Logins kind_of_work);
-		Task UpdateLogin(Logins kind_of_work);
+		Task AddLogin(Logins log);
+		Task DeleteLogin(Logins log);
+		Task UpdateLogin(Logins log);
 		Logins? GetLoginbyID(int Id);
 		IQueryable<Logins> GetAllLogins();
 	}

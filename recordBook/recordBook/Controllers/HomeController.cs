@@ -30,10 +30,12 @@ namespace recordBook.Controllers
 		private readonly ILogins _logins;
 		private readonly ICurator _curator;
 		private readonly IGroup _group;
+		private readonly ILoginsStudent _loginsStudent;
+
 
 		public HomeController(ILogger<HomeController> logger, IStudent student,
 			IDepartment_worker department_worker, ILogins logins, ICurator curator,
-			IGroup group
+			IGroup group, ILoginsStudent loginsStudent
 			)
 		{
 			_logger = logger;
@@ -42,6 +44,7 @@ namespace recordBook.Controllers
 			_logins = logins;
 			_curator = curator;
 			_group = group;
+			_loginsStudent = loginsStudent;
 		}
 
 		#region Get таблиц
@@ -75,6 +78,11 @@ namespace recordBook.Controllers
 			return logins;
 		}
 
+		public List<LoginsStudent> GetLoginsStudents()
+		{
+			var logs = _loginsStudent.GetAllLoginsStudent().ToList();
+			return logs;
+		}
 		#endregion
 
 		#region страницы
@@ -122,51 +130,39 @@ namespace recordBook.Controllers
 						return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
 					}
 				}
-				Logins? login = GetLogins().FirstOrDefault(q => q.Login == user.Login);
+				Logins? loginWordker = GetLogins().FirstOrDefault(q => q.Login == user.Login);
+				LoginsStudent? loginStudent = GetLoginsStudents().FirstOrDefault(q => q.Login == user.Login);
 
-				string salt = CreateSalt();
-				string hashedPassword = HashPassword(user.Password, login.Salt);
-
-				if (login is null || hashedPassword != login.Password)
+				if (loginWordker is null & loginStudent is null)
 				{
 					user.ErrorText = true;
 					return View(user);
 				}
-				else
+				else if (loginWordker != null)
 				{
-					user.ErrorText = false;
-					try
-					{
-						Student? student = GetStudents().FirstOrDefault(q => q.ID_Login == login.ID_Login);
+					string salt = CreateSalt();
+					string hashedPassword = HashPassword(user.Password, loginWordker.Salt);
 
-						var claims = new List<Claim> {
-							new Claim(ClaimTypes.NameIdentifier, login.Login),
-							new Claim(ClaimTypes.Email, login.Email),
-							new Claim(ClaimTypes.Name, student.Name),
-							new Claim(ClaimTypes.Surname, student.Surname),
-							new Claim(ClaimTypes.GivenName, student.Patronymic),
-							new Claim(ClaimTypes.MobilePhone, Convert.ToString(login.Phone)),
-							new Claim(ClaimTypes.Role, "Student"),
-							new Claim(ClaimTypes.GroupSid, Convert.ToString(student.ID_Group)),
-							new Claim(ClaimTypes.SerialNumber, Convert.ToString(student.ID_Student)),
-						};
-						ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
-						await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-						return RedirectToAction("AccountInfo", "Account");
-					}
-					catch
+					if (hashedPassword != loginWordker.Password)
 					{
+						user.ErrorText = true;
+						return View(user);
+					}
+					else
+					{
+						user.ErrorText = false;
+
 						try
 						{
-							Department_worker? adm = GetDepartment_worker().FirstOrDefault(q => q.ID_Login == login.ID_Login);
+							Department_worker? adm = GetDepartment_worker().FirstOrDefault(q => q.ID_Login == loginWordker.ID_Login);
 
 							var claims = new List<Claim> {
-								new Claim(ClaimTypes.NameIdentifier, login.Login),
-								new Claim(ClaimTypes.Email, login.Email),
+								new Claim(ClaimTypes.NameIdentifier, loginWordker.Login),
+								new Claim(ClaimTypes.Email, loginWordker.Email),
 								new Claim(ClaimTypes.Name, adm.Name),
 								new Claim(ClaimTypes.Surname, adm.Surname),
 								new Claim(ClaimTypes.GivenName, adm.Patronymic),
-								new Claim(ClaimTypes.MobilePhone, Convert.ToString(login.Phone)),
+								new Claim(ClaimTypes.MobilePhone, Convert.ToString(loginWordker.Phone)),
 								new Claim(ClaimTypes.Role, "Adm"),
 								new Claim(ClaimTypes.SerialNumber, Convert.ToString(adm.ID_Department_worker)),
 							};
@@ -176,17 +172,17 @@ namespace recordBook.Controllers
 						}
 						catch
 						{
-							Curator? curator = GetCurators().FirstOrDefault(q => q.ID_Login == login.ID_Login);
+							Curator? curator = GetCurators().FirstOrDefault(q => q.ID_Login == loginWordker.ID_Login);
 
 							List<Group>? curGroups = GetGroups().Where(q => q.ID_Curator == curator.ID_Curator).ToList();
 
 							var claims = new List<Claim> {
-								new Claim(ClaimTypes.NameIdentifier, login.Login),
-								new Claim(ClaimTypes.Email, login.Email),
+								new Claim(ClaimTypes.NameIdentifier, loginWordker.Login),
+								new Claim(ClaimTypes.Email, loginWordker.Email),
 								new Claim(ClaimTypes.Name, curator.Name),
 								new Claim(ClaimTypes.Surname, curator.Surname),
 								new Claim(ClaimTypes.GivenName, curator.Patronymic),
-								new Claim(ClaimTypes.MobilePhone, Convert.ToString(login.Phone)),
+								new Claim(ClaimTypes.MobilePhone, Convert.ToString(loginWordker.Phone)),
 								new Claim(ClaimTypes.Role, "Curator"),
 								new Claim(ClaimTypes.SerialNumber, Convert.ToString(curator.ID_Curator))
 							};
@@ -197,6 +193,43 @@ namespace recordBook.Controllers
 							await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 							return RedirectToAction("AccountInfo", "Account");
 						}
+
+					}
+				}
+				else
+				{
+					string salt = CreateSalt();
+					string hashedPassword = HashPassword(user.Password, loginStudent.Salt);
+
+					if (hashedPassword != loginStudent.Password)
+					{
+						user.ErrorText = true;
+						return View(user);
+					}
+					else
+					{
+						user.ErrorText = false;
+
+						Student? student = GetStudents().FirstOrDefault(q => q.NumberOfBook == loginStudent.Number_RecordBook);
+
+						var claims = new List<Claim> {
+							new Claim(ClaimTypes.NameIdentifier, loginStudent.Login),
+							new Claim(ClaimTypes.Email, loginStudent.Email),
+							new Claim(ClaimTypes.Name, student.Name),
+							new Claim(ClaimTypes.Surname, student.Surname),
+							new Claim(ClaimTypes.GivenName, student.Patronymic),
+							new Claim(ClaimTypes.MobilePhone, Convert.ToString(loginStudent.Phone)),
+							new Claim(ClaimTypes.Role, "Student"),
+							new Claim(ClaimTypes.GroupSid, Convert.ToString(student.ID_Group)),
+							new Claim(ClaimTypes.SerialNumber, Convert.ToString(student.ID_Student)),
+							};
+							ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
+						await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+						return RedirectToAction("AccountInfo", "Account");
+
+
+
+
 					}
 				}
 			}
@@ -205,13 +238,13 @@ namespace recordBook.Controllers
 
 		[HttpPost]
 		public async Task<ActionResult> Registration(AuthorizationViewModel user)
-		{ 
+		{
 			return View(user);
 		}
 
-			#endregion
+		#endregion
 
-			[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 		public IActionResult Error()
 		{
 

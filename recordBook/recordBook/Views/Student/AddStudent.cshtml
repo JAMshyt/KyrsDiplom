@@ -13,6 +13,17 @@
 	}
 
 	<!-- #region заполнение студента-->
+	<div class="form-group">
+		<label asp-for="NumberBook" class="control-label">Номер зачетной книжки</label>
+			@if(!Model.studentAdded & Model.NumberBook.ToString().Length != 7)
+			{
+		<span asp-validation-for="NumberBook" style="color:Red;">
+			Длинна номера зачетки должна быть ровная 7
+		</span>
+			}
+		<input type="number" asp-for="NumberBook" class="form-control" />
+	</div>
+
 	<p id="txt">Информация о студенте</p>
 	<div class="form-group">
 		<label asp-for="Surname" class="control-label">Фамилия</label>

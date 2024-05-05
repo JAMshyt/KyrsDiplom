@@ -19,12 +19,15 @@ namespace recordBook.Controllers
 		private readonly ILogins _logins;
 		private readonly IAcademic_performance _academic_Performance;
 		private readonly IKind_of_work _kind_Of_Work;
+		private readonly ILoginsStudent _loginsStudent;
+
 
 		private readonly ILogins _user;
 
 		public StudentController(ILogger<StudentController> logger, IStudent student,
 			IGroup group, ISubject subject, IGroup_Subject group_subject, ILogins user,
-			ILogins logins, IAcademic_performance academic_Performance, IKind_of_work kind_Of_Work
+			ILogins logins, IAcademic_performance academic_Performance, IKind_of_work kind_Of_Work,
+			ILoginsStudent loginsStudent
 			)
 		{
 			_logger = logger;
@@ -35,6 +38,7 @@ namespace recordBook.Controllers
 			_logins = logins;
 			_academic_Performance = academic_Performance;
 			_kind_Of_Work = kind_Of_Work;
+			_loginsStudent = loginsStudent;
 		}
 
 
@@ -60,6 +64,12 @@ namespace recordBook.Controllers
 		{
 			var logins = _logins.GetAllLogins().ToList();
 			return logins;
+		}
+
+		public List<LoginsStudent> GetLoginsStudents()
+		{
+			var logS = _loginsStudent.GetAllLoginsStudent().ToList();
+			return logS;
 		}
 
 		public List<Group_Subject> GetGroupSubject()
@@ -186,9 +196,11 @@ namespace recordBook.Controllers
 		public async Task<IActionResult> DropStudent([FromBody] StudentId studId)
 		{
 			var stu = _student.GetStudentbyID(studId.Id);
+			var log = _loginsStudent.GetAllLoginsStudent().FirstOrDefault(q=>q.Number_RecordBook == stu.NumberOfBook);
 			if (stu != null)
 			{
 				await _student.DeleteStudent(stu);
+				await _loginsStudent.DeleteLoginStudent(log);
 			}
 			return Json(stu);
 		}
@@ -275,11 +287,14 @@ namespace recordBook.Controllers
 		[HttpPost]
 		public async Task<IActionResult> AddStudent(AddStudentViewModel addStu)
 		{
-			var nullLogin = GetLogins().FirstOrDefault(q => q.Login == addStu.Login);
-			var nullEmail = GetLogins().FirstOrDefault(q => q.Email == addStu.Email);
+			var nullLogin = GetLoginsStudents().FirstOrDefault(q => q.Login == addStu.Login);
+			var nullEmail = GetLoginsStudents().FirstOrDefault(q => q.Email == addStu.Email);
+
+			string book = addStu.NumberBook.ToString();
+
 			if (nullLogin == null && nullEmail == null)
 			{
-				if (ModelState.IsValid)
+				if (ModelState.IsValid && book.Length == 7)
 				{
 					string CreateSalt()
 					{
@@ -310,20 +325,21 @@ namespace recordBook.Controllers
 					string salt = CreateSalt();
 					string hashedPassword = HashPassword(addStu.Password, salt);
 
-					var login = new Logins()
+					var login = new LoginsStudent()
 					{
+						Number_RecordBook = addStu.NumberBook,
 						Login = addStu.Login,
 						Password = hashedPassword,
 						Email = addStu.Email,
 						Salt = salt,
 						Phone = Convert.ToDecimal(addStu.Phone)
 					};
-					await _logins.AddLogin(login);
+					await _loginsStudent.AddLoginStudent(login);
 
-					var idNewLogin = GetLogins().FirstOrDefault(q => q.Login == addStu.Login);
-					var addStudent = new Student() { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, ID_Login = idNewLogin.ID_Login };
+					var idNewLogin = GetLoginsStudents().FirstOrDefault(q => q.Login == addStu.Login);
+					var addStudent = new Student() { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, NumberOfBook = idNewLogin.Number_RecordBook};
 					await _student.AddStudent(addStudent);
-					var model = new AddStudentViewModel { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, Groups = GetGroups(), studentAdded = true, loginUnique = true, EmailUnique = true };
+					var model = new AddStudentViewModel {NumberBook = addStu.NumberBook, Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, Groups = GetGroups(), studentAdded = true, loginUnique = true, EmailUnique = true };
 					return View(model);
 				}
 				else

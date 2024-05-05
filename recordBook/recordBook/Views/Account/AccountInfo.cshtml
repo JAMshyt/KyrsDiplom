@@ -31,6 +31,9 @@
 
 				<h3>Источник финансирования:</h3>
 				<span>@Model.Financing_source</span>
+
+				<h3>Номер зачетной книжки:</h3>
+				<span>@Model.NumberOfBook</span>
 			}
 			else if (User.IsInRole("Adm"))
 			{
@@ -55,6 +58,7 @@ else
 			}
 			<input class="form-control" onchange="InfoIsChanged(@Model.ID,event,'Photo')" type="file" id="formFile">
 		</div>
+
 		<div id="textInfo">
 			<button type="button" id="ChangeBtn" class="btn btn-warning" style="width:150px; height:40px; text-align:center">Редактировать</button>
 			<h3>ФИО:</h3><span>@Model.Surname @Model.Name @Model.Patronymic</span>
@@ -94,14 +98,24 @@ else
 			<span>@Model.Financing_source</span><br>
 			<span asp-for="Group.Decoding" class="Gr" style="color:red">Меняется в зависимости от группы</span>
 
-			<h3>Телефон:</h3><span>@Model.Phone</span>
+			<h3>Номер зачетной книжки:</h3>
+			<span>@Model.NumberOfBook</span><br>
+			<span asp-for="Group.Decoding" class="Gr" style="color:red">Вы не можете поменять</span>
+	@* <input type="text" onchange="InfoIsChanged(@Model.ID,event,'Book')" asp-for="NumberOfBook" class="form-control" /> *@
+
+			<h3>Телефон:</h3>
+
+			<span>@Model.Phone</span>
 			<input type="text" onchange="InfoIsChanged(@Model.ID,event,'Phone')" asp-for="Phone" class="form-control" />
 
-			<h3>Почта:</h3><span>@Model.Email</span>
+			<h3>Почта:</h3>
+
+			<span>@Model.Email</span>
 			<input type="text" onchange="InfoIsChanged(@Model.ID,event,'Email')" asp-for="Email" class="form-control" />
 
 		</div>
 	</div>
+
 }
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type='text/javascript'>
@@ -136,7 +150,8 @@ else
 		if (file) {
 			formData.append('file', file);
 		}
-
+		console.log(info);
+		console.log(whatChange);
 		$.ajax({
 			type: 'POST',
 			url: '/Account/InfoIsChanged/',
