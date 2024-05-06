@@ -128,7 +128,7 @@ namespace recordBook.Controllers
 					return View(model);
 				}
 			}
-			else if(User.IsInRole("Student"))
+			else if (User.IsInRole("Student"))
 			{
 
 				model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
@@ -141,7 +141,7 @@ namespace recordBook.Controllers
 				var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
 				var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
 				model.Groups = selectedGroups;
-				model.group_Subject = GetGroupSubject().Where(subject =>subject.ID_Group == selectedGroups.FirstOrDefault().ID_Group);
+				model.group_Subject = GetGroupSubject().Where(subject => subject.ID_Group == selectedGroups.FirstOrDefault().ID_Group);
 				model.selectedGroup = selectedGroups.FirstOrDefault();
 
 				if (selectedGroup > 0)
@@ -196,7 +196,7 @@ namespace recordBook.Controllers
 		public async Task<IActionResult> DropStudent([FromBody] StudentId studId)
 		{
 			var stu = _student.GetStudentbyID(studId.Id);
-			var log = _loginsStudent.GetAllLoginsStudent().FirstOrDefault(q=>q.Number_RecordBook == stu.NumberOfBook);
+			var log = _loginsStudent.GetAllLoginsStudent().FirstOrDefault(q => q.Number_RecordBook == stu.NumberOfBook);
 			if (stu != null)
 			{
 				await _student.DeleteStudent(stu);
@@ -251,14 +251,14 @@ namespace recordBook.Controllers
 			List<Student> StudentsInGroup = GetStudents().Where(q => q.ID_Group == exam.idGroup).ToList();
 			foreach (var r in StudentsInGroup)
 			{
-			var perf = new Academic_performance()
-			{
-				ID_Subject = exam.idSubj,
-				ID_Kind_of_work = exam.idWork,
-				Grade = "Нет оценки",
-				Date = null,
-				ID_Student = r.ID_Student
-			};
+				var perf = new Academic_performance()
+				{
+					ID_Subject = exam.idSubj,
+					ID_Kind_of_work = exam.idWork,
+					Grade = "Нет оценки",
+					Date = null,
+					ID_Student = r.ID_Student
+				};
 				await _academic_Performance.AddAcademic_performance(perf);
 			}
 
@@ -273,7 +273,7 @@ namespace recordBook.Controllers
 		public ViewResult AddStudent() /*async Task<IActionResult>*/
 		{
 			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
-			var model2 = new AddStudentViewModel { Groups = GetGroups(), ID_Group = GetGroups().FirstOrDefault().ID_Group, studentAdded = false, loginUnique = true, EmailUnique = true };
+			var model2 = new AddStudentViewModel { Groups = GetGroups(), ID_Group = GetGroups().FirstOrDefault().ID_Group, PhoneUnique =true ,BookError = false, loginUnique = true, EmailUnique = true };
 			return View(model2);
 		}
 
@@ -287,13 +287,11 @@ namespace recordBook.Controllers
 		[HttpPost]
 		public async Task<IActionResult> AddStudent(AddStudentViewModel addStu)
 		{
-			var nullLogin = GetLoginsStudents().FirstOrDefault(q => q.Login == addStu.Login);
-			var nullEmail = GetLoginsStudents().FirstOrDefault(q => q.Email == addStu.Email);
-
-			string book = addStu.NumberBook.ToString();
-
-			if (nullLogin == null && nullEmail == null)
+			var phone = GetLoginsStudents().FirstOrDefault(q => q.Phone == Convert.ToDecimal(addStu.Phone));
+			if (phone == null)
 			{
+				string book = addStu.NumberBook.ToString();
+
 				if (ModelState.IsValid && book.Length == 7)
 				{
 					string CreateSalt()
@@ -328,7 +326,6 @@ namespace recordBook.Controllers
 					var login = new LoginsStudent()
 					{
 						Number_RecordBook = addStu.NumberBook,
-						Login = addStu.Login,
 						Password = hashedPassword,
 						Email = addStu.Email,
 						Salt = salt,
@@ -337,32 +334,23 @@ namespace recordBook.Controllers
 					await _loginsStudent.AddLoginStudent(login);
 
 					var idNewLogin = GetLoginsStudents().FirstOrDefault(q => q.Login == addStu.Login);
-					var addStudent = new Student() { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, NumberOfBook = idNewLogin.Number_RecordBook};
+					var addStudent = new Student() { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, NumberOfBook = idNewLogin.Number_RecordBook };
 					await _student.AddStudent(addStudent);
-					var model = new AddStudentViewModel {NumberBook = addStu.NumberBook, Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, Groups = GetGroups(), studentAdded = true, loginUnique = true, EmailUnique = true };
+					var model = new AddStudentViewModel { NumberBook = addStu.NumberBook, Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, Groups = GetGroups(), PhoneUnique = true,studentAdded = true, loginUnique = true, EmailUnique = true };
 					return View(model);
 				}
 				else
 				{
-					var model2 = new AddStudentViewModel { Groups = GetGroups(), studentAdded = false, loginUnique = true, EmailUnique = true };
+					var model2 = new AddStudentViewModel { Groups = GetGroups(), BookError = book.Length == 7 ? false : true, studentAdded = false, loginUnique = true, EmailUnique = true };
 					return View(model2);
 				}
 			}
 			else
 			{
-				var model2 = new AddStudentViewModel { Groups = GetGroups(), studentAdded = false, EmailUnique = true, loginUnique = true };
-				if (nullLogin != null && nullEmail != null)
-				{
-					model2.EmailUnique = false;
-					model2.loginUnique = false;
-				}
-				else
-				{
-					if (nullLogin == null) { model2.EmailUnique = false; }
-					else { model2.loginUnique = false; };
-				};
+				var model2 = new AddStudentViewModel { Groups = GetGroups(), PhoneUnique = false, studentAdded = false, loginUnique = true, EmailUnique = true };
 				return View(model2);
 			}
 		}
+
 	}
 }

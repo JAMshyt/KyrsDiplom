@@ -21,11 +21,13 @@ namespace recordBook.Models.ViewModels
 		public bool studentAdded { get; set; }
 		public bool loginUnique { get; set; }
 		public bool EmailUnique { get; set; }
+		public bool PhoneUnique { get; set; }
+		public bool BookError { get; set; }
 
 		#region данные логина
-		[Required(ErrorMessage = "Введите логин")]
-		[StringLength(20, ErrorMessage = "Длинна логина должна быть больше 3 но меньше 20", MinimumLength = 4)]
-		public string Login { get; set; }
+		//[Required(ErrorMessage = "Введите логин")]
+		//[StringLength(20, ErrorMessage = "Длинна логина должна быть больше 3 но меньше 20", MinimumLength = 4)]
+		public string? Login { get; set; }
 
 		[Required(ErrorMessage = "Введите пароль")]
 		[StringLength(20, ErrorMessage = "Длинна пароля должна быть больше 3 но меньше 20", MinimumLength = 4)]
@@ -33,7 +35,7 @@ namespace recordBook.Models.ViewModels
 		public string Email { get; set; }
 		[Required(ErrorMessage ="Введите номер телефона")]
 		[MinLength(5,ErrorMessage ="Слишком короткий")]
-		[MaxLength(15, ErrorMessage = "Неверная длинна")]
+		[MaxLength(15, ErrorMessage = "Слишком длинный")]
 
 		public string Phone { get; set; }
 		#endregion

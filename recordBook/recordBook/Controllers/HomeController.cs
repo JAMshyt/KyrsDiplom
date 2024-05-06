@@ -18,6 +18,9 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using static recordBook.Controllers.StudentController;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System.Text;
+using MimeKit;
+using MailKit.Net.Smtp;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace recordBook.Controllers
 {
@@ -95,7 +98,17 @@ namespace recordBook.Controllers
 
 		public ViewResult Registration()
 		{
-			RegistrationViewModel user = new RegistrationViewModel();
+			RegistrationViewModel user = new RegistrationViewModel()
+			{
+				ErrorText_ActivationCode = false,
+				ErrorText_SurnameName = false,
+				ErrorText_StudentFioAndCode = false,
+				ErrorText_Email = false,
+				ErrorText_EmailCode = false,
+				Succes_SendEmail = false,
+				Succes = false,
+				ErrorText_LoginOld = false,
+		};
 			return View(user);
 		}
 
@@ -226,10 +239,6 @@ namespace recordBook.Controllers
 							ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
 						await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 						return RedirectToAction("AccountInfo", "Account");
-
-
-
-
 					}
 				}
 			}
@@ -237,12 +246,103 @@ namespace recordBook.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> Registration(AuthorizationViewModel user)
+		public async Task<ActionResult> Registration(RegistrationViewModel user)
 		{
+			if (ModelState.IsValid)
+			{
+				RegistrationViewModel model = new RegistrationViewModel();
+
+				Student? stuBook = GetStudents().FirstOrDefault(x => x.NumberOfBook == Convert.ToInt32(user.ActivationCode));
+				Student? stuSurName = GetStudents().FirstOrDefault(x => x.Surname == user.Surname && x.Name == user.Name && x.Patronymic == user.Patronymic);
+
+
+				LoginsStudent? login = GetLoginsStudents().FirstOrDefault(x => x.Number_RecordBook == user.ActivationCode);
+				if (stuBook == null)
+				{
+					model.ErrorText_ActivationCode = true;
+				}
+				if (stuSurName == null)
+				{
+					model.ErrorText_SurnameName = true;
+				}
+				if(stuBook != stuSurName)
+				{
+					model.ErrorText_StudentFioAndCode = true;
+				}
+
+				if (login != null & login.Email != user.Email)
+				{
+					model.ErrorText_Email = true;
+				}
+
+				if (login.Login != null)
+				{
+					model.ErrorText_LoginOld = true;
+				}
+
+				if (user.generatedCode != user.AcceptEmailCode)
+				{
+					model.ErrorText_EmailCode = true;
+				}
+
+				if (model.ErrorText_ActivationCode == true ||
+					model.ErrorText_SurnameName == true ||
+					model.ErrorText_StudentFioAndCode == true ||
+					model.ErrorText_Email == true ||
+					model.ErrorText_EmailCode == true ||
+					model.ErrorText_LoginOld == true) {
+					return View(model);
+				}
+				else
+				{
+					LoginsStudent loginsStu = GetLoginsStudents().FirstOrDefault(q=>q.Number_RecordBook == user.ActivationCode);
+					loginsStu.Login = user.Login;
+					await _loginsStudent.UpdateLoginStudent(loginsStu);
+					model.Succes = true;
+					return View(model);
+				}
+			}
 			return View(user);
 		}
 
 		#endregion
+
+		[HttpPost]
+		[Route("/Home/EmailSend/")]
+		public async Task<IActionResult> EmailSend(string Email)
+		{
+			if (Email != null)
+			{
+				using var emailMessage = new MimeMessage();
+				emailMessage.From.Add(new MailboxAddress("Электронная зачётка", "ElectrZachetka@gmail.com"));
+				emailMessage.To.Add(new MailboxAddress("", Email));
+				emailMessage.Subject = "Код подтверждения";
+
+				const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+				var random = new Random();
+				var Code = new string(Enumerable.Repeat(chars, 6)
+					.Select(s => s[random.Next(s.Length)])
+					.ToArray());
+
+
+				emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
+				{
+					Text = "Код для подтверждения почты - " + Code
+				};
+
+
+				using (var client = new SmtpClient())
+				{
+					await client.ConnectAsync("smtp.gmail.com", 465, true);
+					await client.AuthenticateAsync("ElectrZachetka@gmail.com", "bbxm qbnd hyro ovce");
+					await client.SendAsync(emailMessage);
+					await client.DisconnectAsync(true);
+				}
+				return Ok(Code);
+			}
+			return BadRequest("Email не указан");
+		}
+	
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 		public IActionResult Error()
@@ -250,7 +350,5 @@ namespace recordBook.Controllers
 
 			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 		}
-
-
 	}
 }

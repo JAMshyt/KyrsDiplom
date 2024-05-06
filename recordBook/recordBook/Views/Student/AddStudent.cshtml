@@ -13,18 +13,18 @@
 	}
 
 	<!-- #region заполнение студента-->
+
+	<p id="txt">Информация о студенте</p>
 	<div class="form-group">
 		<label asp-for="NumberBook" class="control-label">Номер зачетной книжки</label>
-			@if(!Model.studentAdded & Model.NumberBook.ToString().Length != 7)
+			@if(Model.BookError)
 			{
-		<span asp-validation-for="NumberBook" style="color:Red;">
+		<span style="color:Red;">
 			Длинна номера зачетки должна быть ровная 7
 		</span>
 			}
 		<input type="number" asp-for="NumberBook" class="form-control" />
 	</div>
-
-	<p id="txt">Информация о студенте</p>
 	<div class="form-group">
 		<label asp-for="Surname" class="control-label">Фамилия</label>
 		<span asp-validation-for="Surname" style="color:Red;"></span>
@@ -57,12 +57,12 @@
 	<!-- #region заполнение логина-->
 	<p id="txt">Аккаунт студента</p>
 	<div class="form-group">
-		<label asp-for="Login" class="control-label">Логин</label>
-		@if (!Model.loginUnique)
+		<label asp-for="Login" class="control-label">Логин создает сам ученик</label>
+@* 		@if (!Model.loginUnique)
 		{
 			<span style="color:red;">Такой логин уже используется</span><br>
 		}
-		<input type="text" asp-for="Login" class="form-control" />
+		<input type="text" asp-for="Login" class="form-control" /> *@
 	</div>
 
 	<div class="form-group">
@@ -77,6 +77,7 @@
 	{
 		<span style="color:red;">Эта почта уже используется</span><br>
 	}
+
 		<input type="text" asp-for="Email" class="form-control" />
 	</div>
 
@@ -85,7 +86,10 @@
 		<span asp-validation-for="Phone" style="color:Red;"></span>
 		<input type="number" asp-for="Phone" class="form-control" />
 	</div>
-
+	@if (!Model.PhoneUnique)
+	{
+		<span style="color:red;">Этот телефон уже используется</span>
+	}
 	<!-- #endregion -->
 
 	<div class="form-group">

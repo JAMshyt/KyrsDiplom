@@ -1,15 +1,22 @@
 ﻿@model recordBook.Models.ViewModels.RegistrationViewModel;
 @{
+	Layout = "_IndexLayout";
 	ViewBag.Title = "Регистрация";
 }
 
 <form asp-action="Registration" asp-controller="Home">
-
+	<input type="hidden" id="generatedCode" name="generatedCode" asp-for="generatedCode" />
 	<div class="form-group">
 		<label asp-for="Email" class="control-label">Электронная почта</label>
 		<span asp-validation-for="Email" style="color:Red;"></span>
-		<input type="text" asp-for="Email" class="form-control" />
+		@if (Model.ErrorText_Email)
+		{
+			<span style="color:Red;">Неверная почта</span>
+		}
+		<input type="text" id="emailInput" asp-for="Email" class="form-control" />
+		<a onclick="sendEmail()" class="link-success" style="margin-top:5px; cursor: pointer">Отправить код на почту</a>
 	</div>
+			<span style="color:green;" id="SuccesSend"></span>
 
 	<div class="form-group">
 		<label asp-for="AcceptEmailCode" class="control-label">Код подтверждения</label>
@@ -17,11 +24,11 @@
 		<input type="text" asp-for="AcceptEmailCode" class="form-control" />
 	</div>
 
-	<div class="form-group">
-		<label asp-for="Login" class="control-label">Логин</label>
-		<span asp-validation-for="Login" style="color:Red;"></span>
-		<input type="text" asp-for="Login" class="form-control" />
-	</div>
+	@if (Model.ErrorText_EmailCode)
+	{
+		<span style="color:Red;">Не верный код подтверждения</span>
+	}
+
 
 	<div class="form-group">
 		<label asp-for="Login" class="control-label">Логин</label>
@@ -41,19 +48,65 @@
 		<input type="text" asp-for="Name" class="form-control" />
 	</div>
 
+
 	<div class="form-group">
 		<label asp-for="Patronymic" class="control-label">Отчество</label>
 		<span asp-validation-for="Patronymic" style="color:Red;"></span>
 		<input type="text" asp-for="Patronymic" class="form-control" />
 	</div>
 
+	@if (Model.ErrorText_SurnameName)
+	{
+		<span style="color:Red;">Студента с таким ФИО нету</span>
+	}
+
 	<div class="form-group">
 		<label asp-for="ActivationCode" class="control-label">Код активации(выдается в деканате)</label>
 		<span asp-validation-for="ActivationCode" style="color:Red;"></span>
+		@if (Model.ErrorText_ActivationCode)
+		{
+			<span style="color:Red;">Неверный код активации</span>
+		}
 		<input type="text" asp-for="ActivationCode" class="form-control" />
 	</div>
-
+	@if (Model.ErrorText_StudentFioAndCode)
+	{
+		<span style="color:Red;">Код активации не подходит к студенту</span>
+	}
 	<div class="form-group">
-		<input type="submit" value="Добавить" class="btn btn-success" style="width:100px; margin-top:10px;" />
+		<input type="submit" value="Регистрация" class="btn btn-success" style="width:120px; margin-top:10px;" />
 	</div>
+
+	@if (Model.Succes)
+	{
+		<span style="color:green;">Регистрация прошла успешно, пароль от аккаунта есть в деканате</span>
+	}
+	@if (Model.ErrorText_LoginOld)
+	{
+		<span style="color:red;">Ученик уже зарегестрирован</span>
+	}
 </form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type='text/javascript'>
+	function sendEmail() {
+		var email = document.getElementById('emailInput').value;
+		$.ajax({
+			type: 'POST',
+			url: '/Home/EmailSend/',
+			contentType: 'application/x-www-form-urlencoded', 
+			data: { Email: email },
+			dataType: 'text',
+			success: function (data) {
+				document.getElementById('SuccesSend').innerText = "Код отправлен";
+				document.getElementById('SuccesSend').style.color = "green";
+				document.getElementById('generatedCode').value = data; 
+			},
+			error: function (xhr, status, error) {
+				document.getElementById('SuccesSend').innerText = "Ошибка отправки";
+				document.getElementById('SuccesSend').style.color = "red";
+			}
+		});
+
+	}
+</script>
