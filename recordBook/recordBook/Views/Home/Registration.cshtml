@@ -33,6 +33,10 @@
 	<div class="form-group">
 		<label asp-for="Login" class="control-label">Логин</label>
 		<span asp-validation-for="Login" style="color:Red;"></span>
+		@if (Model.ErrorText_LoginExist)
+		{
+			<span style="color:red;">Логин занят</span>
+		}
 		<input type="text" asp-for="Login" class="form-control" />
 	</div>
 
@@ -85,6 +89,7 @@
 	{
 		<span style="color:red;">Ученик уже зарегестрирован</span>
 	}
+
 </form>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

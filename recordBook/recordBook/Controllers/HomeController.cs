@@ -108,6 +108,7 @@ namespace recordBook.Controllers
 				Succes_SendEmail = false,
 				Succes = false,
 				ErrorText_LoginOld = false,
+				ErrorText_LoginExist = false,
 		};
 			return View(user);
 		}
@@ -275,9 +276,14 @@ namespace recordBook.Controllers
 					model.ErrorText_Email = true;
 				}
 
+				LoginsStudent? l = GetLoginsStudents().FirstOrDefault(q => q.Login == user.Login);
 				if (login.Login != null)
 				{
 					model.ErrorText_LoginOld = true;
+				}
+				else if(l != null)
+				{
+					model.ErrorText_LoginExist = true;
 				}
 
 				if (user.generatedCode != user.AcceptEmailCode)

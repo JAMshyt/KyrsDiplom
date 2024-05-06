@@ -36,6 +36,7 @@ namespace recordBook.Models.ViewModels
 		public bool ErrorText_EmailCode { get; set; }
 		public bool ErrorText_LoginOld { get; set; }
 		public bool Succes_SendEmail { get; set; }
+		public bool ErrorText_LoginExist { get; set; }
 		public bool Succes { get; set; }
 	}
 }
