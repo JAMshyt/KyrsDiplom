@@ -101,13 +101,68 @@
 					.Distinct()
 					.OrderBy(s => s);
 
-					foreach (var r in CountRait)
+					if (CountRait.Count() == 5)
 					{
-						<th id="tableLabel">
-							<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
-						</th>
-					}
+						foreach (var r in CountRait)
+						{
+							if (r == 4)
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Посещаемость</h6>
+								</th>
+							}
+							else if (r == 5)
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Доп. баллы</h6>
+								</th>
+							}
+							else
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
+								</th>
+							}
+						}
 
+					}
+					else if (CountRait.Count() == 4)
+					{
+
+						foreach (var r in CountRait)
+						{
+							if (r == 3)
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Посещаемость</h6>
+								</th>
+							}
+							else if (r == 4)
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Доп. баллы</h6>
+								</th>
+							}
+							else
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
+								</th>
+							}
+						}
+					}
+					else
+					{
+						foreach (var r in CountRait)
+						{
+							<th id="tableLabel">
+								<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
+							</th>
+						}
+					}
+					<th id="tableLabel">
+						<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Итог</h6>
+					</th>
 				}
 
 			</tr>
@@ -116,11 +171,16 @@
 			@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
 			{
 
+
+
 				<tr id="columnGrade">
 
 					<td style="text-align:justify; font-weight: bold">
 						<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
 					</td>
+					@{
+						int end = 0;
+					}
 
 					@if (Model.RatingControls.FirstOrDefault(q => q.ID_Student == item.ID_Student) != null)
 					{
@@ -135,14 +195,16 @@
 													q.Semester == Model.selectedSemester &&
 													q.RatingNumber == @i))
 								{
+									end += @r.Points;
 									<p class="labelsGrade">@r.Points</p>
-									<input type="number" class="enterPoints" onchange="newPoint(@r.ID_RatingControl,event)" style="max-width:100px; width:60%; height:30px; text-align:center">
+									<input type="tel" class="enterPoints" onchange="newPoint(@r.ID_RatingControl,event)" style="max-width:100px; width:200%; height:30px; text-align:center">
 									emptyRat = false;
 								}
 								@if (emptyRat)
 								{
-									<input type="number" class="enterPoints" onchange="newRating(@item.ID_Student,@Model.selectedSubject.ID_Subject,@Model.selectedSemester,@i,event)" style="max-width:100px; width:60%; height:30px; text-align:center">
+									<input type="tel" class="enterPoints" onchange="newRating(@item.ID_Student,@Model.selectedSubject.ID_Subject,@Model.selectedSemester,@i,event)" style="max-width:100px;  width:200%;  height:30px; text-align:center">
 								}
+
 							</td>
 						}
 					}
@@ -151,10 +213,13 @@
 						for (int i = 1; i <= CountRait.Count(); i++)
 						{
 							<td id="cellPoint" style="text-align:justify;  padding-right:10%; font-weight: bold ">
-								<input type="number" class="enterPoints" onchange="newRating(@item.ID_Student,@Model.selectedSubject.ID_Subject,@Model.selectedSemester,@i,event)" style="width:100px; height:30px; text-align:center">
+								<input type="tel" class="enterPoints" onchange="newRating(@item.ID_Student,@Model.selectedSubject.ID_Subject,@Model.selectedSemester,@i,event)" style="max-width:100px; width:200%; height:30px; text-align:center">
 							</td>
 						}
 					}
+					<td style="text-align:justify; font-weight: bold">
+						<p id="label_s">@end</p>
+					</td>
 				</tr>
 
 			}
@@ -207,14 +272,68 @@ else if (User.IsInRole("Student"))
 					.Select(q => q.RatingNumber)
 					.Distinct()
 					.OrderBy(s => s);
-
-					foreach (var r in CountSemester)
+					if (CountSemester.Count() == 5)
 					{
-						<th id="tableLabel">
-							<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
-						</th>
-					}
+						foreach (var r in CountSemester)
+						{
+							if (r == 4)
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Посещаемость</h6>
+								</th>
+							}
+							else if (r == 5)
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Доп. баллы</h6>
+								</th>
+							}
+							else
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
+								</th>
+							}
+						}
 
+					}
+					else if (CountSemester.Count() == 4)
+					{
+
+						foreach (var r in CountSemester)
+						{
+							if (r == 3)
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Посещаемость</h6>
+								</th>
+							}
+							else if (r == 4)
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Доп. баллы</h6>
+								</th>
+							}
+							else
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
+								</th>
+							}
+						}
+					}
+					else
+					{
+						foreach (var r in CountSemester)
+						{
+							<th id="tableLabel">
+								<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
+							</th>
+						}
+					}
+					<th id="tableLabel">
+						<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Итог</h6>
+					</th>
 				}
 
 			</tr>
@@ -231,13 +350,23 @@ else if (User.IsInRole("Student"))
 							<p id="label_s">@item.Name_subject</p>
 						</td>
 
+						@{
+							int end = 0;
+						}
+
 						@foreach (var r in Model.RatingControls.Where(q => q.ID_Subject == item.ID_Subject &&
 								q.Semester == Model.selectedSemester))
 						{
+							end += @r.Points;
 							<td id="cellPoint" style="text-align:center;  padding-right:10%; font-weight: bold ">
 								<p class="labelsGrade">@r.Points</p>
 							</td>
+
 						}
+
+						<td style="text-align:justify; font-weight: bold">
+							<p id="label_s">@end</p>
+						</td>
 
 					</tr>
 				}
@@ -264,17 +393,17 @@ else
 		</select>
 
 		<select name="selectedSubject" required onchange="this.form.submit()" style="width:200px; height:40px; text-align:center">
-			@foreach (var subj in Model.Subjects)
+			@foreach (var sub in Model.Subjects)
 			{
-				if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(subj.ID_Subject))
+				if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(sub.ID_Subject))
 				{
-					if (subj.ID_Subject == Model.selectedSubject.ID_Subject)
+					if (sub.ID_Subject == Model.selectedSubject.ID_Subject)
 					{
-						<option value="@subj.ID_Subject" selected>@subj.Name_subject</option>
+						<option value="@sub.ID_Subject" selected>@sub.Name_subject</option>
 					}
 					else
 					{
-						<option value="@subj.ID_Subject">@subj.Name_subject</option>
+						<option value="@sub.ID_Subject">@sub.Name_subject</option>
 					}
 				}
 			}
@@ -323,13 +452,71 @@ else
 					.Distinct()
 					.OrderBy(s => s);
 
-					foreach (var r in CountSemester)
+					if (CountSemester.Count() == 5)
 					{
+						foreach (var r in CountSemester)
+						{
+							if (r == 4)
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Посещаемость</h6>
+								</th>
+							}
+							else if (r == 5)
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Доп. баллы</h6>
+								</th>
+							}
+							else
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
+								</th>
+							}
+						}
+
+					}
+					else if (CountSemester.Count() == 4)
+					{
+
+						foreach (var r in CountSemester)
+						{
+							if (r == 3)
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Посещаемость</h6>
+								</th>
+							}
+							else if (r == 4)
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Доп. баллы</h6>
+								</th>
+							}
+							else
+							{
+								<th id="tableLabel">
+									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
+								</th>
+							}
+						}
+					}
+					else
+					{
+						foreach (var r in CountSemester)
+						{
+							<th id="tableLabel">
+								<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
+							</th>
+						}
 						<th id="tableLabel">
-							<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
+							<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Посещаемость</h6>
 						</th>
 					}
-
+					<th id="tableLabel">
+						<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Итог</h6>
+					</th>
 				}
 
 			</tr>
@@ -344,7 +531,9 @@ else
 						<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
 					</td>
 
-
+					@{
+						int end = 0;
+					}
 
 					@foreach (var r in Model.RatingControls.Where(q => q.ID_Student == item.ID_Student &&
 							q.ID_Subject == Model.selectedSubject.ID_Subject &&
@@ -353,7 +542,14 @@ else
 						<td id="cellPoint" style="text-align:center;  padding-right:10%; font-weight: bold ">
 							<p class="labelsGrade">@r.Points</p>
 						</td>
+						end += @r.Points;
+
 					}
+
+
+					<td style="text-align:justify; font-weight: bold">
+						<p id="label_s">@end</p>
+					</td>
 
 				</tr>
 
