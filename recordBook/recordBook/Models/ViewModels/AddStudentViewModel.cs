@@ -14,7 +14,10 @@ namespace recordBook.Models.ViewModels
         [Required(ErrorMessage = "Введите имя")]
         public string Name { get; set; }
 		public string? Patronymic { get; set; }
-        public int ID_Group { get; set; }
+		[DataType(DataType.Upload)]
+		public IFormFile? Photo { get; set; }
+
+		public int ID_Group { get; set; }
 		#endregion
 
 		public IEnumerable<Group>? Groups { get; set; }

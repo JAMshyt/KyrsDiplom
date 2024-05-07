@@ -6,7 +6,7 @@
 	ViewBag.Title = "Добавление студента";
 }
 
-<form asp-action="AddStudent" asp-controller="Student">
+<form asp-action="AddStudent" asp-controller="Student" enctype="multipart/form-data">
 	@if (Model.studentAdded)
 	{
 		<span style="color:green;">Студент @Model.Surname @Model.Name @Model.Patronymic добавлен </span><br>
@@ -90,6 +90,9 @@
 	{
 		<span style="color:red;">Этот телефон уже используется</span>
 	}
+	<br>
+	<label class="control-label">Фото</label>
+	<input class="form-control" asp-for="Photo" type="file" id="formFile">
 	<!-- #endregion -->
 
 	<div class="form-group">

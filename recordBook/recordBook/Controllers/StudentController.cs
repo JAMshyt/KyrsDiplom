@@ -333,8 +333,17 @@ namespace recordBook.Controllers
 					};
 					await _loginsStudent.AddLoginStudent(login);
 
+
 					var idNewLogin = GetLoginsStudents().FirstOrDefault(q => q.Login == addStu.Login);
-					var addStudent = new Student() { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, NumberOfBook = idNewLogin.Number_RecordBook };
+					var addStudent = new Student() { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, NumberOfBook = addStu.NumberBook };
+					if (addStu.Photo != null)
+					{
+						using (var memoryStream = new MemoryStream())
+						{
+							await addStu.Photo.CopyToAsync(memoryStream);
+							addStudent.Photo = memoryStream.ToArray();
+						}
+					}
 					await _student.AddStudent(addStudent);
 					var model = new AddStudentViewModel { NumberBook = addStu.NumberBook, Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, Groups = GetGroups(), PhoneUnique = true,studentAdded = true, loginUnique = true, EmailUnique = true };
 					return View(model);

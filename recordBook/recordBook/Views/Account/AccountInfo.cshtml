@@ -156,10 +156,9 @@ else
 			type: 'POST',
 			url: '/Account/InfoIsChanged/',
 			data: formData,
-			processData: false,  // предотвращаем преобразование в строку
-			contentType: false,  // не устанавливаем contentType, браузер сам укажет multipart/form-data
+			processData: false, 
+			contentType: false,  
 			success: function (result) {
-				// обработка успешного ответа
 			}
 		});
 	}
