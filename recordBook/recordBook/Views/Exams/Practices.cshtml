@@ -174,7 +174,7 @@ else if (User.IsInRole("Student"))
 		</tbody>
 	</table>
 }
-else
+else if (User.IsInRole("Curator"))
 {
 	<form asp-controller="Exams" asp-action="Practices">
 		<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
@@ -200,16 +200,16 @@ else
 
 
 		<select name="selectedSubject" required onchange="this.form.submit()" style="width:200px; height:40px; text-align:center">
-			@foreach (var subj in Model.Subjects.Where(s => subjectsWithPractice.Contains(s.ID_Subject)))
+			@foreach (var subj2 in Model.Subjects.Where(s => subjectsWithPractice.Contains(s.ID_Subject)))
 			{
 
-				if (subj.ID_Subject == Model.selectedSubject.ID_Subject)
+				if (subj2.ID_Subject == Model.selectedSubject.ID_Subject)
 				{
-					<option value="@subj.ID_Subject" selected>@subj.Name_subject</option>
+					<option value="@subj2.ID_Subject" selected>@subj2.Name_subject</option>
 				}
 				else
 				{
-					<option value="@subj.ID_Subject">@subj.Name_subject</option>
+					<option value="@subj2.ID_Subject">@subj2.Name_subject</option>
 				}
 
 			}

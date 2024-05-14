@@ -7,20 +7,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Security.Cryptography;
-using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using recordBook.Models;
 using recordBook.Models.ViewModels;
 using recordBook.RInterface;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static recordBook.Controllers.StudentController;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System.Text;
 using MimeKit;
 using MailKit.Net.Smtp;
-using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
+using static recordBook.Controllers.StudentController;
 
 namespace recordBook.Controllers
 {
@@ -113,7 +107,12 @@ namespace recordBook.Controllers
 			return View(user);
 		}
 
-
+		/// <summary>
+		/// Авторизацияя пользоваьеля.
+		/// Ищет введенный логин в бд, хеширует введенный пароль и сравниввает с хешем в бд
+		/// </summary>
+		/// <param name="user">логин с паролем</param>
+		/// <returns></returns>
 		[HttpPost]
 		public async Task<ActionResult> Authorization(AuthorizationViewModel user)
 		{
@@ -169,13 +168,14 @@ namespace recordBook.Controllers
 						try
 						{
 							Department_worker? adm = GetDepartment_worker().FirstOrDefault(q => q.ID_Login == loginWordker.ID_Login);
+							string patronymic = adm.Patronymic == null ? "" : adm.Patronymic;
 
 							var claims = new List<Claim> {
 								new Claim(ClaimTypes.NameIdentifier, loginWordker.Login),
 								new Claim(ClaimTypes.Email, loginWordker.Email),
 								new Claim(ClaimTypes.Name, adm.Name),
 								new Claim(ClaimTypes.Surname, adm.Surname),
-								new Claim(ClaimTypes.GivenName, adm.Patronymic),
+								new Claim(ClaimTypes.GivenName, patronymic),
 								new Claim(ClaimTypes.MobilePhone, Convert.ToString(loginWordker.Phone)),
 								new Claim(ClaimTypes.Role, "Adm"),
 								new Claim(ClaimTypes.SerialNumber, Convert.ToString(adm.ID_Department_worker)),
@@ -189,13 +189,14 @@ namespace recordBook.Controllers
 							Curator? curator = GetCurators().FirstOrDefault(q => q.ID_Login == loginWordker.ID_Login);
 
 							List<Group>? curGroups = GetGroups().Where(q => q.ID_Curator == curator.ID_Curator).ToList();
+							string patronymic = curator.Patronymic == null ? "" : curator.Patronymic;
 
 							var claims = new List<Claim> {
 								new Claim(ClaimTypes.NameIdentifier, loginWordker.Login),
 								new Claim(ClaimTypes.Email, loginWordker.Email),
 								new Claim(ClaimTypes.Name, curator.Name),
 								new Claim(ClaimTypes.Surname, curator.Surname),
-								new Claim(ClaimTypes.GivenName, curator.Patronymic),
+								new Claim(ClaimTypes.GivenName, patronymic),
 								new Claim(ClaimTypes.MobilePhone, Convert.ToString(loginWordker.Phone)),
 								new Claim(ClaimTypes.Role, "Curator"),
 								new Claim(ClaimTypes.SerialNumber, Convert.ToString(curator.ID_Curator))
@@ -225,13 +226,14 @@ namespace recordBook.Controllers
 						user.ErrorText = false;
 
 						Student? student = GetStudents().FirstOrDefault(q => q.NumberOfBook == loginStudent.Number_RecordBook);
+						string patronymic = student.Patronymic == null ? "": student.Patronymic;
 
 						var claims = new List<Claim> {
 							new Claim(ClaimTypes.NameIdentifier, loginStudent.Login),
 							new Claim(ClaimTypes.Email, loginStudent.Email),
 							new Claim(ClaimTypes.Name, student.Name),
 							new Claim(ClaimTypes.Surname, student.Surname),
-							new Claim(ClaimTypes.GivenName, student.Patronymic),
+							new Claim(ClaimTypes.GivenName, patronymic),
 							new Claim(ClaimTypes.MobilePhone, Convert.ToString(loginStudent.Phone)),
 							new Claim(ClaimTypes.Role, "Student"),
 							new Claim(ClaimTypes.GroupSid, Convert.ToString(student.ID_Group)),
@@ -246,6 +248,13 @@ namespace recordBook.Controllers
 			else return View(user);
 		}
 
+		/// <summary>
+		/// Регистрация студента, сравнивает введеные ФИО и зачетку
+		/// Проверка почты
+		/// Создание логина
+		/// </summary>
+		/// <param name="user"></param>
+		/// <returns></returns>
 		[HttpPost]
 		public async Task<ActionResult> Registration(RegistrationViewModel user)
 		{
@@ -311,8 +320,14 @@ namespace recordBook.Controllers
 			return View(user);
 		}
 
-		#endregion
-
+		
+		/// <summary>
+		/// Проверка почты
+		/// Создлается код, который отсылается по почте
+		/// Сравнивается введеный код с тем что отослали
+		/// </summary>
+		/// <param name="Email"></param>
+		/// <returns></returns>
 		[HttpPost]
 		[Route("/Home/EmailSend/")]
 		public async Task<IActionResult> EmailSend(string Email)
@@ -348,7 +363,7 @@ namespace recordBook.Controllers
 			}
 			return BadRequest("Email не указан");
 		}
-	
+		#endregion
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 		public IActionResult Error()

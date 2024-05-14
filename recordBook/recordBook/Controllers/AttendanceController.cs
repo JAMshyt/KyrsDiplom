@@ -88,6 +88,7 @@ namespace recordBook.Controllers
 					model.selectedGroup = _group.GetGroupbyID(selectedGroup);
 					model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
 				}
+				return View(model);
 			}
 			else if(User.IsInRole("Student"))
 			{
@@ -98,8 +99,9 @@ namespace recordBook.Controllers
 				model.Students = GetStudents().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
 				model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
 				model.selectedGroup = _group.GetGroupbyID(Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+				return View(model);
 			}
-			else
+			else if (User.IsInRole("Curator"))
 			{
 				var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
 				var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
@@ -112,8 +114,12 @@ namespace recordBook.Controllers
 					model.selectedGroup = _group.GetGroupbyID(selectedGroup);
 					model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
 				}
+				return View(model);
 			}
-			return View(model);
+			else
+			{
+				return View("Error");
+			}
 		}
 
 
@@ -124,17 +130,28 @@ namespace recordBook.Controllers
 
 		}
 
+		/// <summary>
+		/// Изменяет посещаемость
+		/// </summary>
+		/// <param name="request"></param>
+		/// <returns></returns>
 		[HttpPost]
 		[Route("/Attendance/ChangeAttendance/")]
 		[Consumes("application/json")]
 		public async Task<IActionResult> ChangeAttendance([FromBody] IdAndAttendance request)
 		{
-
-			Attendance oldAttendance = GetAttendance().FirstOrDefault(z => z.ID_Attendance == request.id);
-			oldAttendance.Precense = request.newAttendance;
-			await _attedance.UpdateAttendance(oldAttendance);
-			var str = request.id + " " + request.newAttendance;
-			return Json(str);
+			if (User.IsInRole("Adm"))
+			{
+				Attendance oldAttendance = GetAttendance().FirstOrDefault(z => z.ID_Attendance == request.id);
+				oldAttendance.Precense = request.newAttendance;
+				await _attedance.UpdateAttendance(oldAttendance);
+				var str = request.id + " " + request.newAttendance;
+				return Json(str);
+			}
+			else
+			{
+				return Redirect("/Error");
+			}
 		}
 
 	}

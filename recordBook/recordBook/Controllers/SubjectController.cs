@@ -52,9 +52,16 @@ namespace recordBook.Controllers
         /// <returns></returns>
         public ViewResult AddSubject()
         {
-            ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
-            var model2 = new AddSubjectViewModel { Groups = GetGroups(), subjectAdded = false };
-            return View(model2);
+            if (User.IsInRole("Adm"))
+            {
+                ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
+                var model2 = new AddSubjectViewModel { Groups = GetGroups(), subjectAdded = false };
+                return View(model2);
+            }
+            else
+            {
+                return View("Error");
+            }
         }
 
         /// <summary>
@@ -66,28 +73,35 @@ namespace recordBook.Controllers
         [Consumes("application/json")]
         public async Task<IActionResult> AddSubject([FromBody] AddSubjectViewModel AddSubj)
         {
-            if (ModelState.IsValid)
+            if (User.IsInRole("Adm"))
             {
-                var addSubject = new Subject() { Name_subject = AddSubj.NameSubject };
-                await _subject.AddSubject(addSubject);
-                foreach (var r in AddSubj.selectedGroups)
+                if (ModelState.IsValid)
                 {
-                    var addGroupSubject = new Group_Subject() { ID_Subject = GetSubjects().LastOrDefault().ID_Subject, ID_Group = r };
-                    await _group_subject.AddGroup_Subject(addGroupSubject);
+                    var addSubject = new Subject() { Name_subject = AddSubj.NameSubject };
+                    await _subject.AddSubject(addSubject);
+                    foreach (var r in AddSubj.selectedGroups)
+                    {
+                        var addGroupSubject = new Group_Subject() { ID_Subject = GetSubjects().LastOrDefault().ID_Subject, ID_Group = r };
+                        await _group_subject.AddGroup_Subject(addGroupSubject);
+                    }
+                    var model = new
+                    {
+                        NameSubject = addSubject.Name_subject,
+                        Groups = GetGroups(),
+                        subjectAdded = true,
+                        AddSubj.selectedGroups,
+                    };
+                    return Json(model);
                 }
-                var model = new
+                else
                 {
-                    NameSubject = addSubject.Name_subject,
-                    Groups = GetGroups(),
-                    subjectAdded = true,
-                    AddSubj.selectedGroups,
-                };
-                return Json(model);
+                    var model2 = new AddSubjectViewModel { Groups = GetGroups(), subjectAdded = false, selectedGroups = AddSubj.selectedGroups, NameSubject = AddSubj.NameSubject };
+                    return Json(model2); ;
+                }
             }
             else
             {
-                var model2 = new AddSubjectViewModel { Groups = GetGroups(), subjectAdded = false, selectedGroups = AddSubj.selectedGroups, NameSubject = AddSubj.NameSubject };
-                return Json(model2); ;
+                return RedirectToAction("Error", "Home");
             }
         }
 
@@ -98,9 +112,16 @@ namespace recordBook.Controllers
         /// <returns>JSON файл с информацией о группе</returns>
         [HttpGet]
         [Route("Subject/SelectGroup/{Id:int}")]
-        public JsonResult SelectGroup(int Id) /*async Task<IActionResult>*/
+        public JsonResult SelectGroup(int Id)
         {
-            return Json(_group.GetGroupbyID(Id));
+            if (User.IsInRole("Adm"))
+            {
+                return Json(_group.GetGroupbyID(Id));
+            }
+            else
+            {
+                return Json("no");
+            }
         }
     }
 }

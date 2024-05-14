@@ -88,7 +88,7 @@
 								<a class="nav-link text-dark" asp-action="Debt" asp-controller="Exams">Задолженности группы</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="Practices" asp-controller="Exams">Практики</a>
+								<a class="nav-link text-dark" asp-action="Practices" asp-controller="Exams">Практики группы</a>
 							</li>
 							<li class="nav-item">
 								<a class="nav-link text-dark" asp-action="Upcoming" asp-controller="Exams">Предстоящие экзамены группы</a>@*  &#13;&#10; - пробел *@
@@ -161,7 +161,7 @@
 				<label class="navLabel2">&nbsp &nbsp Навигация &nbsp &nbsp</label>
 
 			}
-			else
+			else if (User.IsInRole("Curator"))
 			{
 				<input type="submit" id="men1" class="sideMenu" asp-action="ShowStudents" asp-controller="Student" value="Просмотр группы">
 

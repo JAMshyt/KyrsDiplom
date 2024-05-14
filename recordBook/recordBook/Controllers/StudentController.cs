@@ -136,7 +136,7 @@ namespace recordBook.Controllers
 
 				return View(model);
 			}
-			else
+			else if(User.IsInRole("Curator"))
 			{
 				var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
 				var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
@@ -155,8 +155,13 @@ namespace recordBook.Controllers
 
 				return View(model);
 			}
+			else
+			{
+				return View("Error");
+			}
 		}
 
+		#region классы ждя JSON
 		public class IdAndDate
 		{
 			public int idsubj { get; set; }
@@ -164,27 +169,56 @@ namespace recordBook.Controllers
 			public DateTime newDate { get; set; }
 
 		}
-		[HttpPost]
-		[Route("/Student/ChangeDate/")]
-		[Consumes("application/json")]
-		public async Task<IActionResult> ChangeDate([FromBody] IdAndDate request)
-		{
-			List<int> idStudent = GetStudents().Where(q => q.ID_Group == request.group).Select(q => q.ID_Student).ToList();
-			foreach (var r in idStudent)
-			{
-				Academic_performance oldAcademPerf = GetAcademicPerformance().FirstOrDefault(z => z.ID_Subject == request.idsubj && z.ID_Student == r);
-				oldAcademPerf.Date = request.newDate;
-				await _academic_Performance.UpdateAcademic_performance(oldAcademPerf);
-			}
-			var str = request.idsubj + " " + request.newDate;
-			return Json(str);
-		}
-
 
 		public class StudentId
 		{
 			public int Id { get; set; }
 		}
+
+		public class StudentIdNewGroup
+		{
+			public int id { get; set; }
+			public int newGroup { get; set; }
+		}
+
+		public class newExam
+		{
+			public int idSubj { get; set; }
+			public int idWork { get; set; }
+			public int idGroup { get; set; }
+		}
+
+		#endregion
+
+
+		/// <summary>
+		/// Меняет дату сдачи для всех студентов группы
+		/// </summary>
+		/// <param name="request"></param>
+		/// <returns></returns>
+		[HttpPost]
+		[Route("/Student/ChangeDate/")]
+		[Consumes("application/json")]
+		public async Task<IActionResult> ChangeDate([FromBody] IdAndDate request)
+		{
+			if (User.IsInRole("Adm"))
+			{
+				List<int> idStudent = GetStudents().Where(q => q.ID_Group == request.group).Select(q => q.ID_Student).ToList();
+				foreach (var r in idStudent)
+				{
+					Academic_performance oldAcademPerf = GetAcademicPerformance().FirstOrDefault(z => z.ID_Subject == request.idsubj && z.ID_Student == r);
+					oldAcademPerf.Date = request.newDate;
+					await _academic_Performance.UpdateAcademic_performance(oldAcademPerf);
+				}
+				var str = request.idsubj + " " + request.newDate;
+				return Json(str);
+			}
+			else
+			{
+				return Redirect("/Error");
+			}
+		}
+
 		/// <summary>
 		/// удаляет студента
 		/// </summary>
@@ -195,22 +229,24 @@ namespace recordBook.Controllers
 		[Consumes("application/json")]
 		public async Task<IActionResult> DropStudent([FromBody] StudentId studId)
 		{
-			var stu = _student.GetStudentbyID(studId.Id);
-			var log = _loginsStudent.GetAllLoginsStudent().FirstOrDefault(q => q.Number_RecordBook == stu.NumberOfBook);
-			if (stu != null)
+			if (User.IsInRole("Adm"))
 			{
-				await _student.DeleteStudent(stu);
-				await _loginsStudent.DeleteLoginStudent(log);
+				var stu = _student.GetStudentbyID(studId.Id);
+				var log = _loginsStudent.GetAllLoginsStudent().FirstOrDefault(q => q.Number_RecordBook == stu.NumberOfBook);
+				if (stu != null)
+				{
+					await _student.DeleteStudent(stu);
+					await _loginsStudent.DeleteLoginStudent(log);
+				}
+				return Json(stu);
 			}
-			return Json(stu);
+			else
+			{
+				return Redirect("/Error");
+			}
 		}
 
 
-		public class StudentIdNewGroup
-		{
-			public int id { get; set; }
-			public int newGroup { get; set; }
-		}
 		/// <summary>
 		/// Меняет группу у студента
 		/// </summary>
@@ -222,21 +258,22 @@ namespace recordBook.Controllers
 		[Consumes("application/json")]
 		public async Task<IActionResult> ChangeStudentGroup([FromBody] StudentIdNewGroup newGroup)
 		{
-			var stu = _student.GetStudentbyID(newGroup.id);
-			if (stu != null)
+			if (User.IsInRole("Adm"))
 			{
-				stu.ID_Group = newGroup.newGroup;
-				await _student.UpdateStudent(stu);
+				var stu = _student.GetStudentbyID(newGroup.id);
+				if (stu != null)
+				{
+					stu.ID_Group = newGroup.newGroup;
+					await _student.UpdateStudent(stu);
+				}
+				return Json(stu);
 			}
-			return Json(stu);
+			else
+			{
+				return Redirect("/Error");
+			}
 		}
 
-		public class newExam
-		{
-			public int idSubj { get; set; }
-			public int idWork { get; set; }
-			public int idGroup { get; set; }
-		}
 		/// <summary>
 		/// Добавляет новый экзамен
 		/// </summary>
@@ -247,22 +284,27 @@ namespace recordBook.Controllers
 		[Consumes("application/json")]
 		public async Task<IActionResult> addExam([FromBody] newExam exam)
 		{
-
-			List<Student> StudentsInGroup = GetStudents().Where(q => q.ID_Group == exam.idGroup).ToList();
-			foreach (var r in StudentsInGroup)
+			if (User.IsInRole("Adm"))
 			{
-				var perf = new Academic_performance()
+				List<Student> StudentsInGroup = GetStudents().Where(q => q.ID_Group == exam.idGroup).ToList();
+				foreach (var r in StudentsInGroup)
 				{
-					ID_Subject = exam.idSubj,
-					ID_Kind_of_work = exam.idWork,
-					Grade = "Нет оценки",
-					Date = null,
-					ID_Student = r.ID_Student
-				};
-				await _academic_Performance.AddAcademic_performance(perf);
+					var perf = new Academic_performance()
+					{
+						ID_Subject = exam.idSubj,
+						ID_Kind_of_work = exam.idWork,
+						Grade = "Нет оценки",
+						Date = null,
+						ID_Student = r.ID_Student
+					};
+					await _academic_Performance.AddAcademic_performance(perf);
+				}
+				return Json("");
 			}
-
-			return Json("");
+			else
+			{
+				return Redirect("/Error");
+			}
 		}
 
 
@@ -270,11 +312,18 @@ namespace recordBook.Controllers
 		/// страница добавления студента
 		/// </summary>
 		/// <returns></returns>
-		public ViewResult AddStudent() /*async Task<IActionResult>*/
+		public ViewResult AddStudent()
 		{
-			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
-			var model2 = new AddStudentViewModel { Groups = GetGroups(), ID_Group = GetGroups().FirstOrDefault().ID_Group, PhoneUnique =true ,BookError = false, loginUnique = true, EmailUnique = true };
-			return View(model2);
+			if (User.IsInRole("Adm"))
+			{
+				ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
+				var model2 = new AddStudentViewModel { Groups = GetGroups(), ID_Group = GetGroups().FirstOrDefault().ID_Group, PhoneUnique = true, BookError = false, loginUnique = true, EmailUnique = true };
+				return View(model2);
+			}
+			else
+			{
+				return View("Error");
+			}
 		}
 
 
@@ -287,77 +336,84 @@ namespace recordBook.Controllers
 		[HttpPost]
 		public async Task<IActionResult> AddStudent(AddStudentViewModel addStu)
 		{
-			var phone = GetLoginsStudents().FirstOrDefault(q => q.Phone == Convert.ToDecimal(addStu.Phone));
-			if (phone == null)
+			if (User.IsInRole("Adm"))
 			{
-				string book = addStu.NumberBook.ToString();
-
-				if (ModelState.IsValid && book.Length == 7)
+				var phone = GetLoginsStudents().FirstOrDefault(q => q.Phone == Convert.ToDecimal(addStu.Phone));
+				if (phone == null)
 				{
-					string CreateSalt()
+					string book = addStu.NumberBook.ToString();
+
+					if (ModelState.IsValid && book.Length == 7)
 					{
-						byte[] salt = new byte[16];
-						using (var rng = RandomNumberGenerator.Create())
+						string CreateSalt()
 						{
-							rng.GetBytes(salt);
+							byte[] salt = new byte[16];
+							using (var rng = RandomNumberGenerator.Create())
+							{
+								rng.GetBytes(salt);
+							}
+							return Convert.ToBase64String(salt).Substring(0, 16);
 						}
-						return Convert.ToBase64String(salt).Substring(0, 16);
-					}
 
-					string HashPassword(string password, string salt)
-					{
-						byte[] saltBytes = Convert.FromBase64String(salt);
-						byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-
-						byte[] combinedBytes = new byte[saltBytes.Length + passwordBytes.Length];
-						Array.Copy(saltBytes, 0, combinedBytes, 0, saltBytes.Length);
-						Array.Copy(passwordBytes, 0, combinedBytes, saltBytes.Length, passwordBytes.Length);
-
-						using (var sha512 = SHA512.Create())
+						string HashPassword(string password, string salt)
 						{
-							byte[] hashedBytes = sha512.ComputeHash(combinedBytes);
-							return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+							byte[] saltBytes = Convert.FromBase64String(salt);
+							byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+
+							byte[] combinedBytes = new byte[saltBytes.Length + passwordBytes.Length];
+							Array.Copy(saltBytes, 0, combinedBytes, 0, saltBytes.Length);
+							Array.Copy(passwordBytes, 0, combinedBytes, saltBytes.Length, passwordBytes.Length);
+
+							using (var sha512 = SHA512.Create())
+							{
+								byte[] hashedBytes = sha512.ComputeHash(combinedBytes);
+								return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+							}
 						}
-					}
 
-					string salt = CreateSalt();
-					string hashedPassword = HashPassword(addStu.Password, salt);
+						string salt = CreateSalt();
+						string hashedPassword = HashPassword(addStu.Password, salt);
 
-					var login = new LoginsStudent()
-					{
-						Number_RecordBook = addStu.NumberBook,
-						Password = hashedPassword,
-						Email = addStu.Email,
-						Salt = salt,
-						Phone = Convert.ToDecimal(addStu.Phone)
-					};
-					await _loginsStudent.AddLoginStudent(login);
-
-
-					var idNewLogin = GetLoginsStudents().FirstOrDefault(q => q.Login == addStu.Login);
-					var addStudent = new Student() { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, NumberOfBook = addStu.NumberBook };
-					if (addStu.Photo != null)
-					{
-						using (var memoryStream = new MemoryStream())
+						var login = new LoginsStudent()
 						{
-							await addStu.Photo.CopyToAsync(memoryStream);
-							addStudent.Photo = memoryStream.ToArray();
+							Number_RecordBook = addStu.NumberBook,
+							Password = hashedPassword,
+							Email = addStu.Email,
+							Salt = salt,
+							Phone = Convert.ToDecimal(addStu.Phone)
+						};
+						await _loginsStudent.AddLoginStudent(login);
+
+
+						var idNewLogin = GetLoginsStudents().FirstOrDefault(q => q.Login == addStu.Login);
+						var addStudent = new Student() { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, NumberOfBook = addStu.NumberBook };
+						if (addStu.Photo != null)
+						{
+							using (var memoryStream = new MemoryStream())
+							{
+								await addStu.Photo.CopyToAsync(memoryStream);
+								addStudent.Photo = memoryStream.ToArray();
+							}
 						}
+						await _student.AddStudent(addStudent);
+						var model = new AddStudentViewModel { NumberBook = addStu.NumberBook, Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, Groups = GetGroups(), PhoneUnique = true, studentAdded = true, loginUnique = true, EmailUnique = true };
+						return View(model);
 					}
-					await _student.AddStudent(addStudent);
-					var model = new AddStudentViewModel { NumberBook = addStu.NumberBook, Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, Groups = GetGroups(), PhoneUnique = true,studentAdded = true, loginUnique = true, EmailUnique = true };
-					return View(model);
+					else
+					{
+						var model2 = new AddStudentViewModel { Groups = GetGroups(), BookError = book.Length == 7 ? false : true, studentAdded = false, loginUnique = true, EmailUnique = true };
+						return View(model2);
+					}
 				}
 				else
 				{
-					var model2 = new AddStudentViewModel { Groups = GetGroups(), BookError = book.Length == 7 ? false : true, studentAdded = false, loginUnique = true, EmailUnique = true };
+					var model2 = new AddStudentViewModel { Groups = GetGroups(), PhoneUnique = false, studentAdded = false, loginUnique = true, EmailUnique = true };
 					return View(model2);
 				}
 			}
 			else
 			{
-				var model2 = new AddStudentViewModel { Groups = GetGroups(), PhoneUnique = false, studentAdded = false, loginUnique = true, EmailUnique = true };
-				return View(model2);
+				return RedirectToAction("Error", "Home");
 			}
 		}
 

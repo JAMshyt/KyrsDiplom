@@ -246,25 +246,29 @@ else if (User.IsInRole("Student"))
 	<form asp-controller="Exams" asp-action="RatingList">
 
 		@{
-			var maxSemester = Model.RatingControls
-			.Where(q => q.ID_Student == Model.Students.FirstOrDefault(q => q.ID_Group == Model.selectedGroup.ID_Group).ID_Student)
-			.Select(q => q.Semester)
-			.Distinct()
-			.OrderByDescending(s => s);
+
+			var maxSemester = Model.RatingControls?
+				.Where(q => q.ID_Student == Model.Students.FirstOrDefault(q => q.ID_Group == Model.selectedGroup.ID_Group)?.ID_Student)
+				.Select(q => q.Semester)
+				.Distinct()
+				.OrderByDescending(s => s);
 		}
 		<br><br>
 		<p id="tt">
 			Семестр
 			<select name="selectedSemester" required onchange="this.form.submit()" style="width:50px; height:40px; text-align:center">
-				@foreach (var sem in maxSemester)
+				@if (maxSemester != null)
 				{
-					if (sem == Model.selectedSemester)
+					@foreach (var sem in maxSemester)
 					{
-						<option value="@sem" selected>@sem</option>
-					}
-					else
-					{
-						<option value="@sem">@sem</option>
+						if (sem == Model.selectedSemester)
+						{
+							<option value="@sem" selected>@sem</option>
+						}
+						else
+						{
+							<option value="@sem">@sem</option>
+						}
 					}
 				}
 			</select>
@@ -402,7 +406,7 @@ else if (User.IsInRole("Student"))
 		</tbody>
 	</table>
 }
-else
+else if (User.IsInRole("Curator"))
 {
 	<form asp-controller="Exams" asp-action="RatingList">
 		<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
@@ -489,7 +493,6 @@ else
 								<th id="tableLabel">
 									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Посещаемость</h6>
 									<h6>(макс. 10)</h6>
-									<p>из 25</p>
 								</th>
 							}
 							else if (r == 5)

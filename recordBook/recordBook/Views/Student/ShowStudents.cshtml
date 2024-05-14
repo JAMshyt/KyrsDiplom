@@ -7,7 +7,7 @@
 	{
 		ViewData["Title"] = "Студенты групы " + Model.selectedGroup.Name_group;
 	}
-	else
+	else if (User.IsInRole("Curator"))
 	{
 		ViewData["Title"] = "Студенты вашей группы (" + Model.selectedGroup.Name_group + ")";
 	}
@@ -15,7 +15,8 @@
 
 <h1>@ViewData["Title"]</h1>
 
-
+@if (User.IsInRole("Adm") || User.IsInRole("Curator"))
+{
 <p id="grSel">Выберите группу</p>
 <form asp-controller="Student" asp-action="ShowStudents">
 	<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
@@ -178,7 +179,7 @@
 	</tbody>
 	</form>
 </table>
-
+}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type='text/javascript'>
 	$(document).ready(function () {
@@ -270,6 +271,7 @@
 		window.location.href = '/Account/AccountInfoStudent' + id;
 	} 
 
+	//задолженности студента
 	function showDebt(id) {
 		window.location.href = '/Exams/DebtsOfStudent' + id;
 	}

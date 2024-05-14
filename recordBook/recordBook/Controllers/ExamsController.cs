@@ -395,7 +395,7 @@ namespace recordBook.Controllers
 
 						model.selectedSubject = subj == null ? _subject.GetSubjectbyID(subjectsOfSelectedGroup.FirstOrDefault()) : subj;
 					}
-					model.selectedGroup = selectedGroup <1 ? selectedGroups.FirstOrDefault() : _group.GetGroupbyID(selectedGroup);
+					model.selectedGroup = selectedGroup < 1 ? selectedGroups.FirstOrDefault() : _group.GetGroupbyID(selectedGroup);
 
 					return View(model);
 			}
@@ -450,11 +450,23 @@ namespace recordBook.Controllers
 					model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
 					model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
 					model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-					var maxSem = GetRatingControls()
-	.Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value))
-	.Max(q => q.Semester);
+					int se;
+					//FIX
+					//для учеников которых добавили (нету рейтингов в бд)
+					try
+					{
+						se = GetRatingControls()
+		.Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value))
+		.Max(q => q.Semester);
+					}
+					catch
+					{
+						se = 0;
+					}
+
+					var maxSem = se;
 					model.selectedSemester = SelectedSemester < 1 ? maxSem : SelectedSemester;
-					model.RatingControls = GetRatingControls().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value) );
+					model.RatingControls = GetRatingControls().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
 
 
 					if (selectedSubject > 0)
@@ -492,18 +504,30 @@ namespace recordBook.Controllers
 			return View(model);
 		}
 
+		/// <summary>
+		/// Просмотр задолжностей выбранного ученика
+		/// </summary>
+		/// <param name="idStudent"></param>
+		/// <returns></returns>
 		[HttpGet]
 		[Route("/Exams/DebtsOfStudent{idStudent:int}")]
 		public ViewResult DebtsOfStudent(int idStudent)
 		{
-			var model = new ExamsViewModel()
+			if (User.IsInRole("Adm") || User.IsInRole("Curator"))
 			{
-				Students = GetStudents().Where(q => q.ID_Student == idStudent),
-				Academic_Performances = GetAcademic_performance().Where(q => q.ID_Student == idStudent),
-				Kind_of_works = GetKind_of_works(),
-				Subjects = GetSubjects()
-			};
-			return View(model);
+				var model = new ExamsViewModel()
+				{
+					Students = GetStudents().Where(q => q.ID_Student == idStudent),
+					Academic_Performances = GetAcademic_performance().Where(q => q.ID_Student == idStudent),
+					Kind_of_works = GetKind_of_works(),
+					Subjects = GetSubjects()
+				};
+				return View(model);
+			}
+			else
+			{
+				return View("Error");
+			}
 		}
 
 		#region классы для JSON запросов
@@ -548,12 +572,18 @@ namespace recordBook.Controllers
 		[Consumes("application/json")]
 		public async Task<IActionResult> ChangeGrades([FromBody] IdAndGrade request)
 		{
-
-			Academic_performance oldAcademPerf = GetAcademic_performance().FirstOrDefault(z => z.ID_Academic_performance == request.Id);
-			oldAcademPerf.Grade = request.newGrade;
-			await _academic_performance.UpdateAcademic_performance(oldAcademPerf);
-			var str = request.Id + " " + request.newGrade;
-			return Json(str);
+			if (User.IsInRole("Adm"))
+			{
+				Academic_performance oldAcademPerf = GetAcademic_performance().FirstOrDefault(z => z.ID_Academic_performance == request.Id);
+				oldAcademPerf.Grade = request.newGrade;
+				await _academic_performance.UpdateAcademic_performance(oldAcademPerf);
+				var str = request.Id + " " + request.newGrade;
+				return Json(str);
+			}
+			else
+			{
+				return Redirect("/Error");
+			}
 		}
 
 		/// <summary>
@@ -566,12 +596,18 @@ namespace recordBook.Controllers
 		[Consumes("application/json")]
 		public async Task<IActionResult> ChangeDates([FromBody] IdAndDate request)
 		{
-
-			Academic_performance oldAcademPerf = GetAcademic_performance().FirstOrDefault(z => z.ID_Academic_performance == request.Id);
-			oldAcademPerf.Date = request.newDate;
-			await _academic_performance.UpdateAcademic_performance(oldAcademPerf);
-			var str = request.Id + " " + request.newDate;
-			return Json(str);
+			if (User.IsInRole("Adm"))
+			{
+				Academic_performance oldAcademPerf = GetAcademic_performance().FirstOrDefault(z => z.ID_Academic_performance == request.Id);
+				oldAcademPerf.Date = request.newDate;
+				await _academic_performance.UpdateAcademic_performance(oldAcademPerf);
+				var str = request.Id + " " + request.newDate;
+				return Json(str);
+			}
+			else
+			{
+				return Redirect("/Error");
+			}
 		}
 
 		/// <summary>
@@ -584,12 +620,18 @@ namespace recordBook.Controllers
 		[Consumes("application/json")]
 		public async Task<IActionResult> ChangePoints([FromBody] IdAndPoints request)
 		{
-
-			RatingControl oldRating = GetRatingControls().FirstOrDefault(z => z.ID_RatingControl == request.Id);
-			oldRating.Points = request.newPoints;
-			await _ratingControl.UpdateRatingControl(oldRating);
-			var str = request.Id + " " + request.newPoints;
-			return Json(str);
+			if (User.IsInRole("Adm"))
+			{
+				RatingControl oldRating = GetRatingControls().FirstOrDefault(z => z.ID_RatingControl == request.Id);
+				oldRating.Points = request.newPoints;
+				await _ratingControl.UpdateRatingControl(oldRating);
+				var str = request.Id + " " + request.newPoints;
+				return Json(str);
+			}
+			else
+			{
+				return Redirect("/Error");
+			}
 		}
 
 
@@ -603,18 +645,24 @@ namespace recordBook.Controllers
 		[Consumes("application/json")]
 		public async Task<IActionResult> NewRating([FromBody] newRat request)
 		{
-
-			RatingControl newRating = new RatingControl()
+			if (User.IsInRole("Adm"))
 			{
-				ID_Student = request.IdStudent,
-				ID_Subject = request.IdSubject,
-				Semester = request.Semester,
-				RatingNumber = request.NumberRating,
-				Points = request.newPoints,
-			};
-			await _ratingControl.AddRatingControl(newRating);
-			var str = newRating;
-			return Json(str);
+				RatingControl newRating = new RatingControl()
+				{
+					ID_Student = request.IdStudent,
+					ID_Subject = request.IdSubject,
+					Semester = request.Semester,
+					RatingNumber = request.NumberRating,
+					Points = request.newPoints,
+				};
+				await _ratingControl.AddRatingControl(newRating);
+				var str = newRating;
+				return Json(str);
+			}
+			else
+			{
+				return Redirect("/Error");
+			}
 		}
 
 

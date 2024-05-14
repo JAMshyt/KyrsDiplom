@@ -136,17 +136,17 @@ else if (User.IsInRole("Curator"))
 		</select>
 
 		<select name="selectedSubject" required onchange="this.form.submit()" style="width:50%; max-width:300px; height:40px; text-align:center">
-			@foreach (var subj in Model.Subjects)
+			@foreach (var subj2 in Model.Subjects)
 			{
-				if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(subj.ID_Subject))
+				if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(subj2.ID_Subject))
 				{
-					if (subj.ID_Subject == Model.selectedSubject.ID_Subject)
+					if (subj2.ID_Subject == Model.selectedSubject.ID_Subject)
 					{
-						<option value="@subj.ID_Subject" selected>@subj.Name_subject</option>
+						<option value="@subj2.ID_Subject" selected>@subj2.Name_subject</option>
 					}
 					else
 					{
-						<option value="@subj.ID_Subject">@subj.Name_subject</option>
+						<option value="@subj2.ID_Subject">@subj2.Name_subject</option>
 					}
 				}
 			}
@@ -213,7 +213,7 @@ else if (User.IsInRole("Curator"))
 
 	<button id="exportButton" class="btn btn-info" onclick="exportToExcel('@group','@subj')">Сохранить в Excel</button>
 }
-else
+else if(User.IsInRole("Student"))
 {
 	<table class="table" id="myTable">
 

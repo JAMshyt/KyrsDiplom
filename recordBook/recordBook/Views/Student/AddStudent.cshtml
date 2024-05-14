@@ -6,96 +6,99 @@
 	ViewBag.Title = "Добавление студента";
 }
 
-<form asp-action="AddStudent" asp-controller="Student" enctype="multipart/form-data">
-	@if (Model.studentAdded)
-	{
-		<span style="color:green;">Студент @Model.Surname @Model.Name @Model.Patronymic добавлен </span><br>
-	}
+@if (User.IsInRole("Adm"))
+{
+	<form asp-action="AddStudent" asp-controller="Student" enctype="multipart/form-data">
+		@if (Model.studentAdded)
+		{
+			<span style="color:green;">Студент @Model.Surname @Model.Name @Model.Patronymic добавлен </span><br>
+		}
 
-	<!-- #region заполнение студента-->
+		<!-- #region заполнение студента-->
 
-	<p id="txt">Информация о студенте</p>
-	<div class="form-group">
-		<label asp-for="NumberBook" class="control-label">Номер зачетной книжки</label>
-			@if(Model.BookError)
+		<p id="txt">Информация о студенте</p>
+		<div class="form-group">
+			<label asp-for="NumberBook" class="control-label">Номер зачетной книжки</label>
+			@if (Model.BookError)
 			{
-		<span style="color:Red;">
-			Длинна номера зачетки должна быть ровная 7
-		</span>
+				<span style="color:Red;">
+					Длинна номера зачетки должна быть ровная 7
+				</span>
 			}
-		<input type="number" asp-for="NumberBook" class="form-control" />
-	</div>
-	<div class="form-group">
-		<label asp-for="Surname" class="control-label">Фамилия</label>
-		<span asp-validation-for="Surname" style="color:Red;"></span>
-		<input type="text" asp-for="Surname" class="form-control" />
-	</div>
+			<input type="number" asp-for="NumberBook" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label asp-for="Surname" class="control-label">Фамилия</label>
+			<span asp-validation-for="Surname" style="color:Red;"></span>
+			<input type="text" asp-for="Surname" class="form-control" />
+		</div>
 
-	<div class="form-group">
-		<label asp-for="Name" class="control-label">Имя</label>
-		<span asp-validation-for="Name" style="color:Red;"></span>
-		<input type="text" asp-for="Name" class="form-control" />
-	</div>
+		<div class="form-group">
+			<label asp-for="Name" class="control-label">Имя</label>
+			<span asp-validation-for="Name" style="color:Red;"></span>
+			<input type="text" asp-for="Name" class="form-control" />
+		</div>
 
-	<div class="form-group">
-		<label asp-for="Patronymic" class="control-label">Отчество</label>
-		<input type="text" asp-for="Patronymic" class="form-control" />
-	</div>
+		<div class="form-group">
+			<label asp-for="Patronymic" class="control-label">Отчество</label>
+			<input type="text" asp-for="Patronymic" class="form-control" />
+		</div>
 
-	<div class="form-group">
-		<label class="control-label">Группа</label>
-		<select asp-for="ID_Group" style="width:120px; height:40px; text-align:center; margin-top:10px;">
-			@foreach (var groups in Model.Groups)
-			{
-				<option value="@groups.ID_Group">@groups.Name_group</option>
-			}
-		</select>
-	</div>
-	<!-- #endregion -->
-	<br>
-	<hr style="height:3px">
-	<!-- #region заполнение логина-->
-	<p id="txt">Аккаунт студента</p>
-	<div class="form-group">
-		<label asp-for="Login" class="control-label">Логин создает сам ученик</label>
-@* 		@if (!Model.loginUnique)
+		<div class="form-group">
+			<label class="control-label">Группа</label>
+			<select asp-for="ID_Group" style="width:120px; height:40px; text-align:center; margin-top:10px;">
+				@foreach (var groups in Model.Groups)
+				{
+					<option value="@groups.ID_Group">@groups.Name_group</option>
+				}
+			</select>
+		</div>
+		<!-- #endregion -->
+		<br>
+		<hr style="height:3px">
+		<!-- #region заполнение логина-->
+		<p id="txt">Аккаунт студента</p>
+		<div class="form-group">
+			<label asp-for="Login" class="control-label">Логин создает сам ученик</label>
+			@* 		@if (!Model.loginUnique)
 		{
 			<span style="color:red;">Такой логин уже используется</span><br>
 		}
 		<input type="text" asp-for="Login" class="form-control" /> *@
-	</div>
+		</div>
 
-	<div class="form-group">
-		<label asp-for="Password" class="control-label">Пароль</label>
-		<span asp-validation-for="Password" style="color:Red;"></span>
-		<input type="password" asp-for="Password" class="form-control" />
-	</div>
+		<div class="form-group">
+			<label asp-for="Password" class="control-label">Пароль</label>
+			<span asp-validation-for="Password" style="color:Red;"></span>
+			<input type="password" asp-for="Password" class="form-control" />
+		</div>
 
-	<div class="form-group">
-		<label asp-for="Email" class="control-label">Электронная почта</label>
-	@if (!Model.EmailUnique)
-	{
-		<span style="color:red;">Эта почта уже используется</span><br>
-	}
+		<div class="form-group">
+			<label asp-for="Email" class="control-label">Электронная почта</label>
+			@if (!Model.EmailUnique)
+			{
+				<span style="color:red;">Эта почта уже используется</span><br>
+			}
 
-		<input type="text" asp-for="Email" class="form-control" />
-	</div>
+			<input type="text" asp-for="Email" class="form-control" />
+		</div>
 
-	<div class="form-group">
-		<label asp-for="Phone" class="control-label">Телефон</label>
-		<span asp-validation-for="Phone" style="color:Red;"></span>
-		<input type="number" asp-for="Phone" class="form-control" />
-	</div>
-	@if (!Model.PhoneUnique)
-	{
-		<span style="color:red;">Этот телефон уже используется</span>
-	}
-	<br>
-	<label class="control-label">Фото</label>
-	<input class="form-control" asp-for="Photo" type="file" id="formFile">
-	<!-- #endregion -->
+		<div class="form-group">
+			<label asp-for="Phone" class="control-label">Телефон</label>
+			<span asp-validation-for="Phone" style="color:Red;"></span>
+			<input type="number" asp-for="Phone" class="form-control" />
+		</div>
+		@if (!Model.PhoneUnique)
+		{
+			<span style="color:red;">Этот телефон уже используется</span>
+		}
+		<br>
+		<label class="control-label">Фото</label>
+		<input class="form-control" asp-for="Photo" type="file" id="formFile">
+		<!-- #endregion -->
 
-	<div class="form-group">
-		<input type="submit" value="Добавить" class="btn btn-success" style="width:100px; margin-top:10px;" />
-	</div>
-</form>
+		<div class="form-group">
+			<input type="submit" value="Добавить" class="btn btn-success" style="width:100px; margin-top:10px;" />
+		</div>
+	</form>
+}

@@ -92,8 +92,8 @@ namespace recordBook.Controllers
 			switch (User.FindFirst(ClaimTypes.Role)?.Value)
 			{
 				case "Student":
-					var student = GetStudents().FirstOrDefault(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
-					var group = GetGroups().FirstOrDefault(q => q.ID_Group == student.ID_Group);
+					Student student = GetStudents().FirstOrDefault(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+					Group group = GetGroups().FirstOrDefault(q => q.ID_Group == student.ID_Group);
 
 					byte[] photo = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value)).Select(q => q.Photo).FirstOrDefault();
 					string? photoBase64 = photo != null ? Convert.ToBase64String(photo): null ;
@@ -142,34 +142,45 @@ namespace recordBook.Controllers
 			return View(model);
 		}
 
-
+		/// <summary>
+		/// Админ просматривает профиля студентов
+		/// </summary>
+		/// <param name="idLogin"></param>
+		/// <returns></returns>
 		[HttpGet]
 		[Route("/Account/AccountInfoStudent{idLogin:int}")]
 		public ViewResult AccountInfoStudent(int idLogin)
 		{
-			var person = GetStudents().FirstOrDefault(q => q.NumberOfBook == idLogin);
-			var login = GetLoginsStudents().FirstOrDefault(q => q.Number_RecordBook == person.NumberOfBook);
-			byte[] photoCur = person.Photo;
-			string? photoBase64 = photoCur != null ? Convert.ToBase64String(photoCur) : null;
-			var group = GetGroups().FirstOrDefault(q => q.ID_Group == person.ID_Group);
-
-			var model = new AccountViewModel()
+			if (User.IsInRole("Adm"))
 			{
-				ID = person.ID_Student,
-				Surname = person.Surname,
-				Name = person.Name,
-				Patronymic = person.Patronymic,
-				Group = GetGroups().FirstOrDefault(q => q.ID_Group == person.ID_Group),
-				Photo = photoBase64,
-				Email = login.Email,
-				Phone = login.Phone,
-				AdminWatching = true,
-				Graduating_department = group.Graduating_department,
-				Financing_source = group.Financing_source,
-				Groups = GetGroups(),
-				NumberOfBook = person.NumberOfBook,
-			};
-			return View("AccountInfo", model);
+				var person = GetStudents().FirstOrDefault(q => q.NumberOfBook == idLogin);
+				var login = GetLoginsStudents().FirstOrDefault(q => q.Number_RecordBook == person.NumberOfBook);
+				byte[] photoCur = person.Photo;
+				string? photoBase64 = photoCur != null ? Convert.ToBase64String(photoCur) : null;
+				var group = GetGroups().FirstOrDefault(q => q.ID_Group == person.ID_Group);
+
+				var model = new AccountViewModel()
+				{
+					ID = person.ID_Student,
+					Surname = person.Surname,
+					Name = person.Name,
+					Patronymic = person.Patronymic,
+					Group = GetGroups().FirstOrDefault(q => q.ID_Group == person.ID_Group),
+					Photo = photoBase64,
+					Email = login.Email,
+					Phone = login.Phone,
+					AdminWatching = true,
+					Graduating_department = group.Graduating_department,
+					Financing_source = group.Financing_source,
+					Groups = GetGroups(),
+					NumberOfBook = person.NumberOfBook,
+				};
+				return View("AccountInfo", model);
+			}
+			else
+			{
+				return View("Error");
+			}
 		}
 
 		#region классы для JSON
@@ -183,7 +194,7 @@ namespace recordBook.Controllers
 
 		#region Изменение информации о пользователях
 		/// <summary>
-		/// Меняет фамилию
+		/// Изменяет информацию о студенте
 		/// </summary>
 		/// <param name=""></param>
 		/// <returns></returns>
@@ -191,62 +202,69 @@ namespace recordBook.Controllers
 		[Route("/Account/InfoIsChanged/")]
 		public async Task<IActionResult> InfoIsChanged([FromForm] IdAndFIO request)
 		{
-			Student oldStudent = GetStudents().FirstOrDefault(z => z.ID_Student == request.Id);
-
-			switch (request.Change)
+			if (User.IsInRole("Adm"))
 			{
-				case "Name":
-					oldStudent.Name = request.Info;
-					await _student.UpdateStudent(oldStudent);
-					break;
+				Student oldStudent = GetStudents().FirstOrDefault(z => z.ID_Student == request.Id);
 
-				case "Sur":
-					oldStudent.Surname = request.Info;
-					await _student.UpdateStudent(oldStudent);
-					break;
-
-				case "Patr":
-					oldStudent.Patronymic = request.Info;
-					await _student.UpdateStudent(oldStudent);
-					break;
-
-				case "Group":
-					oldStudent.ID_Group = Convert.ToInt32(request.Info);
-					await _student.UpdateStudent(oldStudent);
-					break;
-
-				case "Phone":
-					LoginsStudent login = GetLoginsStudents().FirstOrDefault(x => x.Number_RecordBook == oldStudent.NumberOfBook);
-					login.Phone = Convert.ToDecimal(request.Info);
-					await _loginsStudent.UpdateLoginStudent(login);
-					break;
-
-				//case "Book":
-				//	LoginsStudent login2 = GetLoginsStudents().FirstOrDefault(x => x.Number_RecordBook == oldStudent.NumberOfBook);
-				//	login2.Number_RecordBook = Convert.ToInt32(request.Info);
-				//	await _loginsStudent.UpdateLoginStudent(login2);
-				//	break;
-
-				case "Email":
-					LoginsStudent login3 = GetLoginsStudents().FirstOrDefault(x => x.Number_RecordBook == oldStudent.NumberOfBook);
-					login3.Email = request.Info;
-					await _loginsStudent.UpdateLoginStudent(login3);
-					break;
-
-				case "Photo":
-					var file = Request.Form.Files.GetFile("file");
-					if (file != null)
-					{
-						using (var memoryStream = new MemoryStream())
-						{
-							await file.CopyToAsync(memoryStream);
-							oldStudent.Photo = memoryStream.ToArray();
-						}
+				switch (request.Change)
+				{
+					case "Name":
+						oldStudent.Name = request.Info;
 						await _student.UpdateStudent(oldStudent);
-					}
-					break;
+						break;
+
+					case "Sur":
+						oldStudent.Surname = request.Info;
+						await _student.UpdateStudent(oldStudent);
+						break;
+
+					case "Patr":
+						oldStudent.Patronymic = request.Info;
+						await _student.UpdateStudent(oldStudent);
+						break;
+
+					case "Group":
+						oldStudent.ID_Group = Convert.ToInt32(request.Info);
+						await _student.UpdateStudent(oldStudent);
+						break;
+
+					case "Phone":
+						LoginsStudent login = GetLoginsStudents().FirstOrDefault(x => x.Number_RecordBook == oldStudent.NumberOfBook);
+						login.Phone = Convert.ToDecimal(request.Info);
+						await _loginsStudent.UpdateLoginStudent(login);
+						break;
+
+					//case "Book":
+					//	LoginsStudent login2 = GetLoginsStudents().FirstOrDefault(x => x.Number_RecordBook == oldStudent.NumberOfBook);
+					//	login2.Number_RecordBook = Convert.ToInt32(request.Info);
+					//	await _loginsStudent.UpdateLoginStudent(login2);
+					//	break;
+
+					case "Email":
+						LoginsStudent login3 = GetLoginsStudents().FirstOrDefault(x => x.Number_RecordBook == oldStudent.NumberOfBook);
+						login3.Email = request.Info;
+						await _loginsStudent.UpdateLoginStudent(login3);
+						break;
+
+					case "Photo":
+						var file = Request.Form.Files.GetFile("file");
+						if (file != null)
+						{
+							using (var memoryStream = new MemoryStream())
+							{
+								await file.CopyToAsync(memoryStream);
+								oldStudent.Photo = memoryStream.ToArray();
+							}
+							await _student.UpdateStudent(oldStudent);
+						}
+						break;
+				}
+				return Json("");
 			}
-			return Json("");
+			else
+			{
+				return Redirect("/Error");
+			}
 		}
 		#endregion
 	}
