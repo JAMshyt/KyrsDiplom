@@ -136,7 +136,7 @@ namespace recordBook.Controllers
 
 				return View(model);
 			}
-			else if(User.IsInRole("Curator"))
+			else if (User.IsInRole("Curator"))
 			{
 				var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
 				var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
@@ -317,7 +317,7 @@ namespace recordBook.Controllers
 			if (User.IsInRole("Adm"))
 			{
 				ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
-				var model2 = new AddStudentViewModel { Groups = GetGroups(), ID_Group = GetGroups().FirstOrDefault().ID_Group, PhoneUnique = true, BookError = false, loginUnique = true, EmailUnique = true };
+				var model2 = new AddStudentViewModel { Groups = GetGroups(), ID_Group = GetGroups().FirstOrDefault().ID_Group, EmailUnique = true, PhoneUnique = true, BookUnique = true };
 				return View(model2);
 			}
 			else
@@ -338,78 +338,102 @@ namespace recordBook.Controllers
 		{
 			if (User.IsInRole("Adm"))
 			{
+				var model = new AddStudentViewModel { Groups = GetGroups(), EmailUnique = true, PhoneUnique = true, BookUnique = true };
+
 				var phone = GetLoginsStudents().FirstOrDefault(q => q.Phone == Convert.ToDecimal(addStu.Phone));
-				if (phone == null)
+				if (phone != null) //телефон занят
 				{
-					string book = addStu.NumberBook.ToString();
+					model.PhoneUnique = false;
+				}
+				string book = addStu.NumberBook.ToString();
+				if (book.Length != 7) //длинна зачетной книжки не равна 7
+				{
+					model.BookError = true;
+				}
+				var email = GetLoginsStudents().FirstOrDefault(q => q.Email == addStu.Email);
+				if (email != null) //почта занята
+				{
+					model.EmailUnique = false;
+				}
+				var Recbook = GetLoginsStudents().FirstOrDefault(q => q.Number_RecordBook == addStu.NumberBook);
+				if (Recbook != null)
+				{
+					model.BookUnique = false;
+				}
 
-					if (ModelState.IsValid && book.Length == 7)
+				if (ModelState.IsValid &&
+					model.PhoneUnique == true &&
+					model.BookError == false &&
+					model.EmailUnique == true&&
+					model.BookUnique == true)
+				{
+					string CreateSalt()
 					{
-						string CreateSalt()
+						byte[] salt = new byte[16];
+						using (var rng = RandomNumberGenerator.Create())
 						{
-							byte[] salt = new byte[16];
-							using (var rng = RandomNumberGenerator.Create())
-							{
-								rng.GetBytes(salt);
-							}
-							return Convert.ToBase64String(salt).Substring(0, 16);
+							rng.GetBytes(salt);
 						}
-
-						string HashPassword(string password, string salt)
-						{
-							byte[] saltBytes = Convert.FromBase64String(salt);
-							byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-
-							byte[] combinedBytes = new byte[saltBytes.Length + passwordBytes.Length];
-							Array.Copy(saltBytes, 0, combinedBytes, 0, saltBytes.Length);
-							Array.Copy(passwordBytes, 0, combinedBytes, saltBytes.Length, passwordBytes.Length);
-
-							using (var sha512 = SHA512.Create())
-							{
-								byte[] hashedBytes = sha512.ComputeHash(combinedBytes);
-								return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
-							}
-						}
-
-						string salt = CreateSalt();
-						string hashedPassword = HashPassword(addStu.Password, salt);
-
-						var login = new LoginsStudent()
-						{
-							Number_RecordBook = addStu.NumberBook,
-							Password = hashedPassword,
-							Email = addStu.Email,
-							Salt = salt,
-							Phone = Convert.ToDecimal(addStu.Phone)
-						};
-						await _loginsStudent.AddLoginStudent(login);
-
-
-						var idNewLogin = GetLoginsStudents().FirstOrDefault(q => q.Login == addStu.Login);
-						var addStudent = new Student() { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, NumberOfBook = addStu.NumberBook };
-						if (addStu.Photo != null)
-						{
-							using (var memoryStream = new MemoryStream())
-							{
-								await addStu.Photo.CopyToAsync(memoryStream);
-								addStudent.Photo = memoryStream.ToArray();
-							}
-						}
-						await _student.AddStudent(addStudent);
-						var model = new AddStudentViewModel { NumberBook = addStu.NumberBook, Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, Groups = GetGroups(), PhoneUnique = true, studentAdded = true, loginUnique = true, EmailUnique = true };
-						return View(model);
+						return Convert.ToBase64String(salt).Substring(0, 16);
 					}
-					else
+
+					string HashPassword(string password, string salt)
 					{
-						var model2 = new AddStudentViewModel { Groups = GetGroups(), BookError = book.Length == 7 ? false : true, studentAdded = false, loginUnique = true, EmailUnique = true };
-						return View(model2);
+						byte[] saltBytes = Convert.FromBase64String(salt);
+						byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+
+						byte[] combinedBytes = new byte[saltBytes.Length + passwordBytes.Length];
+						Array.Copy(saltBytes, 0, combinedBytes, 0, saltBytes.Length);
+						Array.Copy(passwordBytes, 0, combinedBytes, saltBytes.Length, passwordBytes.Length);
+
+						using (var sha512 = SHA512.Create())
+						{
+							byte[] hashedBytes = sha512.ComputeHash(combinedBytes);
+							return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+						}
 					}
+
+					string salt = CreateSalt();
+					string hashedPassword = HashPassword(addStu.Password, salt);
+
+					var login = new LoginsStudent()
+					{
+						Number_RecordBook = addStu.NumberBook,
+						Password = hashedPassword,
+						Email = addStu.Email,
+						Salt = salt,
+						Phone = Convert.ToDecimal(addStu.Phone)
+					};
+					await _loginsStudent.AddLoginStudent(login);
+
+					var idNewLogin = GetLoginsStudents().FirstOrDefault(q => q.Login == addStu.Login);
+					var addStudent = new Student() { Surname = addStu.Surname, Name = addStu.Name, Patronymic = addStu.Patronymic, ID_Group = addStu.ID_Group, NumberOfBook = addStu.NumberBook };
+					if (addStu.Photo != null)
+					{
+						using (var memoryStream = new MemoryStream())
+						{
+							await addStu.Photo.CopyToAsync(memoryStream);
+							addStudent.Photo = memoryStream.ToArray();
+						}
+					}
+					await _student.AddStudent(addStudent);
+					model.NumberBook = addStu.NumberBook;
+					model.Surname = addStu.Surname;
+					model.Name = addStu.Name;
+					model.Patronymic = addStu.Patronymic;
+					model.ID_Group = addStu.ID_Group;
+					model.Groups = GetGroups();
+					//model.PhoneUnique = true;
+					model.studentAdded = true;
+					//model.EmailUnique = true;
+					return View(model);
 				}
 				else
 				{
-					var model2 = new AddStudentViewModel { Groups = GetGroups(), PhoneUnique = false, studentAdded = false, loginUnique = true, EmailUnique = true };
-					return View(model2);
+					return View(model);
 				}
+
+
 			}
 			else
 			{

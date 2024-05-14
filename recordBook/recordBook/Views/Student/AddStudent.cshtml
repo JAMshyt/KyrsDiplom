@@ -25,6 +25,12 @@
 					Длинна номера зачетки должна быть ровная 7
 				</span>
 			}
+			@if (!Model.BookUnique)
+			{
+				<span style="color:Red;">
+					Такой номер зачетки уже занят
+				</span>
+			}
 			<input type="number" asp-for="NumberBook" class="form-control" />
 		</div>
 		<div class="form-group">
@@ -60,11 +66,6 @@
 		<p id="txt">Аккаунт студента</p>
 		<div class="form-group">
 			<label asp-for="Login" class="control-label">Логин создает сам ученик</label>
-			@* 		@if (!Model.loginUnique)
-		{
-			<span style="color:red;">Такой логин уже используется</span><br>
-		}
-		<input type="text" asp-for="Login" class="form-control" /> *@
 		</div>
 
 		<div class="form-group">
@@ -86,12 +87,12 @@
 		<div class="form-group">
 			<label asp-for="Phone" class="control-label">Телефон</label>
 			<span asp-validation-for="Phone" style="color:Red;"></span>
-			<input type="number" asp-for="Phone" class="form-control" />
-		</div>
 		@if (!Model.PhoneUnique)
 		{
 			<span style="color:red;">Этот телефон уже используется</span>
 		}
+			<input type="number" asp-for="Phone" class="form-control" />
+		</div>
 		<br>
 		<label class="control-label">Фото</label>
 		<input class="form-control" asp-for="Photo" type="file" id="formFile">
