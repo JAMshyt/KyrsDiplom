@@ -10,5 +10,6 @@
 		public IEnumerable<Subject> subjects { get; set; }
 		public IEnumerable<Academic_performance> academic_Performance { get; set; }
 		public IEnumerable<Kind_of_work> kind_Of_Works { get; set; }
+		public IEnumerable<Curator> Curators { get; set; }
 	}
 }

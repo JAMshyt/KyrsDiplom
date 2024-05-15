@@ -20,6 +20,7 @@ namespace recordBook.Controllers
 		private readonly IAcademic_performance _academic_Performance;
 		private readonly IKind_of_work _kind_Of_Work;
 		private readonly ILoginsStudent _loginsStudent;
+		private readonly ICurator _curator;
 
 
 		private readonly ILogins _user;
@@ -27,7 +28,7 @@ namespace recordBook.Controllers
 		public StudentController(ILogger<StudentController> logger, IStudent student,
 			IGroup group, ISubject subject, IGroup_Subject group_subject, ILogins user,
 			ILogins logins, IAcademic_performance academic_Performance, IKind_of_work kind_Of_Work,
-			ILoginsStudent loginsStudent
+			ILoginsStudent loginsStudent, ICurator curator
 			)
 		{
 			_logger = logger;
@@ -39,6 +40,7 @@ namespace recordBook.Controllers
 			_academic_Performance = academic_Performance;
 			_kind_Of_Work = kind_Of_Work;
 			_loginsStudent = loginsStudent;
+			_curator = curator;
 		}
 
 
@@ -47,6 +49,12 @@ namespace recordBook.Controllers
 		{
 			var students = _student.GetAllStudent().ToList();
 			return students;
+		}
+
+		public List<Curator> GetCurators()
+		{
+			var cur = _curator.GetAllCurator().ToList();
+			return cur;
 		}
 
 		public List<Subject> GetSubject()
@@ -107,6 +115,7 @@ namespace recordBook.Controllers
 				subjects = GetSubject(),
 				academic_Performance = GetAcademicPerformance(),
 				kind_Of_Works = GetKindOfWork(),
+				Curators = GetCurators()
 			};
 
 			if (User.IsInRole("Adm"))
@@ -178,7 +187,7 @@ namespace recordBook.Controllers
 		public class StudentIdNewGroup
 		{
 			public int id { get; set; }
-			public int newGroup { get; set; }
+			public int newGroup { get; set; } //для новой группы или нового куратора
 		}
 
 		public class newExam
@@ -275,6 +284,32 @@ namespace recordBook.Controllers
 		}
 
 		/// <summary>
+		/// Меняет куратора у группы
+		/// </summary>
+		/// <param name="newCurator">id - id группы, newGroup - id  нового куратора</param>
+		/// <returns></returns>
+		[HttpPost]
+		[Route("Student/ChangeCurator/")]
+		[Consumes("application/json")]
+		public async Task<IActionResult> ChangeCurator([FromBody] StudentIdNewGroup newCurator)
+		{
+			if (User.IsInRole("Adm"))
+			{
+				var group = _group.GetGroupbyID(newCurator.id);
+
+				group.ID_Curator = newCurator.newGroup;
+				await _group.UpdateGroup(group);
+
+				return Json(group);
+			}
+			else
+			{
+				return Redirect("/Error");
+			}
+		}
+
+
+		/// <summary>
 		/// Добавляет новый экзамен
 		/// </summary>
 		/// <param name="newGroup"></param>
@@ -364,7 +399,7 @@ namespace recordBook.Controllers
 				if (ModelState.IsValid &&
 					model.PhoneUnique == true &&
 					model.BookError == false &&
-					model.EmailUnique == true&&
+					model.EmailUnique == true &&
 					model.BookUnique == true)
 				{
 					string CreateSalt()

@@ -1,9 +1,7 @@
 ﻿@media (max-width: 768px) {
 
-    #grSel, h1, h3, select {
+    #grSel, h1, h3, select, #ChangeCurator, .table {
         margin-left: 12%;
     }
-    .table {
-        margin-left: 12%;
-    }
+
 }

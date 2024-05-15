@@ -5,17 +5,43 @@
 @{
 	if (User.IsInRole("Adm"))
 	{
+		var curator = Model.Curators.FirstOrDefault(q => q.ID_Curator == Model.selectedGroup.ID_Curator);
 		ViewData["Title"] = "Студенты групы " + Model.selectedGroup.Name_group;
+		ViewData["Title2"] = "Куратор - " + curator.Surname + " " + curator.Name;
 	}
 	else if (User.IsInRole("Curator"))
 	{
-		ViewData["Title"] = "Студенты вашей группы (" + Model.selectedGroup.Name_group + ")";
+		if (Model.selectedGroup!=null){
+			ViewData["Title"] = "Студенты вашей группы (" + Model.selectedGroup.Name_group + ")";
+		}
+		else
+		{
+			ViewData["Title"] = "У вас нет групп";
+		}
 	}
 }
 
 <h1>@ViewData["Title"]</h1>
+@if (User.IsInRole("Adm")) {
+<h1 style="display:inline">@ViewData["Title2"]</h1>
+	<button type="button" id="ChangeCurator" class="btn btn-warning">Изменить куратора</button>
 
-@if (User.IsInRole("Adm") || User.IsInRole("Curator"))
+	<select class="chCurator" onchange="ChangeCurator(@Model.selectedGroup.ID_Group)" style="width:50%; max-width:220px; height:40px; text-align:center">
+		@foreach (var curators in Model.Curators)
+		{
+			if (curators.ID_Curator == Model.selectedGroup.ID_Curator)
+			{
+				<option value="@curators.ID_Curator" selected>@curators.Surname @curators.Name</option>
+			}
+			else
+			{
+				<option value="@curators.ID_Curator">@curators.Surname @curators.Name</option>
+			}
+		}
+	</select>
+}
+
+@if (User.IsInRole("Adm") || User.IsInRole("Curator") & Model.selectedGroup != null)
 {
 <p id="grSel">Выберите группу</p>
 <form asp-controller="Student" asp-action="ShowStudents">
@@ -102,7 +128,7 @@
 	</form>
 </table>
 
-<br></br>
+<br>
 <h3>Предметы</h3>
 <table class="table" id="myTable">
 	<thead>
@@ -186,6 +212,7 @@
 		$('.selectDates').hide();
 		$('.chGroups').hide();
 		$('.kindsOfWorks').hide();
+		$('.chCurator').hide();
 	});
 
 	// Изменение дат
@@ -293,6 +320,30 @@
 		}
 	}
 
+	//изменение куратор 
+	$('#ChangeCurator').click(function (id) {
+		if ($('#ChangeCurator').text() == 'Изменить куратора') {
+			$('.chCurator').show();
+			$('#ChangeCurator').text('Сохранить');
+		}
+		else {
+			$('.chCurator').hide();
+			$('#ChangeCurator').text('Изменить куратора');
+			location.reload()
+		}
+
+	});
+
+	function ChangeCurator(id) {
+		var newCurator = event.target.value;
+		$.ajax({
+			type: 'POST',
+			url: '/Student/ChangeCurator/',
+			contentType: 'application/json',
+			data: JSON.stringify({ id: id, newGroup: newCurator }),
+			dataType: 'json',
+		});
+	}
 
 </script>
 
