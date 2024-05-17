@@ -1,0 +1,102 @@
+﻿@model recordBook.Models.ViewModels.GroupSubjectViewModel;
+@{
+	ViewBag.Title = "Изменение изучаемых предметов у группы" + Model.group.Name_group;
+	ViewData["Title"] = "Предметы изучаемые группой " + Model.group.Name_group;
+}
+
+<h1>@ViewData["Title"]</h1>
+<form asp-action="AddSubject" asp-controller="Subject" id="form">
+	<div class="form-group">
+		<h6 style="margin-bottom : 0px;">Доступные дисциплины</h6>
+		<div class="form-group2">
+			<table class="table">
+				<thead>
+					<tr>
+						<td style="width:35%;">
+						</td>
+						<td>
+						</td>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var subj in Model.subjects.Where(subj => !Model.group_Subject.Any(gs => gs.ID_Subject == subj.ID_Subject)))
+					{
+						<tr style="text-align:center">
+							<td>
+								<p style="text-align:justify">@subj.Name_subject</p>
+							</td>
+							<td>
+
+								<a class="btn btn-outline-success" onclick="selectNewSubj(@subj.ID_Subject, @Model.group.ID_Group)" style="border:1px; font-weight:normal">Добавить</a>
+
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+
+
+		<div class="form-group3">
+			<table class="table">
+				<h6 style="margin-bottom : 0px;">Изучаемые предметы</h6>
+				<thead>
+					<tr>
+						<td style="width:35%;">
+						</td>
+						<td>
+						</td>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var r in Model.group_Subject)
+					{
+						<tr style="width:35%;">
+							<td>
+								<a style="text-align:justify; margin-bottom : 0px;">@Model.subjects.FirstOrDefault(q => q.ID_Subject == r.ID_Subject).Name_subject</a>
+							</td>
+							<td>
+								<a class="btn btn-outline-danger" onclick="removeSubj(@r.ID_Subject, @Model.group.ID_Group)" style="border:1px; font-weight:normal">Убрать</a>
+							</td>
+						</tr>
+					}
+
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<input type="submit" value="Добавить" id="end" class="btn btn-success" style="width:100px;" />
+</form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type='text/javascript'>
+
+	function selectNewSubj(id, idGr) {
+		$.ajax({
+			type: 'POST',
+			url: '/Subject/AddNewSubjectToLearn/',
+			contentType: 'application/json',
+			data: JSON.stringify({ id: id, group: idGr }),
+			dataType: 'json',
+			success: function (data) {
+				location.reload();
+			}
+		});
+	}
+
+	function removeSubj(id, idGr) {
+		$.ajax({
+			type: 'POST',
+			url: '/Subject/RemoveSubjectToLearn/',
+			contentType: 'application/json',
+			data: JSON.stringify({ id: id, group: idGr }),
+			dataType: 'json',
+			success: function (data) {
+				location.reload();
+			}
+		});
+
+	}
+
+</script>

@@ -129,7 +129,8 @@
 </table>
 
 <br>
-<h3>Предметы</h3>
+<h3 style="display:inline">Предметы</h3>
+	<button type="button" onclick="ChangeSubjects(@Model.selectedGroup.ID_Group)" class="btn btn-warning">Изменить предметы</button>
 <table class="table" id="myTable">
 	<thead>
 		<tr>
@@ -157,7 +158,7 @@
 				var subj = Model.subjects.FirstOrDefault(q => q.ID_Subject == item.ID_Subject);
 
 				var mostCommonDate = Model.academic_Performance
-				.Where(q => q.ID_Subject == subj.ID_Subject)
+					.Where(q => q.ID_Subject == subj.ID_Subject && Model.Students.Any(student => student.ID_Student == q.ID_Student && student.ID_Group == Model.selectedGroup.ID_Group))
 				.GroupBy(q => q.Date)
 				.OrderByDescending(g => g.Count())
 				.Select(g => g.Key)
@@ -301,6 +302,11 @@
 	//задолженности студента
 	function showDebt(id) {
 		window.location.href = '/Exams/DebtsOfStudent' + id;
+	}
+
+	//смена изучаемых предметов
+	function ChangeSubjects(id) {
+		window.location.href = '/Subject/ChangeGroupsSubject' + id;
 	}
 
 	//удаление студента
