@@ -26,7 +26,7 @@
 
 	@if (Model.ErrorText_EmailCode)
 	{
-		<span style="color:Red;">Не верный код подтверждения</span>
+		<span style="color:Red;">Неверный код подтверждения</span>
 	}
 
 
@@ -65,8 +65,8 @@
 	}
 
 	<div class="form-group">
-		<label asp-for="ActivationCode" class="control-label">Код активации(выдается в деканате)</label>
-		<span asp-validation-for="ActivationCode" style="color:Red;"></span>
+		<label asp-for="ActivationCode" class="control-label">Код активации (выдается в деканате)</label>
+		@* <span asp-validation-for="ActivationCode" style="color:Red;"></span> *@
 		@if (Model.ErrorText_ActivationCode)
 		{
 			<span style="color:Red;">Неверный код активации</span>

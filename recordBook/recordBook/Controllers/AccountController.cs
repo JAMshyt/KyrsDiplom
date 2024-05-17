@@ -87,59 +87,66 @@ namespace recordBook.Controllers
 
 		public ViewResult AccountInfo()
 		{
-			var model = new AccountViewModel();
-
-			switch (User.FindFirst(ClaimTypes.Role)?.Value)
+			if (!User.Identity.IsAuthenticated)
 			{
-				case "Student":
-					Student student = GetStudents().FirstOrDefault(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
-					Group group = GetGroups().FirstOrDefault(q => q.ID_Group == student.ID_Group);
-
-					byte[] photo = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value)).Select(q => q.Photo).FirstOrDefault();
-					string? photoBase64 = photo != null ? Convert.ToBase64String(photo): null ;
-
-					model.ID = student.ID_Student;
-					model.Name = student.Name;
-					model.Surname = student.Surname;
-					model.Patronymic = student.Patronymic;
-					model.Group = group;
-					model.Photo = photoBase64;
-					model.Graduating_department = group.Graduating_department;
-					model.Financing_source = group.Financing_source;
-					model.Groups = GetGroups();
-					model.NumberOfBook = student.NumberOfBook;
-					return View(model);
-				case "Adm":
-					var dep_work = GetDepartment_Workers().FirstOrDefault(q => q.ID_Department_worker == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
-
-					byte[] photoAdm = GetDepartment_Workers().Where(q => q.ID_Department_worker == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value)).Select(q => q.Photo).FirstOrDefault();
-					string? photoBase64Adm = photoAdm != null ? Convert.ToBase64String(photoAdm) : null;
-
-					model.ID = dep_work.ID_Department_worker;
-					model.Name = dep_work.Name;
-					model.Surname = dep_work.Surname;
-					model.Patronymic = dep_work.Patronymic;
-					model.Photo = photoBase64Adm;
-					model.Institute_title = dep_work.Institute_title;
-					model.Job_title = dep_work.Job_title;
-					model.Groups = GetGroups();
-					return View(model);
-				case "Curator":
-					var cur = GetCurators().FirstOrDefault(q => q.ID_Curator == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
-
-					byte[] photoCur = GetCurators().Where(q => q.ID_Curator == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value)).Select(q => q.Photo).FirstOrDefault();
-					string? photoBase64Cur = photoCur != null ? Convert.ToBase64String(photoCur) : null;
-
-					model.ID = cur.ID_Curator;
-					model.Name = cur.Name;
-					model.Surname = cur.Surname;
-					model.Patronymic = cur.Patronymic;
-					model.Photo = photoBase64Cur;
-					model.Groups = GetGroups();
-					return View(model);
+				return View("Error");
 			}
+			else
+			{
+				var model = new AccountViewModel();
 
-			return View(model);
+				switch (User.FindFirst(ClaimTypes.Role)?.Value)
+				{
+					case "Student":
+						Student student = GetStudents().FirstOrDefault(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+						Group group = GetGroups().FirstOrDefault(q => q.ID_Group == student.ID_Group);
+
+						byte[] photo = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value)).Select(q => q.Photo).FirstOrDefault();
+						string? photoBase64 = photo != null ? Convert.ToBase64String(photo) : null;
+
+						model.ID = student.ID_Student;
+						model.Name = student.Name;
+						model.Surname = student.Surname;
+						model.Patronymic = student.Patronymic;
+						model.Group = group;
+						model.Photo = photoBase64;
+						model.Graduating_department = group.Graduating_department;
+						model.Financing_source = group.Financing_source;
+						model.Groups = GetGroups();
+						model.NumberOfBook = student.NumberOfBook;
+						return View(model);
+					case "Adm":
+						var dep_work = GetDepartment_Workers().FirstOrDefault(q => q.ID_Department_worker == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+
+						byte[] photoAdm = GetDepartment_Workers().Where(q => q.ID_Department_worker == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value)).Select(q => q.Photo).FirstOrDefault();
+						string? photoBase64Adm = photoAdm != null ? Convert.ToBase64String(photoAdm) : null;
+
+						model.ID = dep_work.ID_Department_worker;
+						model.Name = dep_work.Name;
+						model.Surname = dep_work.Surname;
+						model.Patronymic = dep_work.Patronymic;
+						model.Photo = photoBase64Adm;
+						model.Institute_title = dep_work.Institute_title;
+						model.Job_title = dep_work.Job_title;
+						model.Groups = GetGroups();
+						return View(model);
+					case "Curator":
+						var cur = GetCurators().FirstOrDefault(q => q.ID_Curator == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+
+						byte[] photoCur = GetCurators().Where(q => q.ID_Curator == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value)).Select(q => q.Photo).FirstOrDefault();
+						string? photoBase64Cur = photoCur != null ? Convert.ToBase64String(photoCur) : null;
+
+						model.ID = cur.ID_Curator;
+						model.Name = cur.Name;
+						model.Surname = cur.Surname;
+						model.Patronymic = cur.Patronymic;
+						model.Photo = photoBase64Cur;
+						model.Groups = GetGroups();
+						return View(model);
+				}
+
+				return View(model);
+			}
 		}
 
 		/// <summary>

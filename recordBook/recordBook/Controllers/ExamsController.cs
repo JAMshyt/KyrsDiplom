@@ -105,65 +105,73 @@ namespace recordBook.Controllers
 		{
 			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 
-			var model = new ExamsViewModel
+			if (!User.Identity.IsAuthenticated)
 			{
-				Groups = GetGroups(),
-				Students = GetStudents(),
-				Group_Subjects = GetGroup_Subject(),
-				Subjects = GetSubjects(),
-				Academic_Performances = GetAcademic_performance(),
-				selectedGroup = GetGroups().FirstOrDefault(),
-				selectedSubject = GetSubjects().FirstOrDefault(),
-				Kind_of_works = GetKind_of_works(),
-			};
-
-			switch (User.FindFirst(ClaimTypes.Role)?.Value)
-			{
-				case "Adm":
-					if (selectedGroup > 0 & selectedSubject > 0)
-					{
-						var groupById = _group.GetGroupbyID(selectedGroup);
-						var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
-						if (!subjectsOfSelectedGroup.Contains(selectedSubject))
-						{
-							selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
-						}
-						var subjectById = _subject.GetSubjectbyID(selectedSubject);
-						model.selectedGroup = groupById;
-						model.selectedSubject = subjectById;
-					}
-					return View(model);
-
-				case "Student":
-					model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-					model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
-					model.Academic_Performances = GetAcademic_performance().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
-					model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-					model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-					if (selectedSubject > 0)
-					{
-						var subjectById = _subject.GetSubjectbyID(selectedSubject);
-						model.selectedSubject = subjectById;
-					}
-					return View(model);
-
-				case "Curator":
-
-					var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
-					var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
-					model.Groups = selectedGroups;
-					model.Group_Subjects = GetGroup_Subject().Where(subject => selectedGroups.Any(group => group.ID_Group == subject.ID_Group));
-					model.selectedGroup = selectedGroups.FirstOrDefault();
-
-					if (selectedGroup > 0 & selectedSubject > 0)
-					{
-						model.selectedGroup = _group.GetGroupbyID(selectedGroup);
-						model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
-					}
-
-					return View(model);
+				return RedirectToAction("Error", "Home");
 			}
-			return View(model);
+			else
+			{
+
+				var model = new ExamsViewModel
+				{
+					Groups = GetGroups(),
+					Students = GetStudents(),
+					Group_Subjects = GetGroup_Subject(),
+					Subjects = GetSubjects(),
+					Academic_Performances = GetAcademic_performance(),
+					selectedGroup = GetGroups().FirstOrDefault(),
+					selectedSubject = GetSubjects().FirstOrDefault(),
+					Kind_of_works = GetKind_of_works(),
+				};
+
+				switch (User.FindFirst(ClaimTypes.Role)?.Value)
+				{
+					case "Adm":
+						if (selectedGroup > 0 & selectedSubject > 0)
+						{
+							var groupById = _group.GetGroupbyID(selectedGroup);
+							var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
+							if (!subjectsOfSelectedGroup.Contains(selectedSubject))
+							{
+								selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
+							}
+							var subjectById = _subject.GetSubjectbyID(selectedSubject);
+							model.selectedGroup = groupById;
+							model.selectedSubject = subjectById;
+						}
+						return View(model);
+
+					case "Student":
+						model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+						model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+						model.Academic_Performances = GetAcademic_performance().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+						model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+						model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+						if (selectedSubject > 0)
+						{
+							var subjectById = _subject.GetSubjectbyID(selectedSubject);
+							model.selectedSubject = subjectById;
+						}
+						return View(model);
+
+					case "Curator":
+
+						var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
+						var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
+						model.Groups = selectedGroups;
+						model.Group_Subjects = GetGroup_Subject().Where(subject => selectedGroups.Any(group => group.ID_Group == subject.ID_Group));
+						model.selectedGroup = selectedGroups.FirstOrDefault();
+
+						if (selectedGroup > 0 & selectedSubject > 0)
+						{
+							model.selectedGroup = _group.GetGroupbyID(selectedGroup);
+							model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
+						}
+
+						return View(model);
+				}
+				return View(model);
+			}
 		}
 
 
@@ -171,68 +179,76 @@ namespace recordBook.Controllers
 		{
 			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 
-			var model = new ExamsViewModel
+			if (!User.Identity.IsAuthenticated)
 			{
-				Groups = GetGroups(),
-				Students = GetStudents(),
-				Group_Subjects = GetGroup_Subject(),
-				Subjects = GetSubjects(),
-				Academic_Performances = GetAcademic_performance(),
-				selectedGroup = GetGroups().FirstOrDefault(),
-				selectedSubject = GetSubjects().FirstOrDefault(),
-				Kind_of_works = GetKind_of_works(),
-			};
-
-			switch (User.FindFirst(ClaimTypes.Role)?.Value)
-			{
-				case "Adm":
-					if (selectedGroup > 0 & selectedSubject > 0)
-					{
-						var groupById = _group.GetGroupbyID(selectedGroup);
-						var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
-						if (!subjectsOfSelectedGroup.Contains(selectedSubject))
-						{
-							selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
-						}
-						var subjectById = _subject.GetSubjectbyID(selectedSubject);
-						model.selectedGroup = groupById;
-						model.selectedSubject = subjectById;
-					}
-					return View(model);
-
-				case "Student":
-					model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-					model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
-					model.Academic_Performances = GetAcademic_performance()
-						.Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
-					model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-					model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-
-
-					if (selectedSubject > 0)
-					{
-						var subjectById = _subject.GetSubjectbyID(selectedSubject);
-						model.selectedSubject = subjectById;
-					}
-					return View(model);
-
-				case "Curator":
-
-					var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
-					var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
-					model.Groups = selectedGroups;
-					model.Group_Subjects = GetGroup_Subject().Where(subject => selectedGroups.Any(group => group.ID_Group == subject.ID_Group));
-					model.selectedGroup = selectedGroups.FirstOrDefault();
-
-					if (selectedGroup > 0 & selectedSubject > 0)
-					{
-						model.selectedGroup = _group.GetGroupbyID(selectedGroup);
-						model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
-					}
-
-					return View(model);
+				return RedirectToAction("Error", "Home");
 			}
-			return View(model);
+			else
+			{
+
+				var model = new ExamsViewModel
+				{
+					Groups = GetGroups(),
+					Students = GetStudents(),
+					Group_Subjects = GetGroup_Subject(),
+					Subjects = GetSubjects(),
+					Academic_Performances = GetAcademic_performance(),
+					selectedGroup = GetGroups().FirstOrDefault(),
+					selectedSubject = GetSubjects().FirstOrDefault(),
+					Kind_of_works = GetKind_of_works(),
+				};
+
+				switch (User.FindFirst(ClaimTypes.Role)?.Value)
+				{
+					case "Adm":
+						if (selectedGroup > 0 & selectedSubject > 0)
+						{
+							var groupById = _group.GetGroupbyID(selectedGroup);
+							var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
+							if (!subjectsOfSelectedGroup.Contains(selectedSubject))
+							{
+								selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
+							}
+							var subjectById = _subject.GetSubjectbyID(selectedSubject);
+							model.selectedGroup = groupById;
+							model.selectedSubject = subjectById;
+						}
+						return View(model);
+
+					case "Student":
+						model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+						model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+						model.Academic_Performances = GetAcademic_performance()
+							.Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+						model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+						model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+
+
+						if (selectedSubject > 0)
+						{
+							var subjectById = _subject.GetSubjectbyID(selectedSubject);
+							model.selectedSubject = subjectById;
+						}
+						return View(model);
+
+					case "Curator":
+
+						var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
+						var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
+						model.Groups = selectedGroups;
+						model.Group_Subjects = GetGroup_Subject().Where(subject => selectedGroups.Any(group => group.ID_Group == subject.ID_Group));
+						model.selectedGroup = selectedGroups.FirstOrDefault();
+
+						if (selectedGroup > 0 & selectedSubject > 0)
+						{
+							model.selectedGroup = _group.GetGroupbyID(selectedGroup);
+							model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
+						}
+
+						return View(model);
+				}
+				return View(model);
+			}
 		}
 
 
@@ -240,71 +256,78 @@ namespace recordBook.Controllers
 		{
 			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 
-			var model = new ExamsViewModel
+			if (!User.Identity.IsAuthenticated)
 			{
-				Groups = GetGroups(),
-				Students = GetStudents(),
-				Group_Subjects = GetGroup_Subject(),
-				Subjects = GetSubjects(),
-				Academic_Performances = GetAcademic_performance(),
-				selectedGroup = GetGroups().FirstOrDefault(),
-				selectedSubject = GetSubjects().FirstOrDefault(),
-				Kind_of_works = GetKind_of_works(),
-			};
-
-			switch (User.FindFirst(ClaimTypes.Role)?.Value)
-			{
-				case "Adm":
-					if (selectedGroup > 0 & selectedSubject > 0)
-					{
-						var groupById = _group.GetGroupbyID(selectedGroup);
-						var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
-						if (!subjectsOfSelectedGroup.Contains(selectedSubject))
-						{
-							selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
-						}
-						var subjectById = _subject.GetSubjectbyID(selectedSubject);
-						model.selectedGroup = groupById;
-						model.selectedSubject = subjectById;
-					}
-					return View(model);
-
-
-				case "Student":
-					model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-					model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
-					model.Academic_Performances = GetAcademic_performance()
-						.Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
-					model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-					model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-
-
-					if (selectedSubject > 0)
-					{
-						var subjectById = _subject.GetSubjectbyID(selectedSubject);
-						model.selectedSubject = subjectById;
-					}
-					return View(model);
-
-
-				case "Curator":
-
-					var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
-					var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
-					model.Groups = selectedGroups;
-					model.Group_Subjects = GetGroup_Subject().Where(subject => selectedGroups.Any(group => group.ID_Group == subject.ID_Group));
-					model.selectedGroup = selectedGroups.FirstOrDefault();
-
-					if (selectedGroup > 0 & selectedSubject > 0)
-					{
-						model.selectedGroup = _group.GetGroupbyID(selectedGroup);
-						model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
-					}
-
-					return View(model);
+				return RedirectToAction("Error", "Home");
 			}
+			else
+			{
 
+				var model = new ExamsViewModel
+				{
+					Groups = GetGroups(),
+					Students = GetStudents(),
+					Group_Subjects = GetGroup_Subject(),
+					Subjects = GetSubjects(),
+					Academic_Performances = GetAcademic_performance(),
+					selectedGroup = GetGroups().FirstOrDefault(),
+					selectedSubject = GetSubjects().FirstOrDefault(),
+					Kind_of_works = GetKind_of_works(),
+				};
+
+				switch (User.FindFirst(ClaimTypes.Role)?.Value)
+				{
+					case "Adm":
+						if (selectedGroup > 0 & selectedSubject > 0)
+						{
+							var groupById = _group.GetGroupbyID(selectedGroup);
+							var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
+							if (!subjectsOfSelectedGroup.Contains(selectedSubject))
+							{
+								selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
+							}
+							var subjectById = _subject.GetSubjectbyID(selectedSubject);
+							model.selectedGroup = groupById;
+							model.selectedSubject = subjectById;
+						}
+						return View(model);
+
+
+					case "Student":
+						model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+						model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+						model.Academic_Performances = GetAcademic_performance()
+							.Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+						model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+						model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+
+
+						if (selectedSubject > 0)
+						{
+							var subjectById = _subject.GetSubjectbyID(selectedSubject);
+							model.selectedSubject = subjectById;
+						}
+						return View(model);
+
+
+					case "Curator":
+
+						var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
+						var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
+						model.Groups = selectedGroups;
+						model.Group_Subjects = GetGroup_Subject().Where(subject => selectedGroups.Any(group => group.ID_Group == subject.ID_Group));
+						model.selectedGroup = selectedGroups.FirstOrDefault();
+
+						if (selectedGroup > 0 & selectedSubject > 0)
+						{
+							model.selectedGroup = _group.GetGroupbyID(selectedGroup);
+							model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
+						}
+
+						return View(model);
+				}
 			return View(model);
+			}
 		}
 
 
@@ -313,93 +336,101 @@ namespace recordBook.Controllers
 		{
 			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 
-			var model = new ExamsViewModel
+			if (!User.Identity.IsAuthenticated)
 			{
-				Groups = GetGroups(),
-				Students = GetStudents(),
-				Group_Subjects = GetGroup_Subject(),
-				Subjects = GetSubjects(),
-				Academic_Performances = GetAcademic_performance(),
-				selectedGroup = GetGroups().FirstOrDefault(),
-				selectedSubject = GetSubjects().FirstOrDefault(),
-				Kind_of_works = GetKind_of_works(),
-			};
+				return RedirectToAction("Error", "Home");
+			}
+			else
+			{
 
-			switch (User.FindFirst(ClaimTypes.Role)?.Value)
-			{
-				case "Adm":
-					if (selectedGroup > 0 | selectedSubject > 0)
-					{
-						var groupById = _group.GetGroupbyID(selectedGroup);
-						var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
-						if (!subjectsOfSelectedGroup.Contains(selectedSubject))
+				var model = new ExamsViewModel
+				{
+					Groups = GetGroups(),
+					Students = GetStudents(),
+					Group_Subjects = GetGroup_Subject(),
+					Subjects = GetSubjects(),
+					Academic_Performances = GetAcademic_performance(),
+					selectedGroup = GetGroups().FirstOrDefault(),
+					selectedSubject = GetSubjects().FirstOrDefault(),
+					Kind_of_works = GetKind_of_works(),
+				};
+
+				switch (User.FindFirst(ClaimTypes.Role)?.Value)
+				{
+					case "Adm":
+						if (selectedGroup > 0 | selectedSubject > 0)
 						{
-							try
+							var groupById = _group.GetGroupbyID(selectedGroup);
+							var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
+							if (!subjectsOfSelectedGroup.Contains(selectedSubject))
 							{
-								var subj = _subject.GetSubjectbyID(GetGroup_Subject()
-									.FirstOrDefault(q => q.ID_Group == groupById.ID_Group
-									&& GetAcademic_performance().Any(w => w.ID_Kind_of_work == 4 && w.ID_Subject == q.ID_Subject)).ID_Subject);
-								model.selectedSubject = subj;
-							}
-							catch
-							{
+								try
+								{
+									var subj = _subject.GetSubjectbyID(GetGroup_Subject()
+										.FirstOrDefault(q => q.ID_Group == groupById.ID_Group
+										&& GetAcademic_performance().Any(w => w.ID_Kind_of_work == 4 && w.ID_Subject == q.ID_Subject)).ID_Subject);
+									model.selectedSubject = subj;
+								}
+								catch
+								{
 
-								selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
+									selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
+								}
 							}
+							else
+							{
+								var subjectById = _subject.GetSubjectbyID(selectedSubject);
+								model.selectedSubject = subjectById;
+							}
+							model.selectedGroup = groupById;
 						}
-						else
+						return View(model);
+
+
+					case "Student":
+						model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+						model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+						model.Academic_Performances = GetAcademic_performance()
+							.Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+						model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+						model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+
+
+						if (selectedSubject > 0)
 						{
 							var subjectById = _subject.GetSubjectbyID(selectedSubject);
 							model.selectedSubject = subjectById;
 						}
-						model.selectedGroup = groupById;
-					}
-					return View(model);
+						return View(model);
 
 
-				case "Student":
-					model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-					model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
-					model.Academic_Performances = GetAcademic_performance()
-						.Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
-					model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-					model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+					case "Curator":
 
+						var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
+						var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
+						model.Groups = selectedGroups;
+						model.Group_Subjects = GetGroup_Subject().Where(subject => selectedGroups.Any(group => group.ID_Group == subject.ID_Group));
 
-					if (selectedSubject > 0)
-					{
-						var subjectById = _subject.GetSubjectbyID(selectedSubject);
-						model.selectedSubject = subjectById;
-					}
-					return View(model);
+						if (selectedSubject > 0)
+						{
+							model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
+						}
+						else
+						{
+							var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroups.FirstOrDefault().ID_Group).Select(z => z.ID_Subject);
 
+							var subj = _subject?.GetSubjectbyID(GetGroup_Subject()
+								.FirstOrDefault(q => q.ID_Group == selectedGroups.FirstOrDefault()?.ID_Group
+								&& GetAcademic_performance().Any(w => w.ID_Kind_of_work == 4 && w?.ID_Subject == q.ID_Subject))?.ID_Subject);
 
-				case "Curator":
+							model.selectedSubject = subj == null ? _subject.GetSubjectbyID(subjectsOfSelectedGroup.FirstOrDefault()) : subj;
+						}
+						model.selectedGroup = selectedGroup < 1 ? selectedGroups.FirstOrDefault() : _group.GetGroupbyID(selectedGroup);
 
-					var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
-					var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
-					model.Groups = selectedGroups;
-					model.Group_Subjects = GetGroup_Subject().Where(subject => selectedGroups.Any(group => group.ID_Group == subject.ID_Group));
-
-					if (selectedSubject > 0)
-					{
-						model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
-					}
-					else
-					{
-						var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroups.FirstOrDefault().ID_Group).Select(z => z.ID_Subject);
-
-						var subj = _subject?.GetSubjectbyID(GetGroup_Subject()
-							.FirstOrDefault(q => q.ID_Group == selectedGroups.FirstOrDefault()?.ID_Group
-							&& GetAcademic_performance().Any(w => w.ID_Kind_of_work == 4 && w?.ID_Subject == q.ID_Subject))?.ID_Subject);
-
-						model.selectedSubject = subj == null ? _subject.GetSubjectbyID(subjectsOfSelectedGroup.FirstOrDefault()) : subj;
-					}
-					model.selectedGroup = selectedGroup < 1 ? selectedGroups.FirstOrDefault() : _group.GetGroupbyID(selectedGroup);
-
-					return View(model);
+						return View(model);
+				}
+				return View(model);
 			}
-			return View(model);
 		}
 
 
@@ -409,99 +440,107 @@ namespace recordBook.Controllers
 		{
 			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 
-			var maxSemester = GetRatingControls()
-				.Where(q => q.ID_Student == GetStudents().FirstOrDefault(q => q.ID_Group == GetGroups().FirstOrDefault().ID_Group).ID_Student)
-				.Max(q => q.Semester);
-
-			var model = new ExamsViewModel
+			if (!User.Identity.IsAuthenticated)
 			{
-				Groups = GetGroups(),
-				Students = GetStudents(),
-				Group_Subjects = GetGroup_Subject(),
-				Subjects = GetSubjects(),
-				selectedGroup = GetGroups().FirstOrDefault(),
-				selectedSubject = GetSubjects().FirstOrDefault(),
-				RatingControls = GetRatingControls(),
-				selectedSemester = maxSemester,
-			};
-
-			switch (User.FindFirst(ClaimTypes.Role)?.Value)
-			{
-				case "Adm":
-					if (selectedGroup > 0 & selectedSubject > 0 & SelectedSemester > 0)
-					{
-						var groupById = _group.GetGroupbyID(selectedGroup);
-						var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
-						if (!subjectsOfSelectedGroup.Contains(selectedSubject))
-						{
-							selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
-						}
-						var subjectById = _subject.GetSubjectbyID(selectedSubject);
-						model.selectedGroup = groupById;
-						model.selectedSubject = subjectById;
-						model.selectedSemester = SelectedSemester;
-
-					}
-					return View(model);
-
-
-				case "Student":
-					model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-					model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
-					model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-					model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-					int se;
-					//FIX
-					//для учеников которых добавили (нету рейтингов в бд)
-					try
-					{
-						se = GetRatingControls()
-		.Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value))
-		.Max(q => q.Semester);
-					}
-					catch
-					{
-						se = 0;
-					}
-
-					var maxSem = se;
-					model.selectedSemester = SelectedSemester < 1 ? maxSem : SelectedSemester;
-					model.RatingControls = GetRatingControls().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
-
-
-					if (selectedSubject > 0)
-					{
-						var subjectById = _subject.GetSubjectbyID(selectedSubject);
-						model.selectedSubject = subjectById;
-					}
-
-					return View(model);
-
-
-				case "Curator":
-
-					var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
-					var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
-					model.Groups = selectedGroups;
-					model.Group_Subjects = GetGroup_Subject().Where(subject => selectedGroups.Any(group => group.ID_Group == subject.ID_Group));
-					model.selectedGroup = selectedGroups.FirstOrDefault();
-
-					if (selectedGroup > 0 & selectedSubject > 0)
-					{
-						model.selectedGroup = _group.GetGroupbyID(selectedGroup);
-						model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
-					}
-
-					var sem = GetRatingControls()
-						.Where(q => q.ID_Student == GetStudents().FirstOrDefault(q => q.ID_Group == selectedGroups.FirstOrDefault()?.ID_Group)?.ID_Student)
-						.Max(q => q.Semester);
-
-					model.selectedSemester = SelectedSemester < 1 ? sem : SelectedSemester;
-
-					return View(model);
+				return RedirectToAction("Error", "Home");
 			}
+			else
+			{
 
-			return View(model);
+				var maxSemester = GetRatingControls()
+					.Where(q => q.ID_Student == GetStudents().FirstOrDefault(q => q.ID_Group == GetGroups().FirstOrDefault().ID_Group).ID_Student)
+					.Max(q => q.Semester);
+
+				var model = new ExamsViewModel
+				{
+					Groups = GetGroups(),
+					Students = GetStudents(),
+					Group_Subjects = GetGroup_Subject(),
+					Subjects = GetSubjects(),
+					selectedGroup = GetGroups().FirstOrDefault(),
+					selectedSubject = GetSubjects().FirstOrDefault(),
+					RatingControls = GetRatingControls(),
+					selectedSemester = maxSemester,
+				};
+
+				switch (User.FindFirst(ClaimTypes.Role)?.Value)
+				{
+					case "Adm":
+						if (selectedGroup > 0 & selectedSubject > 0 & SelectedSemester > 0)
+						{
+							var groupById = _group.GetGroupbyID(selectedGroup);
+							var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
+							if (!subjectsOfSelectedGroup.Contains(selectedSubject))
+							{
+								selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
+							}
+							var subjectById = _subject.GetSubjectbyID(selectedSubject);
+							model.selectedGroup = groupById;
+							model.selectedSubject = subjectById;
+							model.selectedSemester = SelectedSemester;
+
+						}
+						return View(model);
+
+
+					case "Student":
+						model.Groups = GetGroups().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+						model.Students = GetStudents().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+						model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+						model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
+						int se;
+						//FIX
+						//для учеников которых добавили (нету рейтингов в бд)
+						try
+						{
+							se = GetRatingControls()
+			.Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value))
+			.Max(q => q.Semester);
+						}
+						catch
+						{
+							se = 0;
+						}
+
+						var maxSem = se;
+						model.selectedSemester = SelectedSemester < 1 ? maxSem : SelectedSemester;
+						model.RatingControls = GetRatingControls().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+
+
+						if (selectedSubject > 0)
+						{
+							var subjectById = _subject.GetSubjectbyID(selectedSubject);
+							model.selectedSubject = subjectById;
+						}
+
+						return View(model);
+
+
+					case "Curator":
+
+						var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
+						var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
+						model.Groups = selectedGroups;
+						model.Group_Subjects = GetGroup_Subject().Where(subject => selectedGroups.Any(group => group.ID_Group == subject.ID_Group));
+						model.selectedGroup = selectedGroups.FirstOrDefault();
+
+						if (selectedGroup > 0 & selectedSubject > 0)
+						{
+							model.selectedGroup = _group.GetGroupbyID(selectedGroup);
+							model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
+						}
+
+						var sem = GetRatingControls()
+							.Where(q => q.ID_Student == GetStudents().FirstOrDefault(q => q.ID_Group == selectedGroups.FirstOrDefault()?.ID_Group)?.ID_Student)
+							.Max(q => q.Semester);
+
+						model.selectedSemester = SelectedSemester < 1 ? sem : SelectedSemester;
+
+						return View(model);
+				}
+
+				return View(model);
+			}
 		}
 
 		/// <summary>

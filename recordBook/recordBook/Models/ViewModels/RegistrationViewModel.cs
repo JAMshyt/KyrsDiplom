@@ -30,6 +30,7 @@ namespace recordBook.Models.ViewModels
 
 
 		public bool ErrorText_ActivationCode { get; set; }
+
 		public bool ErrorText_SurnameName { get; set; }
 		public bool ErrorText_StudentFioAndCode { get; set; }
 		public bool ErrorText_Email { get; set; }
@@ -37,6 +38,7 @@ namespace recordBook.Models.ViewModels
 		public bool ErrorText_LoginOld { get; set; }
 		public bool Succes_SendEmail { get; set; }
 		public bool ErrorText_LoginExist { get; set; }
+
 		public bool Succes { get; set; }
 	}
 }

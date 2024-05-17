@@ -15,6 +15,8 @@ using System.Text;
 using MimeKit;
 using MailKit.Net.Smtp;
 using static recordBook.Controllers.StudentController;
+using MailKit;
+using Microsoft.IdentityModel.Tokens;
 
 namespace recordBook.Controllers
 {
@@ -103,7 +105,7 @@ namespace recordBook.Controllers
 				Succes = false,
 				ErrorText_LoginOld = false,
 				ErrorText_LoginExist = false,
-		};
+			};
 			return View(user);
 		}
 
@@ -226,7 +228,7 @@ namespace recordBook.Controllers
 						user.ErrorText = false;
 
 						Student? student = GetStudents().FirstOrDefault(q => q.NumberOfBook == loginStudent.Number_RecordBook);
-						string patronymic = student.Patronymic == null ? "": student.Patronymic;
+						string patronymic = student.Patronymic == null ? "" : student.Patronymic;
 
 						var claims = new List<Claim> {
 							new Claim(ClaimTypes.NameIdentifier, loginStudent.Login),
@@ -239,7 +241,7 @@ namespace recordBook.Controllers
 							new Claim(ClaimTypes.GroupSid, Convert.ToString(student.ID_Group)),
 							new Claim(ClaimTypes.SerialNumber, Convert.ToString(student.ID_Student)),
 							};
-							ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
+						ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
 						await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 						return RedirectToAction("AccountInfo", "Account");
 					}
@@ -258,69 +260,69 @@ namespace recordBook.Controllers
 		[HttpPost]
 		public async Task<ActionResult> Registration(RegistrationViewModel user)
 		{
-			if (ModelState.IsValid)
+
+			RegistrationViewModel model = new RegistrationViewModel();
+
+			Student? stuBook = GetStudents().FirstOrDefault(x => x.NumberOfBook == Convert.ToInt32(user.ActivationCode));
+			Student? stuSurName = GetStudents().FirstOrDefault(x => x.Surname == user.Surname && x.Name == user.Name && x.Patronymic == user.Patronymic);
+
+
+			LoginsStudent? login = GetLoginsStudents().FirstOrDefault(x => x.Number_RecordBook == user.ActivationCode);
+			if (stuBook == null)
 			{
-				RegistrationViewModel model = new RegistrationViewModel();
-
-				Student? stuBook = GetStudents().FirstOrDefault(x => x.NumberOfBook == Convert.ToInt32(user.ActivationCode));
-				Student? stuSurName = GetStudents().FirstOrDefault(x => x.Surname == user.Surname && x.Name == user.Name && x.Patronymic == user.Patronymic);
-
-
-				LoginsStudent? login = GetLoginsStudents().FirstOrDefault(x => x.Number_RecordBook == user.ActivationCode);
-				if (stuBook == null)
-				{
-					model.ErrorText_ActivationCode = true;
-				}
-				if (stuSurName == null)
-				{
-					model.ErrorText_SurnameName = true;
-				}
-				if(stuBook != stuSurName)
-				{
-					model.ErrorText_StudentFioAndCode = true;
-				}
-
-				if (login != null & login.Email != user.Email)
-				{
-					model.ErrorText_Email = true;
-				}
-
-				LoginsStudent? l = GetLoginsStudents().FirstOrDefault(q => q.Login == user.Login);
-				if (login.Login != null)
-				{
-					model.ErrorText_LoginOld = true;
-				}
-				else if(l != null)
-				{
-					model.ErrorText_LoginExist = true;
-				}
-
-				if (user.generatedCode != user.AcceptEmailCode)
-				{
-					model.ErrorText_EmailCode = true;
-				}
-
-				if (model.ErrorText_ActivationCode == true ||
-					model.ErrorText_SurnameName == true ||
-					model.ErrorText_StudentFioAndCode == true ||
-					model.ErrorText_Email == true ||
-					model.ErrorText_EmailCode == true ||
-					model.ErrorText_LoginOld == true) {
-					return View(model);
-				}
-				else
-				{
-					LoginsStudent loginsStu = GetLoginsStudents().FirstOrDefault(q=>q.Number_RecordBook == user.ActivationCode);
-					loginsStu.Login = user.Login;
-					await _loginsStudent.UpdateLoginStudent(loginsStu);
-					model.Succes = true;
-					return View(model);
-				}
+				model.ErrorText_ActivationCode = true;
 			}
-			return View(user);
+			if (stuSurName == null)
+			{
+				model.ErrorText_SurnameName = true;
+			}
+			if (stuBook != stuSurName)
+			{
+				model.ErrorText_StudentFioAndCode = true;
+			}
+
+			if (login != null & login?.Email != user.Email)
+			{
+				model.ErrorText_Email = true;
+			}
+
+			LoginsStudent? l = GetLoginsStudents().FirstOrDefault(q => q.Login == user.Login);
+			if (login?.Login != null)
+			{
+				model.ErrorText_LoginOld = true;
+			}
+			else if (l != null & !user.Login.IsNullOrEmpty())
+			{
+				model.ErrorText_LoginExist = true;
+			}
+
+			if (user.generatedCode != user.AcceptEmailCode)
+			{
+				model.ErrorText_EmailCode = true;
+			}
+
+			if (model.ErrorText_ActivationCode == true ||
+				model.ErrorText_SurnameName == true ||
+				model.ErrorText_StudentFioAndCode == true ||
+				model.ErrorText_Email == true ||
+				model.ErrorText_EmailCode == true ||
+				model.ErrorText_LoginOld == true ||
+				!ModelState.IsValid)
+			{
+				return View(model);
+			}
+			else
+			{
+				LoginsStudent loginsStu = GetLoginsStudents().FirstOrDefault(q => q.Number_RecordBook == user.ActivationCode);
+				loginsStu.Login = user.Login;
+				await _loginsStudent.UpdateLoginStudent(loginsStu);
+				model.Succes = true;
+				return View(model);
+			}
+
 		}
 
-		
+
 		/// <summary>
 		/// Проверка почты
 		/// Создлается код, который отсылается по почте
@@ -363,6 +365,14 @@ namespace recordBook.Controllers
 			}
 			return BadRequest("Email не указан");
 		}
+
+
+		public async Task<IActionResult> Logout()
+		{
+			await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+			return RedirectToAction("Authorization", "Home");
+		}
+
 		#endregion
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
