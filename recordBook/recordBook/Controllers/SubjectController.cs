@@ -133,7 +133,7 @@ namespace recordBook.Controllers
 
 
 		/// <summary>
-		/// Меняем предметы для изучения группе
+		/// Открывает страницу для изменения изучаемых предметов
 		/// </summary>
 		/// <param name="Id"></param>
 		/// <returns></returns>
@@ -164,6 +164,11 @@ namespace recordBook.Controllers
 			public int group { get; set; }
 		}
 
+		/// <summary>
+		/// добавляем предмет для изучения группе
+		/// </summary>
+		/// <param name="req"></param>
+		/// <returns></returns>
 		[HttpPost]
 		[Route("Subject/AddNewSubjectToLearn/")]
 		public async Task<IActionResult> AddNewSubjectToLearn([FromBody] IdAndGroupId req)
@@ -184,6 +189,12 @@ namespace recordBook.Controllers
 			}
 		}
 
+
+		/// <summary>
+		/// убераем предмет из изучения группы
+		/// </summary>
+		/// <param name="req"></param>
+		/// <returns></returns>
 		[HttpPost]
 		[Route("Subject/RemoveSubjectToLearn/")]
 		public async Task<IActionResult> RemoveSubjectToLearn([FromBody] IdAndGroupId req)

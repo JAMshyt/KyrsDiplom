@@ -38,7 +38,7 @@
 							<td value="@groups.ID_Group">@groups.Name_group</td>
 							<td>
 
-								<a class="btn btn-outline-success" onclick="selectGroup(@groups.ID_Group)" style="border:1px; font-weight:normal">Выбрать</a>
+								<a class="btn btn-outline-success" onclick="selectGroup(@groups.ID_Group, event)" style="border:1px; font-weight:normal">Выбрать</a>
 
 							</td>
 						</tr>
@@ -57,6 +57,7 @@
 							<h6 style="margin-bottom : 0px;">Выбранные группы</h6>
 						</td>
 						<td></td>
+						<td></td>
 					</tr>
 				</thead>
 				<tbody>
@@ -64,25 +65,44 @@
 			</table>
 		</div>
 	</div>
-			<input type="submit" value="Добавить" id="end" class="btn btn-success" style="width:100px;" />
+	<input type="submit" value="Добавить" id="end" class="btn btn-success" style="width:100px;" />
 </form>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type='text/javascript'>
 
 
-	function selectGroup(Id) {
+	function selectGroup(Id, event) {
+		event.preventDefault();
 		var url = "/Subject/SelectGroup/" + Id;
 		$.ajax({
 			url: url,
 			method: 'GET',
 			dataType: 'json',
 			success: function (product) {
-				$('#tableOfSelectedGroups').append("<tr><td style='display: none'>" + product.iD_Group + "</td><td>" + product.name_group + "</td><td>" + product.decoding + "</td></tr>");
+				var isDuplicate = false;
+				$('#tableOfSelectedGroups tbody tr').each(function () {
+					var groupID = $(this).find('td:first').text().trim();
+					if (parseFloat(groupID) === parseFloat(product.iD_Group)) {
+						isDuplicate = true;
+						return false;
+					}
+				});
+
+				if (!isDuplicate) {
+					$('#tableOfSelectedGroups tbody').append("<tr><td id='group_" + product.iD_Group + "' style='display: none'>" + product.iD_Group + "</td><td>" + product.name_group + "</td><td>" + product.decoding +
+						"</td> <td> <a class='btn btn-outline-danger' onclick='removeGroup(this.parentNode.parentNode)' style='border: 1px; font - weight:normal'>Убрать</a>	</td> </tr>");
+				} else {
+					alert("Этот предмет уже добавлен.");
+				}
 			},
 		});
 	};
-	
+
+	function removeGroup(row) {
+		$(row).remove();
+	}
+
 	$('#form').submit(function (event) {
 		event.preventDefault();
 
