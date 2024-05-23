@@ -11,7 +11,8 @@
 	}
 	else if (User.IsInRole("Curator"))
 	{
-		if (Model.selectedGroup!=null){
+		if (Model.selectedGroup != null)
+		{
 			ViewData["Title"] = "Студенты вашей группы (" + Model.selectedGroup.Name_group + ")";
 		}
 		else
@@ -22,8 +23,9 @@
 }
 
 <h1>@ViewData["Title"]</h1>
-@if (User.IsInRole("Adm")) {
-<h1 style="display:inline">@ViewData["Title2"]</h1>
+@if (User.IsInRole("Adm"))
+{
+	<h1 style="display:inline">@ViewData["Title2"]</h1>
 	<button type="button" id="ChangeCurator" class="btn btn-warning">Изменить куратора</button>
 
 	<select class="chCurator" onchange="ChangeCurator(@Model.selectedGroup.ID_Group)" style="width:50%; max-width:220px; height:40px; text-align:center">
@@ -43,169 +45,188 @@
 
 @if (User.IsInRole("Adm") || User.IsInRole("Curator") & Model.selectedGroup != null)
 {
-<p id="grSel">Выберите группу</p>
-<form asp-controller="Student" asp-action="ShowStudents">
-	<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
-		@foreach (var groups in Model.Groups)
-		{
-			if (groups.ID_Group == Model.selectedGroup.ID_Group)
-			{
-				<option value="@groups.ID_Group" selected>@groups.Name_group</option>
-			}
-			else
-			{
-				<option value="@groups.ID_Group">@groups.Name_group</option>
-			}
-		}
-	</select>
-</form>
-
-
-<table class="table" id="myTable">
-	<thead>
-		<tr>
-			<th id="tableLabel">
-				<h6 style="margin-bottom : 0px; text-align:justify;">Фамилия</h6>
-			</th>
-			<th id="tableLabel">
-				<h6 style="margin-bottom : 0px; text-align:justify;">Имя</h6>
-			</th>
-			<th id="tableLabel">
-				<h6 style="margin-bottom : 0px; text-align:justify;">Отчество</h6>
-			</th>
-			@if (!User.IsInRole("Student"))
-			{
-				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:justify;">Действие</h6>
-				</th>
-			}
-		</tr>
-	</thead>
+	<p id="grSel">Выберите группу</p>
 	<form asp-controller="Student" asp-action="ShowStudents">
-	<tbody>
-			@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
+		<select name="selectedGroup" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
+			@foreach (var groups in Model.Groups)
 			{
-			<tr>
-				<td style="text-align:justify;font-weight: bold; width:10%">
-					<p id="label_s">@Html.DisplayFor(modelItem => item.Surname)</p>
-				</td>
-				<td style="text-align:justify;font-weight: bold; width:10%">
-					<p id="label_s">@Html.DisplayFor(modelItem => item.Name)</p>
-				</td>
-				<td style="text-align:justify;font-weight: bold; width:10%">
-					<p id="label_s">@Html.DisplayFor(modelItem => item.Patronymic)</p>
-				</td>
-					@if (!User.IsInRole("Student"))
-					{
-					<td style="text-align:justify; width:30%">
-							@if (User.IsInRole("Adm"))
-							{
-							<a class="btn btn-outline-danger" id="deleteStudent" onclick="DropStudent(@item.ID_Student)" style="border:1px; font-weight:normal">Удалить</a>
-							<a class="btn btn-outline-warning" onclick="showGroups(@item.ID_Student, event)" style="border:1px; font-weight:normal">Изменить группу</a>
-
-							<select class="chGroups" id="@item.ID_Student" onchange="ChangeGroupStudent(@item.ID_Student)" style="width:120px; height:40px; text-align:center">
-									@foreach (var groups in Model.Groups)
-									{
-										if (groups.ID_Group == Model.selectedGroup.ID_Group)
-										{
-										<option value="@groups.ID_Group" selected>@groups.Name_group</option>
-										}
-										else
-										{
-										<option value="@groups.ID_Group">@groups.Name_group</option>
-										}
-									}
-							</select>
-							<a class="btn btn-outline-info" onclick="showAccaunt(@item.NumberOfBook)" style="border:1px; font-weight:normal">Профиль</a>
-							}
-						<a class="btn btn-outline-info" onclick="showDebt(@item.ID_Student)" style="border:1px; font-weight:normal">Задолженности</a>
-
-					</td>
-					}
-			</tr>
-			}
-	</tbody>
-	</form>
-</table>
-
-<br>
-<h3 style="display:inline">Предметы</h3>
-	<button type="button" onclick="ChangeSubjects(@Model.selectedGroup.ID_Group)" class="btn btn-warning">Изменить предметы</button>
-<table class="table" id="myTable">
-	<thead>
-		<tr>
-			<th id="tableLabel">
-				<h6 style="margin-bottom : 0px; text-align:justify;">Дисциплина</h6>
-			</th>
-			<th id="tableLabel">
-				<h6 style="margin-bottom : 0px; text-align:justify;">Тип сдачи</h6>
-			</th>
-			<th id="tableLabel">
-				<h6 style="margin-bottom : 0px; display:inline">Дата</h6>
-				@if (User.IsInRole("Adm"))
+				if (groups.ID_Group == Model.selectedGroup.ID_Group)
 				{
-					<button type="button" id="ChangeDateBtn" class="btn btn-warning">Изменить дату сдачи для всех</button>
+					<option value="@groups.ID_Group" selected>@groups.Name_group</option>
 				}
-			</th>
-
-		</tr>
-	</thead>
-	<form asp-controller="Student" asp-action="ShowStudents">
-	<tbody>
-			@foreach (var item in Model.group_Subject)
-			{
-
-				var subj = Model.subjects.FirstOrDefault(q => q.ID_Subject == item.ID_Subject);
-
-				var mostCommonDate = Model.academic_Performance
-					.Where(q => q.ID_Subject == subj.ID_Subject && Model.Students.Any(student => student.ID_Student == q.ID_Student && student.ID_Group == Model.selectedGroup.ID_Group))
-				.GroupBy(q => q.Date)
-				.OrderByDescending(g => g.Count())
-				.Select(g => g.Key)
-				.FirstOrDefault();
-
-				var data = mostCommonDate == new DateTime(0001, 1, 1, 0, 0, 0) ? null : mostCommonDate?.ToString("dd MMMM yyyy");
-
-				var kind = Model.kind_Of_Works.FirstOrDefault(q => q.ID_Kind_of_work == Model.academic_Performance.FirstOrDefault(q => q.ID_Subject == item.ID_Subject && q.Date == mostCommonDate)?.ID_Kind_of_work);
-
-			<tr>
-				<td style="text-align:justify;font-weight: bold">
-					<p id="label_s">@subj.Name_subject</p>
-				</td>
-
-
-				<td style="text-align:justify;font-weight: bold">
-						@if (kind != null)
-						{
-						<p id="label_s">@kind.Title_of_kind</p>
-						}
-						else
-						{
-						<button type="button" id="addExamBtn" onclick="ExamBtnClick(@item.ID_Subject,event)" class="btn btn-warning">Назначить экзамен</button>
-
-						<select class="kindsOfWorks" id="Exams_@item.ID_Subject" onchange="addKindOfWork(@item.ID_Subject, @Model.selectedGroup.ID_Group)" style="width:250px; height:40px; text-align:center">
-								@foreach (var kinds in Model.kind_Of_Works)
-								{
-
-								<option value="@kinds.ID_Kind_of_work">@kinds.Title_of_kind</option>
-
-								}
-						</select>
-						}
-				</td>
-
-				<td style="font-weight: bold">
-						@if (kind != null)
-						{
-						<p id="label_s">@data</p>
-						<input type="date" class="selectDates" onchange="DateIsChanged(@subj.ID_Subject,@Model.selectedGroup.ID_Group,event)" style="width:150px; height:30px; text-align:center">
-						}
-				</td>
-			</tr>
+				else
+				{
+					<option value="@groups.ID_Group">@groups.Name_group</option>
+				}
 			}
-	</tbody>
+		</select>
 	</form>
-</table>
+
+
+	<table class="table" id="myTable">
+		<thead>
+			<tr>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:justify;">ФИО</h6>
+				</th>
+				@if (!User.IsInRole("Student"))
+				{
+					<th id="tableLabel">
+						<h6 style="margin-bottom : 0px; text-align:justify;">Действие</h6>
+					</th>
+				}
+			</tr>
+		</thead>
+		<form asp-controller="Student" asp-action="ShowStudents">
+		<tbody>
+				@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
+				{
+				<tr>
+					<td style="text-align:justify;font-weight: bold; width:10%">
+						<p id="label_s">
+								@Html.DisplayFor(modelItem => item.Surname)
+
+								@Html.DisplayFor(modelItem => item.Name)
+
+								@Html.DisplayFor(modelItem => item.Patronymic)
+						</p>
+					</td>
+						@if (!User.IsInRole("Student"))
+						{
+						<td style="text-align:justify; width:30%">
+								@if (User.IsInRole("Adm"))
+								{
+								<a class="btn btn-outline-danger" id="deleteStudent" onclick="DropStudent(@item.ID_Student)" style="border:1px; font-weight:normal">Удалить</a>
+								<a class="btn btn-outline-warning" onclick="showGroups(@item.ID_Student, event)" style="border:1px; font-weight:normal">Изменить группу</a>
+
+								<select class="chGroups" id="@item.ID_Student" onchange="ChangeGroupStudent(@item.ID_Student)" style="width:120px; height:40px; text-align:center">
+										@foreach (var groups in Model.Groups)
+										{
+											if (groups.ID_Group == Model.selectedGroup.ID_Group)
+											{
+											<option value="@groups.ID_Group" selected>@groups.Name_group</option>
+											}
+											else
+											{
+											<option value="@groups.ID_Group">@groups.Name_group</option>
+											}
+										}
+								</select>
+								<a class="btn btn-outline-info" onclick="showAccaunt(@item.NumberOfBook)" style="border:1px; font-weight:normal">Профиль</a>
+								}
+							<a class="btn btn-outline-info" onclick="showDebt(@item.ID_Student)" style="border:1px; font-weight:normal">Задолженности</a>
+							<a class="btn btn-outline-info" onclick="showExams(@item.ID_Student)" style="border:1px; font-weight:normal">Сданные дисциплины</a>
+
+						</td>
+						}
+				</tr>
+				}
+		</tbody>
+		</form>
+	</table>
+
+	<br>
+	<h3 style="display:inline">Предметы</h3>
+	if (User.IsInRole("Adm"))
+	{
+		<button type="button" onclick="ChangeSubjects(@Model.selectedGroup.ID_Group)" class="btn btn-warning">Изменить предметы</button>
+	}
+	<form asp-controller="Student" asp-action="ShowStudents">
+		<input type="hidden" name="selectedGroup" value="@Model.selectedGroup.ID_Group">
+		<p id="grSel">Выберите семестр</p>
+		<select class="SemeserOfSubj" name="selectedSemester" onchange="this.form.submit()" style="width:50%; max-width:80px; height:40px; text-align:center">
+			@foreach (var sem in Model.RatingControls)
+			{
+				if (sem.Semester == Model.SelectedSemester)
+				{
+					<option value="@sem.Semester" selected>@sem.Semester</option>
+				}
+				else
+				{
+					<option value="@sem.Semester">@sem.Semester</option>
+				}
+			}
+		</select>
+	</form>
+
+	<table class="table" id="myTable">
+		<thead>
+			<tr>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:justify;">Дисциплина</h6>
+				</th>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:justify;">Тип сдачи</h6>
+				</th>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; display:inline">Дата</h6>
+					@if (User.IsInRole("Adm"))
+					{
+						<button type="button" id="ChangeDateBtn" class="btn btn-warning">Изменить дату сдачи для всех</button>
+					}
+				</th>
+
+			</tr>
+		</thead>
+		<form asp-controller="Student" asp-action="ShowStudents">
+		<tbody>
+				@foreach (var item in Model.group_Subject.Where(q=>q.Semester == Model.SelectedSemester))
+				{
+
+					var subj = Model.subjects.FirstOrDefault(q => q.ID_Subject == item.ID_Subject);
+
+					var mostCommonDate = Model.academic_Performance
+					.Where(q => q.ID_Subject == subj.ID_Subject && Model.Students.Any(student => student.ID_Student == q.ID_Student && student.ID_Group == Model.selectedGroup.ID_Group))
+					.GroupBy(q => q.Date)
+					.OrderByDescending(g => g.Count())
+					.Select(g => g.Key)
+					.FirstOrDefault();
+
+					var data = mostCommonDate == new DateTime(0001, 1, 1, 0, 0, 0) ? null : mostCommonDate?.ToString("dd MMMM yyyy");
+
+					var kind = Model.kind_Of_Works.FirstOrDefault(q => q.ID_Kind_of_work == Model.academic_Performance.FirstOrDefault(q => q.ID_Subject == item.ID_Subject && q.Date == mostCommonDate)?.ID_Kind_of_work);
+
+				<tr>
+					<td style="text-align:justify;font-weight: bold">
+						<p id="label_s">@subj.Name_subject</p>
+					</td>
+
+
+					<td style="text-align:justify;font-weight: bold">
+							@if (kind != null)
+							{
+							<p id="label_s">@kind.Title_of_kind</p>
+							}
+							else
+							{
+								if (User.IsInRole("Adm"))
+								{
+								<button type="button" id="addExamBtn" onclick="ExamBtnClick(@item.ID_Subject,event)" class="btn btn-warning">Назначить экзамен</button>
+
+								<select class="kindsOfWorks" id="Exams_@item.ID_Subject" onchange="addKindOfWork(@item.ID_Subject, @Model.selectedGroup.ID_Group)" style="width:250px; height:40px; text-align:center">
+										@foreach (var kinds in Model.kind_Of_Works)
+										{
+
+										<option value="@kinds.ID_Kind_of_work">@kinds.Title_of_kind</option>
+
+										}
+								</select>
+								}
+							}
+					</td>
+
+					<td style="font-weight: bold">
+							@if (kind != null)
+							{
+							<p id="label_s">@data</p>
+							<input type="date" class="selectDates" onchange="DateIsChanged(@subj.ID_Subject,@Model.selectedGroup.ID_Group,event)" style="width:150px; height:30px; text-align:center">
+							}
+					</td>
+				</tr>
+				}
+		</tbody>
+		</form>
+	</table>
 }
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type='text/javascript'>
@@ -297,12 +318,18 @@
 	//профили студентов
 	function showAccaunt(id) {
 		window.location.href = '/Account/AccountInfoStudent' + id;
-	} 
+	}
 
 	//задолженности студента
 	function showDebt(id) {
 		window.location.href = '/Exams/DebtsOfStudent' + id;
 	}
+
+	//сданные экзамены студента
+	function showExams(id) {
+		window.location.href = '/Exams/ExamsOfStudent' + id;
+	}
+
 
 	//смена изучаемых предметов
 	function ChangeSubjects(id) {
@@ -326,7 +353,7 @@
 		}
 	}
 
-	//изменение куратор 
+	//изменение куратор
 	$('#ChangeCurator').click(function (id) {
 		if ($('#ChangeCurator').text() == 'Изменить куратора') {
 			$('.chCurator').show();

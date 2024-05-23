@@ -27,7 +27,6 @@ namespace recordBook.Controllers
 		private readonly IGroup _group;
 		private readonly ISubject _subject;
 		private readonly IKind_of_work _kind_of_work;
-		//private readonly IDepartment_worker _department_worker;
 		private readonly IGroup_Subject _group_subject;
 		private readonly IAcademic_performance _academic_performance;
 		private readonly IRatingControl _ratingControl;
@@ -43,7 +42,6 @@ namespace recordBook.Controllers
 			_group = group;
 			_subject = subject;
 			_kind_of_work = kind_wf_work;
-			//_department_worker = department_worker;
 			_group_subject = group_subject;
 			_academic_performance = academic_performance;
 			_ratingControl = ratingControl;
@@ -326,7 +324,7 @@ namespace recordBook.Controllers
 
 						return View(model);
 				}
-			return View(model);
+				return View(model);
 			}
 		}
 
@@ -446,10 +444,20 @@ namespace recordBook.Controllers
 			}
 			else
 			{
+				int? group = null;
+				if (User.IsInRole("Adm"))
+				{
+					group = selectedGroup == 0 ? GetGroups()?.FirstOrDefault()?.ID_Group : selectedGroup;
+				}
+				else if (User.IsInRole("Curator") || User.IsInRole("Student"))
+				{
+					group = selectedGroup == 0 ? GetGroups()?.FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid).Value)).ID_Group : selectedGroup;
+				}
+
 
 				var maxSemester = GetRatingControls()
-					.Where(q => q.ID_Student == GetStudents().FirstOrDefault(q => q.ID_Group == GetGroups().FirstOrDefault().ID_Group).ID_Student)
-					.Max(q => q.Semester);
+						.Where(q => q.ID_Student == GetStudents()?.FirstOrDefault(q => q.ID_Group == group)?.ID_Student)
+						.Max(q => q.Semester);
 
 				var model = new ExamsViewModel
 				{
@@ -457,8 +465,6 @@ namespace recordBook.Controllers
 					Students = GetStudents(),
 					Group_Subjects = GetGroup_Subject(),
 					Subjects = GetSubjects(),
-					selectedGroup = GetGroups().FirstOrDefault(),
-					selectedSubject = GetSubjects().FirstOrDefault(),
 					RatingControls = GetRatingControls(),
 					selectedSemester = maxSemester,
 				};
@@ -466,20 +472,19 @@ namespace recordBook.Controllers
 				switch (User.FindFirst(ClaimTypes.Role)?.Value)
 				{
 					case "Adm":
-						if (selectedGroup > 0 & selectedSubject > 0 & SelectedSemester > 0)
-						{
-							var groupById = _group.GetGroupbyID(selectedGroup);
-							var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
-							if (!subjectsOfSelectedGroup.Contains(selectedSubject))
-							{
-								selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
-							}
-							var subjectById = _subject.GetSubjectbyID(selectedSubject);
-							model.selectedGroup = groupById;
-							model.selectedSubject = subjectById;
-							model.selectedSemester = SelectedSemester;
 
+						model.selectedGroup = selectedGroup == 0 ? GetGroups().FirstOrDefault() : _group.GetGroupbyID(selectedGroup);
+						model.selectedSubject = selectedSubject == 0 | !model.RatingControls
+						.Where(w => w.ID_Student == GetStudents()?.FirstOrDefault(q => q.ID_Group == group).ID_Student).Select(w => w.ID_Subject).Contains(selectedSubject)
+						? GetSubjects().FirstOrDefault(q => q.ID_Subject == model.RatingControls
+						.FirstOrDefault(w => w.ID_Student == GetStudents()?.FirstOrDefault(q => q.ID_Group == group)?.ID_Student).ID_Subject)
+							: _subject.GetSubjectbyID(selectedSubject);
+						var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(model.selectedGroup.ID_Group).Select(z => z.ID_Subject);
+						if (!subjectsOfSelectedGroup.Contains(selectedSubject))
+						{
+							selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
 						}
+						model.selectedSemester = SelectedSemester == 0 || SelectedSemester > maxSemester ? maxSemester : SelectedSemester;
 						return View(model);
 
 
@@ -503,15 +508,13 @@ namespace recordBook.Controllers
 						}
 
 						var maxSem = se;
-						model.selectedSemester = SelectedSemester < 1 ? maxSem : SelectedSemester;
-						model.RatingControls = GetRatingControls().Where(q => q.ID_Student == Convert.ToInt32(User.FindFirst(ClaimTypes.SerialNumber)?.Value));
+						model.selectedSemester = SelectedSemester == 0 || SelectedSemester > maxSemester ? maxSemester : SelectedSemester;
 
-
-						if (selectedSubject > 0)
-						{
-							var subjectById = _subject.GetSubjectbyID(selectedSubject);
-							model.selectedSubject = subjectById;
-						}
+						model.selectedSubject = selectedSubject == 0 | !model.RatingControls
+												.Where(w => w.ID_Student == GetStudents()?.FirstOrDefault(q => q.ID_Group == group).ID_Student).Select(w => w.ID_Subject).Contains(selectedSubject)
+												? GetSubjects().FirstOrDefault(q => q.ID_Subject == model.RatingControls
+												.FirstOrDefault(w => w.ID_Student == GetStudents()?.FirstOrDefault(q => q.ID_Group == group)?.ID_Student).ID_Subject)
+													: _subject.GetSubjectbyID(selectedSubject);
 
 						return View(model);
 
@@ -523,7 +526,11 @@ namespace recordBook.Controllers
 						model.Groups = selectedGroups;
 						model.Group_Subjects = GetGroup_Subject().Where(subject => selectedGroups.Any(group => group.ID_Group == subject.ID_Group));
 						model.selectedGroup = selectedGroups.FirstOrDefault();
-
+						model.selectedSubject = selectedSubject == 0 | !model.RatingControls
+								.Where(w => w.ID_Student == GetStudents()?.FirstOrDefault(q => q.ID_Group == group).ID_Student).Select(w => w.ID_Subject).Contains(selectedSubject)
+								? GetSubjects().FirstOrDefault(q => q.ID_Subject == model.RatingControls
+								.FirstOrDefault(w => w.ID_Student == GetStudents()?.FirstOrDefault(q => q.ID_Group == group)?.ID_Student).ID_Subject)
+									: _subject.GetSubjectbyID(selectedSubject);
 						if (selectedGroup > 0 & selectedSubject > 0)
 						{
 							model.selectedGroup = _group.GetGroupbyID(selectedGroup);
@@ -557,11 +564,44 @@ namespace recordBook.Controllers
 				var model = new ExamsViewModel()
 				{
 					Students = GetStudents().Where(q => q.ID_Student == idStudent),
-					Academic_Performances = GetAcademic_performance().Where(q => q.ID_Student == idStudent),
+					Academic_Performances = GetAcademic_performance().Where(q => q.ID_Student == idStudent)
+					.Where(a => a.Grade == "Нет оценки" || a.Grade == "Не удовлетворительно")
+					.Where(q => q.Date < DateTime.Now),
+
 					Kind_of_works = GetKind_of_works(),
-					Subjects = GetSubjects()
+					Subjects = GetSubjects(),
+					whatWhatvhing = "Задолжености"
 				};
-				return View(model);
+				return View("AcademPerdOfStudent", model);
+			}
+			else
+			{
+				return View("Error");
+			}
+		}
+
+
+		/// <summary>
+		/// Просмотр сданных экзаменов выбранного ученика
+		/// </summary>
+		/// <param name="idStudent"></param>
+		/// <returns></returns>
+		[HttpGet]
+		[Route("/Exams/ExamsOfStudent{idStudent:int}")]
+		public ViewResult ExamsOfStudent(int idStudent)
+		{
+			if (User.IsInRole("Adm") || User.IsInRole("Curator"))
+			{
+				var model = new ExamsViewModel()
+				{
+					Students = GetStudents().Where(q => q.ID_Student == idStudent),
+					Academic_Performances = GetAcademic_performance().Where(q => q.ID_Student == idStudent)
+					.Where(p => p.Grade != "Нет оценки" && p.Grade != "Не удовлетворительно" & p.ID_Kind_of_work != 4 & p.ID_Kind_of_work != 5 & p.ID_Kind_of_work != 6),
+					Kind_of_works = GetKind_of_works(),
+					Subjects = GetSubjects(),
+					whatWhatvhing = "Сданные дисциплины"
+				};
+				return View("AcademPerdOfStudent", model);
 			}
 			else
 			{

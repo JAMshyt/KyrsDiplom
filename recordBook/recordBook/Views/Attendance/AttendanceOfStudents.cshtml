@@ -8,13 +8,9 @@
 	{
 		ViewData["Title"] = "Ваша посещаемость, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 	}
-	else if (User.IsInRole("Adm"))
+	else if (User.IsInRole("Adm") || User.IsInRole("Curator"))
 	{
 		ViewData["Title"] = "Посещаемость группы " + Model.selectedGroup.Name_group;
-	}
-	else
-	{
-		ViewData["Title"] = "Посещаемость вашей группы (" + Model.selectedGroup.Name_group + ")";
 	}
 }
 
@@ -59,12 +55,13 @@
 	<br>
 
 	<p>
-		<input class="leg" type="checkbox" checked disabled> - Был на паре
+		<input class="leg" type="checkbox" checked disabled> - Пропуск
 	</p>
 
 	<p>
-		<input class="leg" type="checkbox" disabled> - Пропуск
+		<input class="leg" type="checkbox" disabled> - Был на паре
 	</p>
+
 
 	<table class="table" id="myTable">
 
@@ -104,7 +101,7 @@
 						<td style="text-align:center; font-weight: bold;">
 							@if (@r.Precense == true)
 							{
-								<input type="checkbox" class="AttendaceCheckbox" onchange="AttendanceIsChanged(@r.ID_Attendance,event)" checked disabled>
+								<input type="checkbox" class="AttendaceCheckbox" onchange="AttendanceIsChanged(@r.ID_Attendance,event)"  checked disabled>
 							}
 							else
 							{
@@ -386,4 +383,8 @@ else if(User.IsInRole("Student"))
 			dataType: 'json',
 		});
 	};
+
+
+
+
 </script>

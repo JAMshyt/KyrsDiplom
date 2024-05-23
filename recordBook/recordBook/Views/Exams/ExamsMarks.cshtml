@@ -8,13 +8,9 @@
 	{
 		ViewData["Title"] = "Ваши оценки, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 	}
-	else if (User.IsInRole("Adm"))
+	else if (User.IsInRole("Adm") || User.IsInRole("Curator"))
 	{
-		ViewData["Title"] = "Оценки группы " + Model.selectedGroup.Name_group;
-	}
-	else
-	{
-		ViewData["Title"] = "Оценки вашей группы (" + Model.selectedGroup.Name_group+")";
+		ViewData["Title"] = "Оценки группы " + Model.selectedGroup.Name_group+" по дисциплинам";
 	}
 }
 
@@ -85,7 +81,7 @@
 				@foreach (var r in Model.Academic_Performances
 						.Where(z => z.ID_Student == item.ID_Student)
 						.Where(i => i.ID_Subject == Model.selectedSubject.ID_Subject)
-						.Where(p => p.Grade != "Нет оценки" && p.Grade != "Не удовлетворительно" & p.ID_Kind_of_work != 4))
+						.Where(p => p.Grade != "Нет оценки" && p.Grade != "Не удовлетворительно" & p.ID_Kind_of_work != 4 & p.ID_Kind_of_work != 5 & p.ID_Kind_of_work != 6))
 				{
 					<tr id="columnGrade">
 						@if (item.ID_Student == r.ID_Student)

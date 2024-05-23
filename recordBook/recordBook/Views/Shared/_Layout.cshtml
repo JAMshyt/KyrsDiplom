@@ -12,86 +12,94 @@
 	<header>
 		<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
 			<div class="container-fluid">
-				<a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Logout">заЧётка</a>
+				<a class="navbar-brand" onclick="clearLocalStorage()" asp-area="" asp-controller="Home" asp-action="Logout">заЧётка</a>
 				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
 						aria-expanded="false" aria-label="Toggle navigation">
 					<span class="navbar-toggler-icon"></span>
 				</button>
 				<div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+
+					<style>
+						.nav-link.active {
+							color:red;
+							background-color: gray;}
+					</style>
+
 					<ul class="navbar-nav flex-grow-1">
 						@if (User.IsInRole("Adm"))
 						{
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="ShowStudents" asp-controller="Student">Просмотр групп</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="ShowStudents" asp-controller="Student">Просмотр групп</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="AttendanceOfStudents" asp-controller="Attendance">Посещаемость</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="AttendanceOfStudents" asp-controller="Attendance">Посещаемость</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="ExamsMarks" asp-controller="Exams">Экзамены</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="ExamsMarks" asp-controller="Exams">Экзамены</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="RatingList" asp-controller="Exams">Рейтинги</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="RatingList" asp-controller="Exams">Рейтинги</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="Debt" asp-controller="Exams">Задолженности</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="Debt" asp-controller="Exams">Задолженности</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="Upcoming" asp-controller="Exams">Предстоящие экзамены</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="Upcoming" asp-controller="Exams">Предстоящие экзамены</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="Practices" asp-controller="Exams">Практики</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="Practices" asp-controller="Exams">Практики</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="AddStudent" asp-controller="Student">Добавить студента</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="AddStudent" asp-controller="Student">Добавить студента</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="AddSubject" asp-controller="Subject">Добавить предмет</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="AddSubject" asp-controller="Subject">Добавить предмет</a>
 							</li>
+
 						}
 						else if (User.IsInRole("Student"))
 						{
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="AttendanceOfStudents" asp-controller="Attendance">Посещаемость</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="AttendanceOfStudents" asp-controller="Attendance">Посещаемость</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="ExamsMarks" asp-controller="Exams">Оценки</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="ExamsMarks" asp-controller="Exams">Оценки</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="RatingList" asp-controller="Exams">Рейтинги</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="RatingList" asp-controller="Exams">Рейтинги</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="Debt" asp-controller="Exams">Задолженности</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="Debt" asp-controller="Exams">Задолженности</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="Practices" asp-controller="Exams">Практики</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="Practices" asp-controller="Exams">Практики</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="Upcoming" asp-controller="Exams">Предстоящие экзамены</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="Upcoming" asp-controller="Exams">Предстоящие экзамены</a>
 							</li>
 						}
 						else if (User.IsInRole("Curator"))
 						{
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="ShowStudents" asp-controller="Student">Просмотр группы</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="ShowStudents" asp-controller="Student">Просмотр группы</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="AttendanceOfStudents" asp-controller="Attendance">Посещаемость группы</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="AttendanceOfStudents" asp-controller="Attendance">Посещаемость группы</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="ExamsMarks" asp-controller="Exams">Экзамены группы</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="ExamsMarks" asp-controller="Exams">Экзамены группы</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="RatingList" asp-controller="Exams">Рейтинги группы</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="RatingList" asp-controller="Exams">Рейтинги группы</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="Debt" asp-controller="Exams">Задолженности группы</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="Debt" asp-controller="Exams">Задолженности группы</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="Practices" asp-controller="Exams">Практики группы</a>
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="Practices" asp-controller="Exams">Практики группы</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-action="Upcoming" asp-controller="Exams">Предстоящие экзамены группы</a>@*  &#13;&#10; - пробел *@
+								<a class="nav-link text-dark" onclick="changeClass(this)" asp-action="Upcoming" asp-controller="Exams">Предстоящие экзамены группы</a>@*  &#13;&#10; - пробел *@
 							</li>
 						}
 					</ul>
@@ -108,31 +116,31 @@
 			@if (User.IsInRole("Adm"))
 			{
 
-				<input type="submit" id="men1" class="sideMenu" asp-action="ShowStudents" asp-controller="Student" value="Просмотр групп">
+				<input type="submit" id="men1" class="sideMenu" onclick="changeClass(this)" asp-action="ShowStudents" asp-controller="Student" value="Просмотр групп">
 
 				<br>
-				<input type="submit" class="sideMenu" asp-action="AttendanceOfStudents" asp-controller="Attendance" value="Посещаемость">
+				<input type="submit" class="sideMenu" onclick="changeClass(this)" asp-action="AttendanceOfStudents" asp-controller="Attendance" value="Посещаемость">
 
 				<br>
-				<input type="submit" class="sideMenu" asp-action="ExamsMarks" asp-controller="Exams" value="Экзамены">
+				<input type="submit" class="sideMenu" onclick="changeClass(this)" asp-action="ExamsMarks" asp-controller="Exams" value="Экзамены">
 
 				<br>
-				<input type="submit" class="sideMenu" asp-action="RatingList" asp-controller="Exams" value="Рейтинги">
+				<input type="submit" class="sideMenu" onclick="changeClass(this)" asp-action="RatingList" asp-controller="Exams" value="Рейтинги">
 
 				<br>
-				<input type="submit" class="sideMenu" asp-action="Debt" asp-controller="Exams" value="Задолженности">
+				<input type="submit" class="sideMenu" onclick="changeClass(this)" asp-action="Debt" asp-controller="Exams" value="Задолженности">
 
 				<br>
-				<input type="submit" class="sideMenu" asp-action="Upcoming" asp-controller="Exams" value="Предстоящие экзамены">
+				<input type="submit" class="sideMenu" onclick="changeClass(this)" asp-action="Upcoming" asp-controller="Exams" value="Предстоящие экзамены">
 
 				<br>
-				<input type="submit" class="sideMenu" asp-action="Practices" asp-controller="Exams" value="Практики">
+				<input type="submit" class="sideMenu" onclick="changeClass(this)" asp-action="Practices" asp-controller="Exams" value="Практики">
 
 				<br>
-				<input type="submit" class="sideMenu" asp-action="AddStudent" asp-controller="Student" value="Добавить студента">
+				<input type="submit" class="sideMenu" onclick="changeClass(this)" asp-action="AddStudent" asp-controller="Student" value="Добавить студента">
 
 				<br>
-				<input type="submit" id="men2" class="sideMenu" asp-action="AddSubject" asp-controller="Subject" value="Добавить предмет">
+				<input type="submit" id="men2" class="sideMenu" onclick="changeClass(this)" asp-action="AddSubject" asp-controller="Subject" value="Добавить предмет">
 
 				<br>
 				<label class="navLabel">&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Навигация &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp</label>
@@ -140,22 +148,22 @@
 			else if (User.IsInRole("Student"))
 			{
 
-				<input type="submit" id="men1" class="sideMenu" asp-action="AttendanceOfStudents" asp-controller="Attendance" value="Посещаемость">
+				<input type="submit" id="men1" class="sideMenu" onclick="changeClass(this)" asp-action="AttendanceOfStudents" asp-controller="Attendance" value="Посещаемость">
 
 				<br>
-				<input type="submit" class="sideMenu" asp-action="ExamsMarks" asp-controller="Exams" value="Оценки">
+				<input type="submit" class="sideMenu" onclick="changeClass(this)" asp-action="ExamsMarks" asp-controller="Exams" value="Оценки">
 
 				<br>
-				<input type="submit" class="sideMenu" asp-action="RatingList" asp-controller="Exams" value="Рейтинги">
+				<input type="submit" class="sideMenu" onclick="changeClass(this)" asp-action="RatingList" asp-controller="Exams" value="Рейтинги">
 
 				<br>
-				<input type="submit" class="sideMenu" asp-action="Debt" asp-controller="Exams" value="Задолженности">
+				<input type="submit" class="sideMenu" onclick="changeClass(this)" asp-action="Debt" asp-controller="Exams" value="Задолженности">
 
 				<br>
-				<input type="submit" class="sideMenu" asp-action="Practices" asp-controller="Exams" value="Практики">
+				<input type="submit" class="sideMenu" onclick="changeClass(this)" asp-action="Practices" asp-controller="Exams" value="Практики">
 
 				<br>
-				<input type="submit" id="men2" class="sideMenu" asp-action="Upcoming" asp-controller="Exams" value="Предстоящие экзамены">
+				<input type="submit" id="men2" class="sideMenu" onclick="changeClass(this)" asp-action="Upcoming" asp-controller="Exams" value="Предстоящие экзамены">
 
 				<br>
 				<label class="navLabel2">&nbsp &nbsp Навигация &nbsp &nbsp</label>
@@ -163,25 +171,25 @@
 			}
 			else if (User.IsInRole("Curator"))
 			{
-				<input type="submit" id="men1" class="sideMenu" asp-action="ShowStudents" asp-controller="Student" value="Просмотр группы">
+				<input type="submit" id="men1" class="sideMenu" onclick="changeClass(this)" asp-action="ShowStudents" asp-controller="Student" value="Просмотр группы">
 
 				<br>
-				<input type="submit" class="sideMenu" asp-action="AttendanceOfStudents" asp-controller="Attendance" value="Посещаемость группы">
+				<input type="submit" class="sideMenu" onclick="changeClass(this)" asp-action="AttendanceOfStudents" asp-controller="Attendance" value="Посещаемость группы">
 
 				<br>
-				<input type="submit" class="sideMenu" asp-action="ExamsMarks" asp-controller="Exams" value="Экзамены группы">
+				<input type="submit" class="sideMenu" onclick="changeClass(this)" asp-action="ExamsMarks" asp-controller="Exams" value="Экзамены группы">
 
 				<br>
-				<input type="submit" class="sideMenu" asp-action="RatingList" asp-controller="Exams" value="Рейтинги группы">
+				<input type="submit" class="sideMenu" onclick="changeClass(this)" asp-action="RatingList" asp-controller="Exams" value="Рейтинги группы">
 
 				<br>
-				<input type="submit" class="sideMenu" asp-action="Debt" asp-controller="Exams" value="Задолженности группы">
+				<input type="submit" class="sideMenu" onclick="changeClass(this)" asp-action="Debt" asp-controller="Exams" value="Задолженности группы">
 
 				<br>
-				<input type="submit" class="sideMenu" asp-action="Practices" asp-controller="Exams" value="Практики">
+				<input type="submit" class="sideMenu" onclick="changeClass(this)" asp-action="Practices" asp-controller="Exams" value="Практики">
 
 				<br>
-				<input type="submit" id="men2" class="sideMenu" asp-action="Upcoming" asp-controller="Exams" value="Предстоящие экзамены&#13;&#10;группы">
+				<input type="submit" id="men2" class="sideMenu" onclick="changeClass(this)" asp-action="Upcoming" asp-controller="Exams" value="Предстоящие экзамены&#13;&#10;группы">
 
 				<br>
 				<label class="navLabel3">&nbsp &nbsp &nbsp &nbsp &nbsp Навигация &nbsp &nbsp &nbsp &nbsp &nbsp</label>
@@ -207,3 +215,30 @@
 	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+<script>
+	function changeClass(element) {
+		var navLinks = document.querySelectorAll('.nav-link');
+		for (var i = 0; i < navLinks.length; i++) {
+			navLinks[i].classList.remove('active');
+		}
+		element.classList.add('active');
+		localStorage.setItem('activeTab', element.textContent);
+	}
+
+	window.onload = function () {
+		var activeTab = localStorage.getItem('activeTab');
+		if (activeTab) {
+			var navLinks = document.querySelectorAll('.nav-link');
+			for (var i = 0; i < navLinks.length; i++) {
+				if (navLinks[i].textContent === activeTab) {
+					navLinks[i].classList.add('active');
+				}
+			}
+		}
+	}
+
+	function clearLocalStorage() {
+		localStorage.removeItem('activeTab');
+	}
+</script>

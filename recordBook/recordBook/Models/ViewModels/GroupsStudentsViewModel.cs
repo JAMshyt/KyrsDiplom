@@ -11,5 +11,7 @@
 		public IEnumerable<Academic_performance> academic_Performance { get; set; }
 		public IEnumerable<Kind_of_work> kind_Of_Works { get; set; }
 		public IEnumerable<Curator> Curators { get; set; }
+		public IEnumerable<RatingControl> RatingControls { get; set; }
+		public int? SelectedSemester {  get; set; }
 	}
 }

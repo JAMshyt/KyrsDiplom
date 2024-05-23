@@ -4,7 +4,7 @@
 
 @model ExamsViewModel
 @{
-	ViewData["Title"] = "Задолженности: " + Model.Students.First().Surname + " " + Model.Students.First().Name + " " + Model.Students.First().Patronymic ;
+	ViewData["Title"] = Model.whatWhatvhing+": " + Model.Students.FirstOrDefault().Surname + " " + Model.Students.FirstOrDefault().Name + " " + Model.Students.FirstOrDefault().Patronymic;
 }
 @if (User.IsInRole("Adm") || User.IsInRole("Curator"))
 {
@@ -30,9 +30,7 @@
 		</thead>
 		<tbody>
 
-			@foreach (var r in Model.Academic_Performances
-											.Where(a => a.Grade == "Нет оценки" || a.Grade == "Не удовлетворительно")
-											.Where(q => q.Date < DateTime.Now))
+			@foreach (var r in Model.Academic_Performances)
 			{
 
 				<tr id="columnGrade">

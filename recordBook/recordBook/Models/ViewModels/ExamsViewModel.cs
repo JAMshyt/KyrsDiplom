@@ -13,5 +13,7 @@
 
 		public Group selectedGroup { get; set; }
 		public Subject selectedSubject { get; set; }
+
+		public string? whatWhatvhing { get; set; } //для оглавления на странице о личной успеваемости каждого студента
 	}
 }

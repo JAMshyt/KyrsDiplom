@@ -21,14 +21,12 @@ namespace recordBook.Controllers
 		private readonly IKind_of_work _kind_Of_Work;
 		private readonly ILoginsStudent _loginsStudent;
 		private readonly ICurator _curator;
-
-
-		private readonly ILogins _user;
+		private readonly IRatingControl _ratingControl;
 
 		public StudentController(ILogger<StudentController> logger, IStudent student,
-			IGroup group, ISubject subject, IGroup_Subject group_subject, ILogins user,
+			IGroup group, ISubject subject, IGroup_Subject group_subject,
 			ILogins logins, IAcademic_performance academic_Performance, IKind_of_work kind_Of_Work,
-			ILoginsStudent loginsStudent, ICurator curator
+			ILoginsStudent loginsStudent, ICurator curator, IRatingControl ratingControl
 			)
 		{
 			_logger = logger;
@@ -41,6 +39,7 @@ namespace recordBook.Controllers
 			_kind_Of_Work = kind_Of_Work;
 			_loginsStudent = loginsStudent;
 			_curator = curator;
+			_ratingControl = ratingControl;
 		}
 
 
@@ -97,6 +96,12 @@ namespace recordBook.Controllers
 			var kow = _kind_Of_Work.GetAllKind_of_work().ToList();
 			return kow;
 		}
+
+		public List<RatingControl> GetRatingControls()
+		{
+			var rait = _ratingControl.GetAllRatingControl().ToList();
+			return rait;
+		}
 		#endregion
 
 
@@ -105,64 +110,66 @@ namespace recordBook.Controllers
 		/// </summary>
 		/// <param name="selectedGroup">id выбранной группы</param>
 		/// <returns>модел с всеми учениками выбранной группы</returns>
-		public async Task<IActionResult> ShowStudents(int selectedGroup)
+		public async Task<IActionResult> ShowStudents(int selectedGroup, int selectedSemester)
 		{
-			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
-			var model = new GroupsStudentsViewModel
+			if (User.Identity.IsAuthenticated)
 			{
-				Groups = GetGroups(),
-				Students = GetStudents(),
-				subjects = GetSubject(),
-				academic_Performance = GetAcademicPerformance(),
-				kind_Of_Works = GetKindOfWork(),
-				Curators = GetCurators()
-			};
-
-			if (User.IsInRole("Adm"))
-			{
-				if (selectedGroup > 0)
+				ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
+				var model = new GroupsStudentsViewModel
 				{
-					var groupById = _group.GetGroupbyID(selectedGroup);
+					Groups = GetGroups(),
+					Students = GetStudents(),
+					subjects = GetSubject(),
+					academic_Performance = GetAcademicPerformance(),
+					kind_Of_Works = GetKindOfWork(),
+					Curators = GetCurators(),
+				};
 
-					model.selectedGroup = groupById;
-					model.group_Subject = GetGroupSubject().Where(q => q.ID_Group == groupById.ID_Group);
+				if (User.IsInRole("Adm"))
+				{
+						model.selectedGroup = selectedGroup == 0 ? GetGroups().FirstOrDefault() : _group.GetGroupbyID(selectedGroup);
+						model.group_Subject = GetGroupSubject().Where(q => q.ID_Group == model.selectedGroup.ID_Group);
+						model.RatingControls = GetRatingControls()
+							.Where(q => q.ID_Student == GetStudents().FirstOrDefault(w => w.ID_Group == model.selectedGroup.ID_Group).ID_Student
+								&& q.ID_Subject == model.group_Subject.FirstOrDefault().ID_Subject
+								&& q.RatingNumber == 1)
+							.GroupBy(q => q.ID_RatingControl)
+							.Select(g => g.First())
+							.OrderByDescending(q => q.ID_RatingControl)
+							.ToList();
+						model.SelectedSemester = selectedSemester == 0 ? GetRatingControls()
+							.Where(q => q.ID_Student == GetStudents().FirstOrDefault(w => w.ID_Group == model.selectedGroup.ID_Group).ID_Student)
+							.Select(q => q.Semester)
+							.Max() : selectedSemester; 
+						return View(model);
 
+				}
+				else if (User.IsInRole("Curator"))
+				{
+					var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
+					var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
+					model.Groups = selectedGroups;
+					model.selectedGroup = selectedGroup == 0 ? model.Groups.FirstOrDefault() : _group.GetGroupbyID(selectedGroup);
+					model.group_Subject = GetGroupSubject().Where(subject => subject.ID_Group == selectedGroups.FirstOrDefault().ID_Group);
+					model.RatingControls = GetRatingControls()
+						.Where(q => q.ID_Student == GetStudents().FirstOrDefault(w => w.ID_Group == model.selectedGroup.ID_Group)?.ID_Student
+							&& q.ID_Subject == model.group_Subject.FirstOrDefault().ID_Subject
+							&& q.RatingNumber == 1)
+						.GroupBy(q => q.ID_RatingControl)
+						.Select(g => g.First())
+						.OrderByDescending(q => q.ID_RatingControl)
+						.ToList();
+					model.SelectedSemester = selectedSemester == 0 ? GetRatingControls()
+						.Where(q => q.ID_Student == GetStudents().FirstOrDefault(w => w.ID_Group == model.selectedGroup?.ID_Group)?.ID_Student)
+						.Select(q => q.Semester)
+						.Max() : selectedSemester;
+										
 					return View(model);
 				}
 				else
 				{
-
-					model.selectedGroup = GetGroups().FirstOrDefault();
-					model.group_Subject = GetGroupSubject().Where(q => q.ID_Group == GetGroups().FirstOrDefault().ID_Group);
-					return View(model);
+					return View("Error");
 				}
-			}
-			else if (User.IsInRole("Student"))
-			{
-
-				model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
-				model.group_Subject = GetGroupSubject().Where(q => q.ID_Group == GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value)).ID_Group);
-
-				return View(model);
-			}
-			else if (User.IsInRole("Curator"))
-			{
-				var groupClaims = User.FindAll(ClaimTypes.GroupSid).Select(claim => Convert.ToInt32(claim.Value)).ToList();
-				var selectedGroups = GetGroups().Where(group => groupClaims.Contains(group.ID_Group));
-				model.Groups = selectedGroups;
-				model.group_Subject = GetGroupSubject().Where(subject => subject.ID_Group == selectedGroups.FirstOrDefault().ID_Group);
-				model.selectedGroup = selectedGroups.FirstOrDefault();
-
-				if (selectedGroup > 0)
-				{
-					var groupById = _group.GetGroupbyID(selectedGroup);
-					model.group_Subject = GetGroupSubject().Where(q => q.ID_Group == groupById.ID_Group);
-					model.selectedGroup = groupById;
-
-					return View(model);
-				}
-
-				return View(model);
 			}
 			else
 			{

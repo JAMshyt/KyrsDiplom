@@ -8,13 +8,9 @@
 	{
 		ViewData["Title"] = "Ваши рейтинги, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 	}
-	else if (User.IsInRole("Adm"))
+	else if (User.IsInRole("Adm") || User.IsInRole("Curator"))
 	{
 		ViewData["Title"] = "Рейтинги группы " + Model.selectedGroup.Name_group;
-	}
-	else
-	{
-		ViewData["Title"] = "Рейтинги вашей группы (" + Model.selectedGroup.Name_group + ")";
 	}
 }
 
@@ -38,30 +34,12 @@
 			}
 		</select>
 
-
-		<select name="selectedSubject" required onchange="this.form.submit()" style="width:200px; height:40px; text-align:center">
-			@foreach (var subj in Model.Subjects)
-			{
-				if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(subj.ID_Subject))
-				{
-					if (subj.ID_Subject == Model.selectedSubject.ID_Subject)
-					{
-						<option value="@subj.ID_Subject" selected>@subj.Name_subject</option>
-					}
-					else
-					{
-						<option value="@subj.ID_Subject">@subj.Name_subject</option>
-					}
-				}
-			}
-		</select>
-
 		@{
 			var maxSemester = Model.RatingControls
-			.Where(q => q.ID_Student == Model.Students.FirstOrDefault(q => q.ID_Group == Model.selectedGroup.ID_Group).ID_Student)
-			.Select(q => q.Semester)
-			.Distinct()
-			.OrderByDescending(s => s);
+					.Where(q => q.ID_Student == Model.Students.FirstOrDefault(q => q.ID_Group == Model.selectedGroup.ID_Group).ID_Student)
+					.Select(q => q.Semester)
+					.Distinct()
+					.OrderByDescending(s => s);
 		}
 		<br><br>
 		<p id="tt">
@@ -83,9 +61,32 @@
 			<button type="button" id="ChangePoints" class="btn btn-warning">Изменить баллы</button>
 		</p>
 
+
+
+		<select name="selectedSubject" required onchange="this.form.submit()" style="width:200px; height:40px; text-align:center">
+
+			@{
+				var studentId = Model.Students.FirstOrDefault(q => q.ID_Group == Model.selectedGroup.ID_Group).ID_Student;
+				var subjects = Model.RatingControls.Where(q => q.ID_Student == studentId & q.Semester == Model.selectedSemester).Select(q => q.ID_Subject).ToList();
+				var filteredSubjects = Model.Subjects.Where(s => subjects.Contains(s.ID_Subject));
+			}
+
+			@foreach (var subj in filteredSubjects)
+			{
+				if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(subj.ID_Subject))
+				{
+					if (subj.ID_Subject == Model.selectedSubject.ID_Subject)
+					{
+						<option value="@subj.ID_Subject" selected>@subj.Name_subject</option>
+					}
+					else
+					{
+						<option value="@subj.ID_Subject">@subj.Name_subject</option>
+					}
+				}
+			}
+		</select>
 	</form>
-
-
 	<table class="table" id="myTable" style="width:95%">
 
 		<thead>
@@ -160,8 +161,8 @@
 								<th id="tableLabel">
 									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
 
-										<h6>(макс. 40)</h6>
-									
+									<h6>(макс. 40)</h6>
+
 								</th>
 							}
 						}
@@ -194,7 +195,7 @@
 						<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
 					</td>
 					@{
-						int end = 0;
+						int? end = 0;
 					}
 
 					@if (Model.RatingControls.FirstOrDefault(q => q.ID_Student == item.ID_Student) != null)
@@ -206,9 +207,9 @@
 
 							<td id="cellPoint" style="text-align:center;  padding-right:10%; font-weight: bold ">
 								@foreach (var r in Model.RatingControls.Where(q => q.ID_Student == item.ID_Student &&
-													q.ID_Subject == Model.selectedSubject.ID_Subject &&
-													q.Semester == Model.selectedSemester &&
-													q.RatingNumber == @i))
+																									q.ID_Subject == Model.selectedSubject.ID_Subject &&
+																									q.Semester == Model.selectedSemester &&
+																									q.RatingNumber == @i))
 								{
 									end += @r.Points;
 									<p class="labelsGrade">@r.Points</p>
@@ -248,10 +249,10 @@ else if (User.IsInRole("Student"))
 		@{
 
 			var maxSemester = Model.RatingControls?
-				.Where(q => q.ID_Student == Model.Students.FirstOrDefault(q => q.ID_Group == Model.selectedGroup.ID_Group)?.ID_Student)
-				.Select(q => q.Semester)
-				.Distinct()
-				.OrderByDescending(s => s);
+					.Where(q => q.ID_Student == Model.Students.FirstOrDefault(q => q.ID_Group == Model.selectedGroup.ID_Group)?.ID_Student)
+					.Select(q => q.Semester)
+					.Distinct()
+					.OrderByDescending(s => s);
 		}
 		<br><br>
 		<p id="tt">
@@ -279,6 +280,9 @@ else if (User.IsInRole("Student"))
 
 	<table class="table" id="myTable" style="width:95%">
 
+
+
+
 		<thead>
 			<tr>
 				<th id="tableLabel">
@@ -286,14 +290,15 @@ else if (User.IsInRole("Student"))
 				</th>
 
 				@{
-					var CountSemester = Model.RatingControls
+					var CountRait = Model.RatingControls
 					.Where(q => q.ID_Student == Model.Students.FirstOrDefault(q => q.ID_Group == Model.selectedGroup.ID_Group).ID_Student)
 					.Select(q => q.RatingNumber)
 					.Distinct()
 					.OrderBy(s => s);
-					if (CountSemester.Count() == 5)
+
+					if (CountRait.Count() == 5)
 					{
-						foreach (var r in CountSemester)
+						foreach (var r in CountRait)
 						{
 							if (r == 4)
 							{
@@ -326,10 +331,10 @@ else if (User.IsInRole("Student"))
 						}
 
 					}
-					else if (CountSemester.Count() == 4)
+					else if (CountRait.Count() == 4)
 					{
 
-						foreach (var r in CountSemester)
+						foreach (var r in CountRait)
 						{
 							if (r == 3)
 							{
@@ -349,14 +354,16 @@ else if (User.IsInRole("Student"))
 							{
 								<th id="tableLabel">
 									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
+
 									<h6>(макс. 40)</h6>
+
 								</th>
 							}
 						}
 					}
 					else
 					{
-						foreach (var r in CountSemester)
+						foreach (var r in CountRait)
 						{
 							<th id="tableLabel">
 								<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
@@ -371,39 +378,65 @@ else if (User.IsInRole("Student"))
 			</tr>
 		</thead>
 		<tbody>
-			@foreach (var f in Model.Group_Subjects)
-			{
-				@foreach (var item in Model.Subjects.Where(z => z.ID_Subject == f.ID_Subject))
-				{
 
-					<tr id="columnGrade">
+			@foreach (var f in Model.RatingControls
+					.Where(q => q.Semester == Model.selectedSemester &&
+					q.ID_Student == Model.Students.FirstOrDefault().ID_Student)
+					.Select(q => new { q.ID_Student, q.Semester, q.ID_Subject })
+					.Distinct())
+			{
+				<tr id="columnGrade">
+					@foreach (var item in Model.Subjects.Where(z => z.ID_Subject == f.ID_Subject))
+					{
 
 						<td style="text-align:justify; font-weight: bold">
 							<p id="label_s">@item.Name_subject</p>
 						</td>
 
-						@{
-							int end = 0;
-						}
+						int? end = 0;
 
-						@foreach (var r in Model.RatingControls.Where(q => q.ID_Subject == item.ID_Subject &&
-								q.Semester == Model.selectedSemester))
+
+						@if (Model.RatingControls.FirstOrDefault(q => q.ID_Student == Model.Students.FirstOrDefault().ID_Student) != null)
 						{
-							end += @r.Points;
-							<td id="cellPoint" style="text-align:center;  padding-right:10%; font-weight: bold ">
-								<p class="labelsGrade">@r.Points</p>
-							</td>
+							@for (int i = 1; i <= CountRait.Count(); i++)
+							{
 
+								bool emptyRat = true;
+
+								<td id="cellPoint" style="text-align:center;  padding-right:10%; font-weight: bold ">
+									@foreach (var r in Model.RatingControls.Where(q => q.ID_Student == Model.Students.FirstOrDefault().ID_Student &&
+														q.ID_Subject == f.ID_Subject &&
+														q.Semester == Model.selectedSemester &&
+														q.RatingNumber == @i))
+									{
+										end += @r.Points;
+										<p class="labelsGrade">@r.Points</p>
+										<input type="tel" class="enterPoints" onchange="newPoint(@r.ID_RatingControl,event)" style="max-width:100px; width:200%; height:30px; text-align:center">
+										emptyRat = false;
+									}
+
+								</td>
+							}
 						}
-
+						else
+						{
+							for (int i = 1; i <= CountRait.Count(); i++)
+							{
+								<td id="cellPoint" style="text-align:justify;  padding-right:10%; font-weight: bold ">
+								</td>
+							}
+						}
 						<td style="text-align:justify; font-weight: bold">
 							<p id="label_s">@end</p>
 						</td>
 
-					</tr>
-				}
+					}
+				</tr>
 			}
+
 		</tbody>
+
+
 	</table>
 }
 else if (User.IsInRole("Curator"))
@@ -424,8 +457,16 @@ else if (User.IsInRole("Curator"))
 			}
 		</select>
 
+
+		@{
+			var studentId = Model.Students.FirstOrDefault(q => q.ID_Group == Model.selectedGroup.ID_Group).ID_Student;
+			var subjects = Model.RatingControls.Where(q => q.ID_Student == studentId & q.Semester == Model.selectedSemester).Select(q => q.ID_Subject).ToList();
+			var filteredSubjects = Model.Subjects.Where(s => subjects.Contains(s.ID_Subject));
+		}
+
 		<select name="selectedSubject" required onchange="this.form.submit()" style="width:200px; height:40px; text-align:center">
-			@foreach (var sub in Model.Subjects)
+
+			@foreach (var sub in filteredSubjects)
 			{
 				if (Model.Group_Subjects.Where(y => y.ID_Group == Model.selectedGroup.ID_Group).Select(z => z.ID_Subject).Contains(sub.ID_Subject))
 				{
@@ -438,6 +479,7 @@ else if (User.IsInRole("Curator"))
 						<option value="@sub.ID_Subject">@sub.Name_subject</option>
 					}
 				}
+
 			}
 		</select>
 
@@ -478,15 +520,15 @@ else if (User.IsInRole("Curator"))
 				</th>
 
 				@{
-					var CountSemester = Model.RatingControls?
-					.Where(q => q.ID_Student == Model.Students.FirstOrDefault(q => q.ID_Group == Model.selectedGroup.ID_Group)?.ID_Student)
+					var CountRait = Model.RatingControls
+					.Where(q => q.ID_Student == Model.Students.FirstOrDefault(q => q.ID_Group == Model.selectedGroup.ID_Group).ID_Student)
 					.Select(q => q.RatingNumber)
 					.Distinct()
 					.OrderBy(s => s);
 
-					if (CountSemester.Count() == 5)
+					if (CountRait.Count() == 5)
 					{
-						foreach (var r in CountSemester)
+						foreach (var r in CountRait)
 						{
 							if (r == 4)
 							{
@@ -519,10 +561,10 @@ else if (User.IsInRole("Curator"))
 						}
 
 					}
-					else if (CountSemester.Count() == 4)
+					else if (CountRait.Count() == 4)
 					{
 
-						foreach (var r in CountSemester)
+						foreach (var r in CountRait)
 						{
 							if (r == 3)
 							{
@@ -542,22 +584,21 @@ else if (User.IsInRole("Curator"))
 							{
 								<th id="tableLabel">
 									<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
+
 									<h6>(макс. 40)</h6>
+
 								</th>
 							}
 						}
 					}
 					else
 					{
-						foreach (var r in CountSemester)
+						foreach (var r in CountRait)
 						{
 							<th id="tableLabel">
 								<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Рейтинг№@r</h6>
 							</th>
 						}
-						<th id="tableLabel">
-							<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Посещаемость</h6>
-						</th>
 					}
 					<th id="tableLabel">
 						<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Итог</h6>
@@ -570,32 +611,50 @@ else if (User.IsInRole("Curator"))
 			@foreach (var item in Model.Students.Where(z => z.ID_Group == Model.selectedGroup.ID_Group))
 			{
 
+
+
 				<tr id="columnGrade">
 
 					<td style="text-align:justify; font-weight: bold">
 						<p id="label_s">@item.Surname  @item.Name  @item.Patronymic</p>
 					</td>
-
 					@{
-						int end = 0;
+						int? end = 0;
 					}
 
-					@foreach (var r in Model.RatingControls.Where(q => q.ID_Student == item.ID_Student &&
-							q.ID_Subject == Model.selectedSubject.ID_Subject &&
-							q.Semester == Model.selectedSemester))
+					@if (Model.RatingControls.FirstOrDefault(q => q.ID_Student == item.ID_Student) != null)
 					{
-						<td id="cellPoint" style="text-align:center;  padding-right:10%; font-weight: bold ">
-							<p class="labelsGrade">@r.Points</p>
-						</td>
-						end += @r.Points;
+						@for (int i = 1; i <= CountRait.Count(); i++)
+						{
 
+							bool emptyRat = true;
+
+							<td id="cellPoint" style="text-align:center;  padding-right:10%; font-weight: bold ">
+								@foreach (var r in Model.RatingControls.Where(q => q.ID_Student == item.ID_Student &&
+													q.ID_Subject == Model.selectedSubject.ID_Subject &&
+													q.Semester == Model.selectedSemester &&
+													q.RatingNumber == @i))
+								{
+									end += @r.Points;
+									<p class="labelsGrade">@r.Points</p>
+									<input type="tel" class="enterPoints" onchange="newPoint(@r.ID_RatingControl,event)" style="max-width:100px; width:200%; height:30px; text-align:center">
+									emptyRat = false;
+								}
+
+							</td>
+						}
 					}
-
-
+					else
+					{
+						for (int i = 1; i <= CountRait.Count(); i++)
+						{
+							<td id="cellPoint" style="text-align:justify;  padding-right:10%; font-weight: bold ">
+							</td>
+						}
+					}
 					<td style="text-align:justify; font-weight: bold">
 						<p id="label_s">@end</p>
 					</td>
-
 				</tr>
 
 			}

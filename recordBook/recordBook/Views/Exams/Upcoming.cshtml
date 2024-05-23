@@ -8,13 +8,9 @@
 	{
 		ViewData["Title"] = "Ваши предстоящие экзамены, " + User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 	}
-	else if (User.IsInRole("Adm"))
+	else if (User.IsInRole("Adm") || User.IsInRole("Curator"))
 	{
 		ViewData["Title"] = "Предстоящие экзамены группы " + Model.selectedGroup.Name_group;
-	}
-	else
-	{
-		ViewData["Title"] = "Предстоящие экзамены вашей группы (" + Model.selectedGroup.Name_group+")";
 	}
 }
 

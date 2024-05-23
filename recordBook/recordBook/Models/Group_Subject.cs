@@ -9,5 +9,7 @@ namespace recordBook.Models
 		public int ID_Group { get; set; }
 		public int ID_Subject { get; set; }
 
+		public int? Semester {  get; set; }
+
 	}
 }
