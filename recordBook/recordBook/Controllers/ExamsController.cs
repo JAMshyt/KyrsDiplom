@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Crypto;
 using recordBook.Migrations;
 using recordBook.Models;
 using recordBook.Models.ViewModels;
@@ -330,7 +331,7 @@ namespace recordBook.Controllers
 
 
 
-		public async Task<IActionResult> Practices(int selectedGroup, int selectedSubject)
+		public async Task<IActionResult> Practices(int selectedGroup, int selectedSemester)
 		{
 			ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
 
@@ -349,39 +350,55 @@ namespace recordBook.Controllers
 					Subjects = GetSubjects(),
 					Academic_Performances = GetAcademic_performance(),
 					selectedGroup = GetGroups().FirstOrDefault(),
-					selectedSubject = GetSubjects().FirstOrDefault(),
+					//selectedSubject = GetSubjects().FirstOrDefault(),
 					Kind_of_works = GetKind_of_works(),
 				};
 
 				switch (User.FindFirst(ClaimTypes.Role)?.Value)
 				{
 					case "Adm":
-						if (selectedGroup > 0 | selectedSubject > 0)
+						int idGr = selectedGroup == 0 ? model.selectedGroup.ID_Group : selectedGroup;
+						var first = model.Students.FirstOrDefault(q => q.ID_Group == idGr);
+
+
+						int? semester = model.Group_Subjects.FirstOrDefault(q => q.ID_Group == idGr & model.Academic_Performances
+.Where(e => (e.ID_Kind_of_work == 4 || e.ID_Kind_of_work == 5 || e.ID_Kind_of_work == 6) & e.ID_Student == first.ID_Student).Select(r => r.ID_Subject).Contains(q.ID_Subject))
+?.Semester;
+
+						int? semesterLast = model.Group_Subjects.Where(q => q.ID_Group == idGr & model.Academic_Performances
+.Where(e => (e.ID_Kind_of_work == 4 || e.ID_Kind_of_work == 5 || e.ID_Kind_of_work == 6) & e.ID_Student == first.ID_Student).Select(r => r.ID_Subject).Contains(q.ID_Subject))
+ .Max(q => q.Semester);
+						if (selectedGroup > 0 /*| selectedSubject > 0*/)
 						{
 							var groupById = _group.GetGroupbyID(selectedGroup);
-							var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
-							if (!subjectsOfSelectedGroup.Contains(selectedSubject))
-							{
-								try
-								{
-									var subj = _subject.GetSubjectbyID(GetGroup_Subject()
-										.FirstOrDefault(q => q.ID_Group == groupById.ID_Group
-										&& GetAcademic_performance().Any(w => w.ID_Kind_of_work == 4 && w.ID_Subject == q.ID_Subject)).ID_Subject);
-									model.selectedSubject = subj;
-								}
-								catch
-								{
+							//var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroup).Select(z => z.ID_Subject);
+							//if (!subjectsOfSelectedGroup.Contains(selectedSubject))
+							//{
+							//	try
+							//	{
+							//		var subj = _subject.GetSubjectbyID(GetGroup_Subject()
+							//			.FirstOrDefault(q => q.ID_Group == groupById.ID_Group
+							//			&& GetAcademic_performance().Any(w => w.ID_Kind_of_work == 4 && w.ID_Subject == q.ID_Subject)).ID_Subject);
+							//		model.selectedSubject = subj;
+							//	}
+							//	catch
+							//	{
 
-									selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
-								}
-							}
-							else
-							{
-								var subjectById = _subject.GetSubjectbyID(selectedSubject);
-								model.selectedSubject = subjectById;
-							}
+							//		selectedSubject = subjectsOfSelectedGroup.FirstOrDefault();
+							//	}
+							//}
+							//else
+							//{
+							//	var subjectById = _subject.GetSubjectbyID(selectedSubject);
+							//	model.selectedSubject = subjectById;
+							//}
 							model.selectedGroup = groupById;
+							model.selectedSemester = selectedSemester == 0 || selectedSemester > semesterLast ? semester: selectedSemester;
+							return View(model);
+
 						}
+
+						model.selectedSemester = selectedSemester == 0 ? semester : selectedSemester;
 						return View(model);
 
 
@@ -393,12 +410,21 @@ namespace recordBook.Controllers
 						model.selectedGroup = GetGroups().FirstOrDefault(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
 						model.Group_Subjects = GetGroup_Subject().Where(q => q.ID_Group == Convert.ToInt32(User.FindFirst(ClaimTypes.GroupSid)?.Value));
 
+						int idGr2 = selectedGroup == 0 ? model.selectedGroup.ID_Group : selectedGroup;
+						var first2 = model.Students.FirstOrDefault(q => q.ID_Group == idGr2);
 
-						if (selectedSubject > 0)
-						{
-							var subjectById = _subject.GetSubjectbyID(selectedSubject);
-							model.selectedSubject = subjectById;
-						}
+
+						int? semester2 = model.Group_Subjects.FirstOrDefault(q => q.ID_Group == idGr2 & model.Academic_Performances
+.Where(e => (e.ID_Kind_of_work == 4 || e.ID_Kind_of_work == 5 || e.ID_Kind_of_work == 6) & e.ID_Student == first2.ID_Student).Select(r => r.ID_Subject).Contains(q.ID_Subject))
+?.Semester;
+
+						model.selectedSemester = selectedSemester == 0 ? semester2 : selectedSemester;
+
+						//if (selectedSubject > 0)
+						//{
+						//	var subjectById = _subject.GetSubjectbyID(selectedSubject);
+						//	model.selectedSubject = subjectById;
+						//}
 						return View(model);
 
 
@@ -409,21 +435,32 @@ namespace recordBook.Controllers
 						model.Groups = selectedGroups;
 						model.Group_Subjects = GetGroup_Subject().Where(subject => selectedGroups.Any(group => group.ID_Group == subject.ID_Group));
 
-						if (selectedSubject > 0)
-						{
-							model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
-						}
-						else
-						{
-							var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroups.FirstOrDefault().ID_Group).Select(z => z.ID_Subject);
+						//if (selectedSubject > 0)
+						//{
+						//	model.selectedSubject = _subject.GetSubjectbyID(selectedSubject);
+						//}
+						//else
+						//{
+						//	var subjectsOfSelectedGroup = _group_subject.GetGroup_SubjectbyGroupID(selectedGroups.FirstOrDefault().ID_Group).Select(z => z.ID_Subject);
 
-							var subj = _subject?.GetSubjectbyID(GetGroup_Subject()
-								.FirstOrDefault(q => q.ID_Group == selectedGroups.FirstOrDefault()?.ID_Group
-								&& GetAcademic_performance().Any(w => w.ID_Kind_of_work == 4 && w?.ID_Subject == q.ID_Subject))?.ID_Subject);
+						//	var subj = _subject?.GetSubjectbyID(GetGroup_Subject()
+						//		.FirstOrDefault(q => q.ID_Group == selectedGroups.FirstOrDefault()?.ID_Group
+						//		&& GetAcademic_performance().Any(w => w.ID_Kind_of_work == 4 && w?.ID_Subject == q.ID_Subject))?.ID_Subject);
 
-							model.selectedSubject = subj == null ? _subject.GetSubjectbyID(subjectsOfSelectedGroup.FirstOrDefault()) : subj;
-						}
+						//	model.selectedSubject = subj == null ? _subject.GetSubjectbyID(subjectsOfSelectedGroup.FirstOrDefault()) : subj;
+						//}
 						model.selectedGroup = selectedGroup < 1 ? selectedGroups.FirstOrDefault() : _group.GetGroupbyID(selectedGroup);
+
+
+						int idGr3 = selectedGroup == 0 ? model.selectedGroup.ID_Group : selectedGroup;
+						var first3 = model.Students.FirstOrDefault(q => q.ID_Group == idGr3);
+
+
+						int? semester3 = model.Group_Subjects.FirstOrDefault(q => q.ID_Group == idGr3 & model.Academic_Performances
+.Where(e => (e.ID_Kind_of_work == 4 || e.ID_Kind_of_work == 5 || e.ID_Kind_of_work == 6) & e.ID_Student == first3.ID_Student).Select(r => r.ID_Subject).Contains(q.ID_Subject))
+?.Semester;
+
+						model.selectedSemester = selectedSemester == 0 ? semester3 : selectedSemester;
 
 						return View(model);
 				}

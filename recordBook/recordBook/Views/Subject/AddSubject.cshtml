@@ -17,6 +17,9 @@
 	<div class="form-group">
 		<label asp-for="NameSubject" class="control-label">Название</label>
 		<input type="text" asp-for="NameSubject" id="nameOfGroup" class="form-control" style="width:30%" />
+		<label asp-for="Semester" class="control-label">Семестр</label>
+		<input type="tel" asp-for="Semester" id="semOfGroup" class="form-control" style="width:20%" />
+
 	</div>
 	<p id="txt" style="margin-top:50px; margin-bottom:20px;">Выберите группы, которые изучают предмет</p>
 	<div class="form-group1">
@@ -107,8 +110,11 @@
 		event.preventDefault();
 
 		var nameSubject = document.getElementById('nameOfGroup').value;
+		var sem = document.getElementById('semOfGroup').value;
+
 		var addSubjectData = {
 			NameSubject: nameSubject,
+			Semester:sem,
 			selectedGroups: [],
 		};
 

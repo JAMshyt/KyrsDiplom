@@ -9,10 +9,10 @@
 		public IEnumerable<Academic_performance> Academic_Performances { get; set; }
 		public IEnumerable<Kind_of_work> Kind_of_works { get; set; }
 		public IEnumerable<RatingControl>? RatingControls{ get; set; }
-		public int selectedSemester {  get; set; }
+		public int? selectedSemester {  get; set; }
 
 		public Group selectedGroup { get; set; }
-		public Subject selectedSubject { get; set; }
+		public Subject? selectedSubject { get; set; }
 
 		public string? whatWhatvhing { get; set; } //для оглавления на странице о личной успеваемости каждого студента
 	}

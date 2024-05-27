@@ -10,11 +10,21 @@
 	}
 	else
 	{
-		ViewData["Title"] = "Практики группы " + Model.selectedGroup.Name_group;
+		ViewData["Title"] = "Практики группы " + Model.selectedGroup.Name_group ;
 	}
+	var first = Model.Students.FirstOrDefault(q => q.ID_Group == Model.selectedGroup.ID_Group);
+
+	// ViewData["Title2"] = "Название - " + Model.Subjects.FirstOrDefault(subject =>
+	// 	Model.Academic_Performances.Any(ap => ap.ID_Student == first.ID_Student &&
+	// 													(ap.ID_Kind_of_work == 4 || ap.ID_Kind_of_work == 5 || ap.ID_Kind_of_work == 6) &&
+	// 													Model.Group_Subjects.Any(gs => gs.ID_Group == Model.selectedGroup.ID_Group &&
+	// 																			gs.Semester == Model.selectedSemester &&
+	// 																			gs.ID_Subject == ap.ID_Subject)))?.Name_subject + " FIX";
 }
 
 <h1>@ViewData["Title"]</h1>
+
+<h3 style="display:inline">@ViewData["Title2"]</h3>
 
 
 @if (User.IsInRole("Adm"))
@@ -35,14 +45,42 @@
 		</select>
 
 		@{
-			var subjectsWithPractice = Model.Group_Subjects
-			.Where(q => q.ID_Group == Model.selectedGroup.ID_Group
-			&& Model.Academic_Performances.Any(w => w.ID_Kind_of_work == 4 && w.ID_Subject == q.ID_Subject))
-			.Select(q => q.ID_Subject)
-			.Distinct();
+			// var subjectsWithPractice = Model.Group_Subjects
+			// 			.Where(q => q.ID_Group == Model.selectedGroup.ID_Group
+			// 			&& Model.Academic_Performances.Any(w => w.ID_Kind_of_work == 4 || w.ID_Kind_of_work == 5 || w.ID_Kind_of_work == 6 && w.ID_Subject == q.ID_Subject))
+			// 			.Select(q => q.ID_Subject)
+			// 			.Distinct();
+
+
+			var semester = Model.Group_Subjects.Where(q => q.ID_Group == Model.selectedGroup.ID_Group & Model.Academic_Performances
+			.Where(e => (e.ID_Kind_of_work == 4 || e.ID_Kind_of_work == 5 || e.ID_Kind_of_work == 6) & e.ID_Student == first.ID_Student).Select(r => r.ID_Subject).Contains(q.ID_Subject))
+			.Select(w=>w.Semester).Distinct();
+
+			// var semester = Model.Group_Subjects
+			// .Where(q => q.ID_Group == Model.selectedGroup.ID_Group)
+			// .Select(q => q.ID_Subject)
+			// .Where(subjectId => Model.Academic_Performances
+			// .Any(ap => (ap.ID_Kind_of_work == 4 || ap.ID_Kind_of_work == 5 || ap.ID_Kind_of_work == 6) &&
+			// ap.ID_Subject == subjectId))
+			// .Select(subjectId => Model.Subjects.FirstOrDefault(s => s.ID_Subject == subjectId)?.Semester)
+			// .Distinct();
 		}
 
+		<select name="selectedSemester" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
+			@foreach (var sem in semester)
+			{
+				if (sem == Model.selectedSemester)
+				{
+					<option value="@sem" selected>@sem</option>
+				}
+				else
+				{
+					<option value="@sem">@sem</option>
+				}
+			}
+		</select>
 
+@* 
 		<select name="selectedSubject" required onchange="this.form.submit()" style="width:200px; height:40px; text-align:center">
 			@foreach (var subj in Model.Subjects.Where(s => subjectsWithPractice.Contains(s.ID_Subject)))
 			{
@@ -57,7 +95,7 @@
 				}
 
 			}
-		</select>
+		</select> *@
 
 	</form>
 
@@ -84,7 +122,10 @@
 		<tbody>
 
 			@foreach (var r in Model.Academic_Performances
-					.Where(q => q.ID_Kind_of_work == 4 && q.ID_Subject == Model.selectedSubject.ID_Subject))
+					.Where(q => (q.ID_Kind_of_work == 4 || q.ID_Kind_of_work == 5 || q.ID_Kind_of_work == 6) &&
+					Model.Group_Subjects.Any(gs => gs.ID_Group == Model.selectedGroup.ID_Group &&
+					gs.Semester == Model.selectedSemester &&
+					gs.ID_Subject == q.ID_Subject)))
 			{
 				bool groupCheck = Model.Students.Where(q => q.ID_Group == Model.selectedGroup.ID_Group).Any(q => q.ID_Student == r.ID_Student);
 
@@ -124,7 +165,7 @@ else if (User.IsInRole("Student"))
 {
 	var subjectsWithPractice = Model.Group_Subjects
 		.Where(q => q.ID_Group == Model.selectedGroup.ID_Group
-		&& Model.Academic_Performances.Any(w => w.ID_Kind_of_work == 4 && w.ID_Subject == q.ID_Subject))
+		&& Model.Academic_Performances.Any(w => w.ID_Kind_of_work == 4 || w.ID_Kind_of_work == 5 || w.ID_Kind_of_work == 6 && w.ID_Subject == q.ID_Subject && q.Semester == Model.selectedSemester))
 		.Select(q => q.ID_Subject)
 		.Distinct();
 
@@ -142,6 +183,9 @@ else if (User.IsInRole("Student"))
 					<h6 style="margin-bottom : 0px; text-align:justify">Тип работы</h6>
 				</th>
 				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:center">Семестр</h6>
+				</th>
+				<th id="tableLabel">
 					<h6 style="margin-bottom : 0px; text-align:justify">Дата сдачи</h6>
 				</th>
 			</tr>
@@ -150,7 +194,7 @@ else if (User.IsInRole("Student"))
 			@foreach (var subj in Model.Group_Subjects.Where(s=> subjectsWithPractice.Contains(s.ID_Subject)))
 			{
 				@foreach (var r in Model.Academic_Performances
-						.Where(q => q.ID_Kind_of_work == 4 & q.ID_Subject == subj.ID_Subject))
+						.Where(q => (q.ID_Kind_of_work == 4 || q.ID_Kind_of_work == 5 || q.ID_Kind_of_work == 6) & subj.ID_Subject == q.ID_Subject))
 				{
 					var subjName = Model.Subjects.Where(q => q.ID_Subject == r.ID_Subject).Select(q => q.Name_subject).FirstOrDefault();
 					<tr id="columnGrade">
@@ -164,6 +208,9 @@ else if (User.IsInRole("Student"))
 
 						<td style="text-align:justify;  font-weight: bold ">
 							<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
+						</td>
+						<td style="text-align:center;  font-weight: bold ">
+							<p id="label_s"> @subj.Semester</p>
 						</td>
 						<td style="text-align:justify;  font-weight: bold ">
 							<p id="label_s"> @r.Date?.ToString("dd MMMM yyyy") </p>
@@ -191,14 +238,33 @@ else if (User.IsInRole("Curator"))
 			}
 		</select>
 		@{
-			var subjectsWithPractice = Model.Group_Subjects
-			.Where(q => q.ID_Group == Model.selectedGroup.ID_Group
-			&& Model.Academic_Performances.Any(w => w.ID_Kind_of_work == 4 && w.ID_Subject == q.ID_Subject))
-			.Select(q => q.ID_Subject)
-			.Distinct();
+			// var subjectsWithPractice = Model.Group_Subjects
+			// .Where(q => q.ID_Group == Model.selectedGroup.ID_Group
+			// && Model.Academic_Performances.Any(w => w.ID_Kind_of_work == 4 && w.ID_Subject == q.ID_Subject))
+			// .Select(q => q.ID_Subject)
+			// .Distinct();
+
+		var semester = Model.Group_Subjects.Where(q => q.ID_Group == Model.selectedGroup.ID_Group & Model.Academic_Performances
+		.Where(e => (e.ID_Kind_of_work == 4 || e.ID_Kind_of_work == 5 || e.ID_Kind_of_work == 6) & e.ID_Student == first.ID_Student).Select(r => r.ID_Subject).Contains(q.ID_Subject))
+		.Select(w => w.Semester).Distinct();
 		}
 
 
+
+		<select name="selectedSemester" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
+			@foreach (var sem in semester)
+			{
+				if (sem == Model.selectedSemester)
+				{
+					<option value="@sem" selected>@sem</option>
+				}
+				else
+				{
+					<option value="@sem">@sem</option>
+				}
+			}
+		</select>
+@* 
 		<select name="selectedSubject" required onchange="this.form.submit()" style="width:200px; height:40px; text-align:center">
 			@foreach (var subj2 in Model.Subjects.Where(s => subjectsWithPractice.Contains(s.ID_Subject)))
 			{
@@ -213,7 +279,7 @@ else if (User.IsInRole("Curator"))
 				}
 
 			}
-		</select>
+		</select> *@
 
 	</form>
 
@@ -226,7 +292,10 @@ else if (User.IsInRole("Curator"))
 					<h6 style="margin-bottom : 0px; text-align:justify;">Студент</h6>
 				</th>
 				<th id="tableLabel">
-					<h6 style="margin-bottom : 0px; text-align:justify; display:inline">Оценка</h6>
+					<h6 style="margin-bottom : 0px; text-align:justify; width:20%">Оценка</h6>
+				</th>
+				<th id="tableLabel">
+					<h6 style="margin-bottom : 0px; text-align:justify">Тип работы</h6>
 				</th>
 				<th id="tableLabel">
 					<h6 style="margin-bottom : 0px; text-align:justify">Дата сдачи</h6>
@@ -236,7 +305,10 @@ else if (User.IsInRole("Curator"))
 		<tbody>
 
 			@foreach (var r in Model.Academic_Performances
-					.Where(q => q.ID_Kind_of_work == 4 && q.ID_Subject == Model.selectedSubject.ID_Subject))
+					.Where(q => (q.ID_Kind_of_work == 4 || q.ID_Kind_of_work == 5 || q.ID_Kind_of_work == 6) &&
+					Model.Group_Subjects.Any(gs => gs.ID_Group == Model.selectedGroup.ID_Group &&
+					gs.Semester == Model.selectedSemester &&
+					gs.ID_Subject == q.ID_Subject)))
 			{
 				bool groupCheck = Model.Students.Where(q => q.ID_Group == Model.selectedGroup.ID_Group).Any(q => q.ID_Student == r.ID_Student);
 
@@ -247,11 +319,12 @@ else if (User.IsInRole("Curator"))
 						<td style="text-align:justify; font-weight: bold">
 							<p id="label_s">@student.Surname  @student.Name  @student.Patronymic</p>
 						</td>
-
-						<td id="cellGrade" style="text-align:justify;  padding-right:10%; font-weight: bold ">
+						<td id="cellGrade" style="text-align:justify;  padding-right:10%; width:20%; font-weight: bold ">
 							<p class="labelsGrade">@r.Grade</p>
 						</td>
-
+						<td style="text-align:justify;  font-weight: bold ">
+							<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
+						</td>
 						<td style="text-align:justify;  font-weight: bold ">
 							<p id="label_s"> @r.Date?.ToString("dd MMMM yyyy") </p>
 						</td>
@@ -262,7 +335,7 @@ else if (User.IsInRole("Curator"))
 		</tbody>
 	</table>
 	string group = Model.selectedGroup.Name_group;
-	string subj = Model.selectedSubject.Name_subject;
+	string subj = Convert.ToString(Model.selectedSemester); //для названия excel 
 
 	<button id="exportButton" class="btn btn-info" onclick="exportToExcel('@group','@subj')">Сохранить в Excel</button>
 }
@@ -353,7 +426,7 @@ else if (User.IsInRole("Curator"))
 			column.width = maxLength + 2;
 		});
 
-		var Title = "Практики " + selectedGroup + " " + selectedSubject + ".xlsx";
+		var Title = "Практики " + selectedGroup + " семестр " + selectedSubject + ".xlsx";
 		// Скачиваем Excel файл
 		const buffer = await workbook.xlsx.writeBuffer();
 		saveAs(new Blob([buffer], { type: "application/octet-stream" }), Title);

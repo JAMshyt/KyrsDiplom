@@ -10,6 +10,7 @@ namespace recordBook.Models.ViewModels
 		public bool subjectAdded { get; set; }
 		[MinLengthAttribute(1)]
 		public int[] selectedGroups { get; set; }
+		public int Semester{ get; set; }
 
 	}
 }

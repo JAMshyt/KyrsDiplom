@@ -88,7 +88,7 @@ namespace recordBook.Controllers
 					await _subject.AddSubject(addSubject);
 					foreach (var r in AddSubj.selectedGroups)
 					{
-						var addGroupSubject = new Group_Subject() { ID_Subject = GetSubjects().LastOrDefault().ID_Subject, ID_Group = r };
+						var addGroupSubject = new Group_Subject() { ID_Subject = GetSubjects().LastOrDefault().ID_Subject, ID_Group = r, Semester = AddSubj.Semester};
 						await _group_subject.AddGroup_Subject(addGroupSubject);
 					}
 					var model = new
@@ -102,7 +102,7 @@ namespace recordBook.Controllers
 				}
 				else
 				{
-					var model2 = new AddSubjectViewModel { Groups = GetGroups(), subjectAdded = false, selectedGroups = AddSubj.selectedGroups, NameSubject = AddSubj.NameSubject };
+					var model2 = new AddSubjectViewModel { Groups = GetGroups(), subjectAdded = false, selectedGroups = AddSubj.selectedGroups, NameSubject = AddSubj.NameSubject,Semester = AddSubj.Semester };
 					return Json(model2); ;
 				}
 			}
