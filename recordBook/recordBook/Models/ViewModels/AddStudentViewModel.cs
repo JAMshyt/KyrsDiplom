@@ -23,6 +23,7 @@ namespace recordBook.Models.ViewModels
 		public IEnumerable<Group>? Groups { get; set; }
 		public bool studentAdded { get; set; }
 		public bool EmailUnique { get; set; }
+		public bool IsEmail { get; set; }
 		public bool PhoneUnique { get; set; }
 		public bool BookUnique { get; set; }
 		public bool BookError { get; set; }

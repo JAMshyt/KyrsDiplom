@@ -80,7 +80,12 @@
 			{
 				<span style="color:red;">Эта почта уже используется</span><br>
 			}
+			@if (!Model.IsEmail)
+			{
+				<span style="color:red;">Почта введена не верно</span>
 
+				<br>
+			}
 			<input type="text" asp-for="Email" class="form-control" />
 		</div>
 

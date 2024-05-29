@@ -13,6 +13,12 @@
 		{
 			<span style="color:Red;">Неверная почта</span>
 		}
+		@if (Model.ErrorText_IsEmail)
+		{
+			<span style="color:red;">Почта введена не верно</span>
+
+			<br>
+		}
 		<input type="text" id="emailInput" asp-for="Email" class="form-control" />
 		<a onclick="sendEmail()" class="link-success" style="margin-top:5px; cursor: pointer">Отправить код на почту</a>
 	</div>

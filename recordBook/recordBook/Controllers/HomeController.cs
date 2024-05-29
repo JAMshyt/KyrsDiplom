@@ -17,6 +17,7 @@ using MailKit.Net.Smtp;
 using static recordBook.Controllers.StudentController;
 using MailKit;
 using Microsoft.IdentityModel.Tokens;
+using System.Text.RegularExpressions;
 
 namespace recordBook.Controllers
 {
@@ -261,7 +262,15 @@ namespace recordBook.Controllers
 		public async Task<ActionResult> Registration(RegistrationViewModel user)
 		{
 
-			RegistrationViewModel model = new RegistrationViewModel();
+			RegistrationViewModel model = new RegistrationViewModel() { ErrorText_ActivationCode = false, 
+				ErrorText_SurnameName = false, ErrorText_StudentFioAndCode = false, ErrorText_Email = false,
+				ErrorText_IsEmail = false,
+				ErrorText_EmailCode = false,
+				ErrorText_LoginOld = false,
+				Succes_SendEmail = false,
+				ErrorText_LoginExist = false,
+				Succes = false
+			};
 
 			Student? stuBook = GetStudents().FirstOrDefault(x => x.NumberOfBook == Convert.ToInt32(user.ActivationCode));
 			Student? stuSurName = GetStudents().FirstOrDefault(x => x.Surname == user.Surname && x.Name == user.Name && x.Patronymic == user.Patronymic);
@@ -284,6 +293,13 @@ namespace recordBook.Controllers
 			if (login != null & login?.Email != user.Email)
 			{
 				model.ErrorText_Email = true;
+			}
+
+			string pattern = @"^(?("")(""[^""]+?""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))" +
+@"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9]{2,17}))$";
+			if (!Regex.IsMatch(user.Email, pattern, RegexOptions.IgnoreCase))
+			{
+				model.ErrorText_IsEmail = true;
 			}
 
 			LoginsStudent? l = GetLoginsStudents().FirstOrDefault(q => q.Login == user.Login);

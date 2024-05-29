@@ -65,7 +65,7 @@
 			// .Select(subjectId => Model.Subjects.FirstOrDefault(s => s.ID_Subject == subjectId)?.Semester)
 			// .Distinct();
 		}
-
+		<p style="margin-bottom:0px; margin-top:10px;">Семестр</p>
 		<select name="selectedSemester" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
 			@foreach (var sem in semester)
 			{
@@ -250,6 +250,7 @@ else if (User.IsInRole("Curator"))
 		}
 
 
+		<p style="margin-bottom:0px; margin-top:10px;">Семестр</p>
 
 		<select name="selectedSemester" required onchange="this.form.submit()" style="width:120px; height:40px; text-align:center">
 			@foreach (var sem in semester)

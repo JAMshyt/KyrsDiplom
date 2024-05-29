@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using recordBook.Models;
 using recordBook.Models.ViewModels;
@@ -62,7 +63,7 @@ namespace recordBook.Controllers
 			return subj;
 		}
 
-		public List<Group> GetGroups()
+		public List<recordBook.Models.Group> GetGroups()
 		{
 			var group = _group.GetAllGroup().ToList();
 			return group;
@@ -359,7 +360,7 @@ namespace recordBook.Controllers
 			if (User.IsInRole("Adm"))
 			{
 				ViewData["User"] = User.FindFirst(ClaimTypes.Surname)?.Value + " " + User.FindFirst(ClaimTypes.Name)?.Value;
-				var model2 = new AddStudentViewModel { Groups = GetGroups(), ID_Group = GetGroups().FirstOrDefault().ID_Group, EmailUnique = true, PhoneUnique = true, BookUnique = true };
+				var model2 = new AddStudentViewModel { Groups = GetGroups(), ID_Group = GetGroups().FirstOrDefault().ID_Group, EmailUnique = true, PhoneUnique = true, BookUnique = true, IsEmail = true };
 				return View(model2);
 			}
 			else
@@ -380,7 +381,7 @@ namespace recordBook.Controllers
 		{
 			if (User.IsInRole("Adm"))
 			{
-				var model = new AddStudentViewModel { Groups = GetGroups(), EmailUnique = true, PhoneUnique = true, BookUnique = true };
+				var model = new AddStudentViewModel { Groups = GetGroups(), EmailUnique = true, PhoneUnique = true, BookUnique = true, IsEmail = true };
 
 				var phone = GetLoginsStudents().FirstOrDefault(q => q.Phone == Convert.ToDecimal(addStu.Phone));
 				if (phone != null) //телефон занят
@@ -401,6 +402,13 @@ namespace recordBook.Controllers
 				if (Recbook != null)
 				{
 					model.BookUnique = false;
+				}
+
+				string pattern = @"^(?("")(""[^""]+?""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))" +
+				@"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9]{2,17}))$";
+				if (!Regex.IsMatch(addStu.Email, pattern, RegexOptions.IgnoreCase))
+				{
+					model.IsEmail = false;
 				}
 
 				if (ModelState.IsValid &&
