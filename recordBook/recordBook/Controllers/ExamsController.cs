@@ -602,7 +602,7 @@ namespace recordBook.Controllers
 				{
 					Students = GetStudents().Where(q => q.ID_Student == idStudent),
 					Academic_Performances = GetAcademic_performance().Where(q => q.ID_Student == idStudent)
-					.Where(a => a.Grade == "Нет оценки" || a.Grade == "Не удовлетворительно")
+					.Where(a => a.Grade == "Нет оценки" || a.Grade == "Неудовлетворительно")
 					.Where(q => q.Date < DateTime.Now),
 
 					Kind_of_works = GetKind_of_works(),
@@ -633,7 +633,7 @@ namespace recordBook.Controllers
 				{
 					Students = GetStudents().Where(q => q.ID_Student == idStudent),
 					Academic_Performances = GetAcademic_performance().Where(q => q.ID_Student == idStudent)
-					.Where(p => p.Grade != "Нет оценки" && p.Grade != "Не удовлетворительно" & p.ID_Kind_of_work != 4 & p.ID_Kind_of_work != 5 & p.ID_Kind_of_work != 6),
+					.Where(p => p.Grade != "Нет оценки" && p.Grade != "Неудовлетворительно" & p.ID_Kind_of_work != 4 & p.ID_Kind_of_work != 5 & p.ID_Kind_of_work != 6),
 					Kind_of_works = GetKind_of_works(),
 					Subjects = GetSubjects(),
 					whatWhatvhing = "Сданные дисциплины"
