@@ -66,7 +66,7 @@ namespace recordBook.Controllers
 			return curators;
 		}
 
-		public List<Group> GetGroups()
+		public List<recordBook.Models.Group> GetGroups()
 		{
 			var group = _group.GetAllGroup().ToList();
 			return group;
@@ -191,7 +191,7 @@ namespace recordBook.Controllers
 						{
 							Curator? curator = GetCurators().FirstOrDefault(q => q.ID_Login == loginWordker.ID_Login);
 
-							List<Group>? curGroups = GetGroups().Where(q => q.ID_Curator == curator.ID_Curator).ToList();
+							List<recordBook.Models.Group>? curGroups = GetGroups().Where(q => q.ID_Curator == curator.ID_Curator).ToList();
 							string patronymic = curator.Patronymic == null ? "" : curator.Patronymic;
 
 							var claims = new List<Claim> {

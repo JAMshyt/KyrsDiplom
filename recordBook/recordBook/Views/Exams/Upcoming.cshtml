@@ -55,7 +55,7 @@
 	</form>
 
 
-	<table class="table" id="myTable" style="width:95%">
+	<table class="table" id="TableStudents" style="width:95%">
 
 		<thead>
 			<tr>
@@ -104,7 +104,7 @@
 							</select>
 						</td>
 
-						<td style="text-align:justify;   max-width: 100px; word-wrap: break-word; font-weight: bold ">
+						<td style="text-align:justify;  width:20%; max-width: 100px; word-wrap: break-word; font-weight: bold ">
 							<p id="label_s"> @Model.Kind_of_works.Where(z => z.ID_Kind_of_work == @r.ID_Kind_of_work).Select(z => z.Title_of_kind).FirstOrDefault() </p>
 						</td>
 						<td style="text-align:center;  font-weight: bold ">
@@ -118,6 +118,10 @@
 
 		</tbody>
 	</table>
+	string group = Model.selectedGroup.Name_group;
+	string subj = Model.selectedSubject.Name_subject;
+
+	<button id="exportButton" class="btn btn-info" onclick="exportToExcel('@group','@subj')">Сохранить в Excel</button>
 }
 else if (User.IsInRole("Student"))
 {
@@ -200,7 +204,7 @@ else if (User.IsInRole("Curator"))
 	</form>
 
 
-	<table class="table" id="CuratorTable" style="width:95%">
+	<table class="table" id="TableStudents" style="width:95%">
 
 		<thead>
 			<tr>
@@ -269,7 +273,7 @@ else if (User.IsInRole("Curator"))
 		var worksheet = workbook.addWorksheet('Sheet1');
 
 		// Находим таблицу на сайте
-		var table = document.getElementById('CuratorTable');
+		var table = document.getElementById('TableStudents');
 
 		// Получаем данные из HTML-таблицы
 		var data = [];
